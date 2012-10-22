@@ -24,8 +24,7 @@ define([], function() {
             this.on('resize', $.proxy(this.onResize, this));
             
             renderer.setSize(this.width(), this.height());
-            this._$container.append(renderer.domElement);
-            console.log(this._$container, renderer.domElement);
+            this.append(renderer.domElement);
             
             //this.requestFullScreen();
         },

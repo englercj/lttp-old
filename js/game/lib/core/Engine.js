@@ -2,7 +2,9 @@ define([
     //Modules
     'game/lib/core/Viewport',
     'game/lib/core/Controls',
-    'game/lib/core/TileMap'
+    'game/lib/core/TileMap',
+    //Scritps that modify global
+    'game/lib/core/three_fpcontrols'
 ], function(Viewport, Controls, TileMap) {
     var Engine = Class.extend({
         init: function(container, resources) {
@@ -13,14 +15,23 @@ define([
             this.viewport = new Viewport(container, this.renderer);
 
             var width = this.viewport.width(), height = this.viewport.height();
-            this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 10000);//new THREE.PerspectiveCamera(60, this.viewport.aspect(), 1, 10000);
-            this.controls = new Controls(this.viewport, this.camera);
+            this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);//new THREE.PerspectiveCamera(60, this.viewport.aspect(), 1, 10000);
+            this.controls = new Controls(this.viewport, this.camera);//new THREE.FirstPersonControls(this.camera);
+            this.controls.movementSpeed = 10;
 
-            //this.map = new TileMap(resources.tilemap, resources.tilset, resources.collisionset);
-            //this.scene.add(this.map.mesh);
+            this.map = new TileMap(resources.tilemap, resources.tileset, resources.collisionset, this.viewport);
+            this.scene.add(this.map.mesh);
+            window.map = this.map;
+            console.log(this.map.mesh.position, this.map.mesh.rotation);
+
+            //setup camera
+            this.camera.position.z = 300;
+            //this.camera.position.y = CONST.UNIT_SIZE; //raise camera off the ground
+            //this.camera.lookAt(this.scene.position);
+            this.scene.add(this.camera);
 
             // set up the sphere vars
-            var radius = 50,
+            /*var radius = 50,
                 segments = 16,
                 rings = 16;
 
@@ -38,13 +49,7 @@ define([
                 })
             );
 
-            this.scene.add(sphere);
-
-            //setup camera
-            //this.camera.position.z = 300;
-            //this.camera.position.y = CONST.UNIT_SIZE; //raise camera off the ground
-            this.camera.lookAt(this.scene.position);
-            this.scene.add(this.camera);
+            this.scene.add(sphere);*/
             
             //create point light
             /*var pLight = new THREE.PointLight(0xFFFFFF);
@@ -78,7 +83,7 @@ define([
             this.stats.update();
             
             //update controls
-            //this.controls.update(delta);
+            this.controls.update(delta);
             
             //do trace/collision checks
             

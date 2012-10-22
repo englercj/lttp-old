@@ -4,7 +4,7 @@ require([
     'game/lib/utils/AssetLoader',
     'game/lib/core/Engine',
     //Scripts that modify global:
-    'game/vendor/three/three.min',
+    'game/vendor/three/three',
     'game/vendor/three/Stats',
     'game/vendor/three/Detector',
 ], function(util, AssetLoader, Engine) {
