@@ -22,7 +22,7 @@
  */
 
 define([
-    "game/util/game-shim"
+    "js/util/game-shim.js"
 ], function() {
 
     "use strict";

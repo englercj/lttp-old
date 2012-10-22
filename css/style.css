@@ -14,7 +14,7 @@ button {
     padding: 0 8px;
 }
 
-#game-canvas {
+#game canvas {
     background-color: #330000;
     display: block;
 }
@@ -43,7 +43,7 @@ button {
     margin: 0.5em;
 }
 
-#game-canvas {
+#game canvas {
     height: 896px;
     left: 0;
     margin: 0;
@@ -70,7 +70,7 @@ button {
     visibility: visible;
 }
 
-#canvas-container {
+#game {
     height: 896px;
     left: 50%;
     margin-left: -512px;
@@ -79,3 +79,31 @@ button {
     visibility: visible;
     width: 1024px;
 }
+
+#progTotal {
+    width:700px;
+    height:35px;
+    
+    margin:10px auto;
+}
+
+#progPart {
+    width:500px;
+    height:20px;
+    
+    margin:0 auto 10px auto;
+}
+
+.ui-progressbar-text {
+    position: absolute;
+    left: 50%;
+    
+    width: 400px;
+    margin-left: -200px;
+    text-align: center;
+}
+
+#progTotal .ui-progressbar-text { font-size:0.8em; font-weight:bold; line-height:35px; }
+#progPart .ui-progressbar-text { font-size:0.6em; line-height:20px; }
+
+#btnStart { display:none; }

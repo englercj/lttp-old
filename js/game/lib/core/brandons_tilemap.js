@@ -27,8 +27,8 @@
  * to the rendered scene.
  */
 define([
-    "game/util/gl-util",
-    "game/util/gl-matrix-min"
+    "util/gl-util",
+    "util/gl-matrix-min"
 ], function (GLUtil) {
 
     // Shader
