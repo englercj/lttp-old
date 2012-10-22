@@ -80,7 +80,6 @@ define([], function() {
             }
         },
         update: function(delta) {
-            console.log(this.moving.up, delta);
             var speed = delta * this.moveSpeed;
 
             if(this.moving.up) this.camera.translateY(speed);
