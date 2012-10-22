@@ -56,7 +56,7 @@ define([
 
     var TileMap = Class.extend({
         //need to be textures
-        init: function(tilemap, tileset, collisionset, viewport) {
+        init: function(tilemap, tileset, collisionset, viewport, scene) {
             this.tileScale = 1;
             this.tileSize = 16;
 
@@ -135,7 +135,11 @@ define([
 
             /*this.material = new THREE.MeshBasicMaterial({
                 color: 0xCC0000
-            })*/
+            });*/
+
+            /*this.material = new THREE.MeshBasicMaterial({
+                map: THREE.ImageUtils.loadTexture('assets/maps/overworld/lttp-tiles.png')
+            });*/
 
             this.plane = new THREE.PlaneGeometry(
                 tilemap.image.width * this.tileSize * this.tileScale, //width
