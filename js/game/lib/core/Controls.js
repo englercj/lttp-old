@@ -1,9 +1,10 @@
-define([], function() {
-    var Controls = Class.extend({
+define([
+    'game/lib/bases/Emitter'
+], function(Emitter) {
+    var Controls = Emitter.extend({
         init: function(viewport, camera, events) {
             this.viewport = viewport;
             this.camera = camera;
-            this._$ = $(this);
 
             this.moveSpeed = 250;
 
@@ -27,8 +28,6 @@ define([], function() {
 
             this.bindEvents();
         },
-        on: function() { return this._$.on.apply(this._$, arguments); },
-        trigger: function() { return this._$.trigger.apply(this._$, arguments); },
         bindEvents: function() {
             /*this.viewport.on({
                 resize: $.proxy(this.onResize, this),
@@ -55,9 +54,9 @@ define([], function() {
                         var dir = k.replace('move', '');
 
                         this.moving[dir] = true;
-                        this.trigger('move', [dir, true]);
+                        this.emit('move', [dir, true]);
                     } else {
-                        this.trigger(k);
+                        this.emit(k);
                     }
                 }
             }
@@ -74,7 +73,7 @@ define([], function() {
                     if(k.indexOf('move') === 0) {
                         var dir = k.replace('move', '');
                         this.moving[dir] = false;
-                        this.trigger('move', [dir, false]);
+                        this.emit('move', [dir, false]);
                     }
                 }
             }

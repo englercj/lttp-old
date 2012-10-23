@@ -1,5 +1,7 @@
-define([], function() {
-    var AssetLoader = Class.extend({
+define([
+    'game/lib/bases/Emitter'
+], function(Emitter) {
+    var AssetLoader = Emitter.extend({
         init: function() {
 
         },

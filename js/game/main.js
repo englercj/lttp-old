@@ -29,6 +29,7 @@ require([
                     { name: 'tileset', type: 'texture', src: 'assets/maps/overworld/lttp-tiles.png' }
                 ],
                 function(rsrcs) {
+                    console.log(rsrcs);
                     resources = rsrcs;
 
                     $('#btnDownload').hide();

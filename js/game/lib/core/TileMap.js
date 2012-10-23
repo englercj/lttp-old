@@ -1,7 +1,6 @@
 define([
-    //Modules
-], function() {
-
+    'game/lib/bases/SceneObject'
+], function(SceneObject) {
     // Shader
     var tilemapVS = [
         "attribute vec2 pos;",
@@ -54,9 +53,11 @@ define([
         }
     });
 
-    var TileMap = Class.extend({
+    var TileMap = SceneObject.extend({
         //need to be textures
-        init: function(tilemap, tileset, collisionset, viewport, scene) {
+        init: function(tilemap, tileset, collisionset, viewport) {
+            this._super();
+
             this.tileScale = 1;
             this.tileSize = 16;
 
@@ -110,7 +111,7 @@ define([
             gl.drawArrays(gl.TRIANGLES, 0, 6);
             */
 
-            this.material = new THREE.ShaderMaterial({
+            /*this._material = new THREE.ShaderMaterial({
                 attributes: {
                     pos: { type: 'v2', value: new THREE.Vector2(0, 0) },
                     texture: { type: 'v2', value: new THREE.Vector2(0, 0) }
@@ -131,26 +132,24 @@ define([
                 vertexShader: tilemapVS,
                 fragmentShader: tilemapFS,
                 transparent: false
-            });
+            });*/
 
-            /*this.material = new THREE.MeshBasicMaterial({
+            /*this._material = new THREE.MeshBasicMaterial({
                 color: 0xCC0000
             });*/
 
-            /*this.material = new THREE.MeshBasicMaterial({
+            this._material = new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture('assets/maps/overworld/lttp-tiles.png')
-            });*/
+            });
 
-            this.plane = new THREE.PlaneGeometry(
+            this._plane = new THREE.PlaneGeometry(
                 tilemap.image.width * this.tileSize * this.tileScale, //width
                 tilemap.image.height * this.tileSize * this.tileScale//, //height
                 //tilemap.image.width * this.tileScale, //width-segments
                 //tilemap.image.height * this.tileScale //height-segments
             );
 
-            this.plane.dynamic = true;
-
-            this.mesh = new THREE.Mesh(this.plane, this.material);
+            this._mesh = new THREE.Mesh(this._plane, this._material);
         },
         addTileLayer: function(tilemap, scrollScaleX, scrollScaleY) {
             this.layers.push(new TileMapLayer(tilemap, this));

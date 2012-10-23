@@ -3,9 +3,9 @@ define([
     'game/lib/core/Viewport',
     'game/lib/core/Controls',
     'game/lib/core/TileMap',
-    'game/lib/core/Sprite',
+    'game/lib/core/Sprite'//,
     //Scritps that modify global
-    'game/lib/core/three_fpcontrols'
+    //'game/lib/core/three_fpcontrols'
 ], function(Viewport, Controls, TileMap, Sprite) {
     var Engine = Class.extend({
         init: function(container, resources) {
@@ -20,8 +20,7 @@ define([
             this.controls = new Controls(this.viewport, this.camera);//new THREE.FirstPersonControls(this.camera);
 
             this.map = new TileMap(resources.tilemap, resources.tileset, resources.collisionset, this.viewport);
-            this.scene.add(this.map.mesh);
-            window.map = this.map;
+            this.map.addToScene(this.scene);
 
             this.scene.add(new THREE.AmbientLight(0xFFFFFF));
 
@@ -53,31 +52,37 @@ define([
             this.scene.add(sphere);*/
 
             //Test Sprite
-            var txtr = THREE.ImageUtils.loadTexture('assets/sprites/Zelda3Sheet1.gif');
-            console.log(txtr)
-            this.sprite = new Sprite({
-                //sprite
-                texture: txtr,
-                size: [25, 25],
-                offset: [7, 550], //offset to first frame in texture
-                zindex: 2, //default: 1
+            var txtr = THREE.ImageUtils.loadTexture('assets/sprites/link-walking.png');
+            console.log(txtr);
+            this.sprites = [], i = 0, z = 0;
+            for(var i = 0; i < 28; ++i) {
+                for(var z = 0; z < 17; ++z) {
+                    var spr;
+                    this.sprites.push(spr = new Sprite({
+                        //sprite
+                        texture: txtr,
+                        size: new THREE.Vector2(32, 44),
+                        offset: new THREE.Vector2(0, 0), //offset to first frame in texture (in cols/rows)
+                        area: new THREE.Vector2(8, 2), //number of cols/rows of frames in the texture
+                        zindex: 2, //default: 1
 
-                //animations
-                animations: {
-                    moveup: { //semantic name
-                        offset: [7, 550], //offset to first frame in texture
-                        numFrames: 8, //default: 1 (no animation)
-                        area: [8, 1], //number of columns and rows the animation resides in, default: [frames, 1]
-                        duration: 1000, //default: 1000
-                        loop: true //default: true
-                    }
-                },
+                        //animations
+                        animations: {
+                            movedown: { numFrames: 8, duration: 600 },
+                            moveleft: { offset: new THREE.Vector2(0, 1), numFrames: 8, duration: 8000, loop:false },
+                        },
 
-                //misc
-                useScreenCoordinates: true, //default: false
-                affectedByDistance: false //default: false
-            });
-            this.sprite.addToScene(this.scene);
+                        //misc
+                        useScreenCoordinates: true, //default: false
+                        affectedByDistance: false //default: false
+                    }));
+                    spr.setAnimation('movedown');
+                    spr.setPosition(-475 + (i * 35), -400 + (z * 50));
+                    spr.addToScene(this.scene);
+                    window.spr = spr;
+                }
+            }
+            console.log(this.sprites.length);
             
             //create point light
             /*var pLight = new THREE.PointLight(0xFFFFFF);
@@ -96,11 +101,14 @@ define([
             $('body').append(this.stats.domElement);
         },
         start: function() {
-            this._paint();
+            this._tick();
         },
-        _paint: function() {
+        //TODO: More intelligent redraw, some expensive calls
+        // (such as .render()) don't need to be called every
+        //  tick
+        _tick: function() {
             //proxy the call so we retain the context
-            requestAnimationFrame($.proxy(this._paint, this));
+            requestAnimationFrame($.proxy(this._tick, this));
 
             //useful for throttling framerate for testing
             //0 = show all frames, 1 = half frames, 2 = 1/3 frames, 3 = 1/4 frames, etc...
@@ -119,7 +127,9 @@ define([
             this.controls.update(delta);
 
             //update sprite
-            //this.sprite.draw(delta);
+            for(var s = 0, len = this.sprites.length; s < len; ++s) {
+                this.sprites[s].animate(delta);
+            }
             
             //do trace/collision checks
             
