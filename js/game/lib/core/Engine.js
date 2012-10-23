@@ -3,9 +3,10 @@ define([
     'game/lib/core/Viewport',
     'game/lib/core/Controls',
     'game/lib/core/TileMap',
+    'game/lib/core/Sprite',
     //Scritps that modify global
     'game/lib/core/three_fpcontrols'
-], function(Viewport, Controls, TileMap) {
+], function(Viewport, Controls, TileMap, Sprite) {
     var Engine = Class.extend({
         init: function(container, resources) {
             //setup game
@@ -50,6 +51,33 @@ define([
             );
 
             this.scene.add(sphere);*/
+
+            //Test Sprite
+            var txtr = THREE.ImageUtils.loadTexture('assets/sprites/Zelda3Sheet1.gif');
+            console.log(txtr)
+            this.sprite = new Sprite({
+                //sprite
+                texture: txtr,
+                size: [25, 25],
+                offset: [7, 550], //offset to first frame in texture
+                zindex: 2, //default: 1
+
+                //animations
+                animations: {
+                    moveup: { //semantic name
+                        offset: [7, 550], //offset to first frame in texture
+                        numFrames: 8, //default: 1 (no animation)
+                        area: [8, 1], //number of columns and rows the animation resides in, default: [frames, 1]
+                        duration: 1000, //default: 1000
+                        loop: true //default: true
+                    }
+                },
+
+                //misc
+                useScreenCoordinates: true, //default: false
+                affectedByDistance: false //default: false
+            });
+            this.sprite.addToScene(this.scene);
             
             //create point light
             /*var pLight = new THREE.PointLight(0xFFFFFF);
@@ -89,6 +117,9 @@ define([
             
             //update controls
             this.controls.update(delta);
+
+            //update sprite
+            //this.sprite.draw(delta);
             
             //do trace/collision checks
             

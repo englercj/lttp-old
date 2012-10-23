@@ -13,12 +13,12 @@ define([], function() {
                     name: { //semantic name
                         offset: [Number (X), Number (Y)], //offset to first frame in texture
                         numFrames: Number, //default: 1 (no animation)
-                        area: [Number (C), Number (R)] //number of columns and rows the animation resides in, default: [frames, 1]
+                        area: [Number (C), Number (R)], //number of columns and rows the animation resides in, default: [frames, 1]
                         duration: Number, //default: 1000
-                        loop: Boolean, //default: true
+                        loop: Boolean //default: true
                     },
                     ...
-                }
+                },
 
                 //misc
                 useScreenCoordinates: Boolean, //default: false
@@ -30,6 +30,7 @@ define([], function() {
             this.texture = opts.texture;
             this.size = opts.size; //[width, height] in pixels
             this.offset = opts.offset; //[x, y] in pixels
+            this.zindex = opts.zindex || 1;
 
             //animations
             this.animations = {};
@@ -39,7 +40,7 @@ define([], function() {
                     numFrames: opts.animations[a].numFrames || 1, //number of frames
                     area: opts.animations[a].area || [(opts.animations[a].numFrames || 1), 1], //area (cols/rows of the sprite texture animation frames)
                     duration: opts.animations[a].duration || 1000, //duration of the animation
-                    loop: opts.animations[a].loop || true;
+                    loop: opts.animations[a].loop || true
                 };
 
                 this.animations[a]._frameTime = (this.animations[a].duration / this.animations[a].numFrames);
@@ -52,16 +53,21 @@ define([], function() {
             //class vars
             this.currentFrameTime = 0;
             this.currentTile = 0;
+            this.currentAnim = 0;
 
             //actual sprite
             this._sprite = new THREE.Sprite({
-                map: texture,
+                map: this.texture,
                 useScreenCoordinates: this.useScreenCoordinates,
                 affectedByDistance: this.affectedByDistance
             });
+            this._sprite.position.z = this.zindex;
+        },
+        addToScene: function(scene) {
+            scene.add(this._sprite);
         },
         setPosition: function(x, y) {
-            this.sprite.position.set(x, y, 0);
+            this._sprite.position.set(x, y, 0);
         },
         setAnimation: function(name) {
             if(this.animations[name]) {
@@ -73,23 +79,27 @@ define([], function() {
 
             return null;
         },
-        draw: function(delta) {
-            var ms = delta * 1000;
+        animate: function(delta) {
+            if(this.currentAnim) {
+                var ms = delta * 1000;
 
-            this.currentFrameTime += ms;
-            while(this.currentFrameTime > this.currentAnim._frameTime) {
-                this.currentFrameTime -= this.currentAnim._frameTime;
-                this.currentTile++;
+                this.currentFrameTime += ms;
+                while(this.currentFrameTime > this.currentAnim._frameTime) {
+                    this.currentFrameTime -= this.currentAnim._frameTime;
+                    this.currentTile++;
 
-                if(this.currentTile == this.currentAnim.numFrames && this.currentAnim.loop)
-                    this.currentTile = 0;
+                    if(this.currentTile == this.currentAnim.numFrames && this.currentAnim.loop)
+                        this.currentTile = 0;
 
-                var currColumn = this.currentTile % this.currentAnim.area[0];
-                this.texture.offset.x = currColumn / this.currentAnim.area[0];
+                    var currColumn = this.currentTile % this.currentAnim.area[0];
+                    this.texture.offset.x = currColumn / this.currentAnim.area[0];
 
-                var currRow = Math.floor(this.currentTile / this.currentAnim.area[0]);
-                this.texture.offset.y = currRow / this.currentAnim.area[1];
+                    var currRow = Math.floor(this.currentTile / this.currentAnim.area[0]);
+                    this.texture.offset.y = currRow / this.currentAnim.area[1];
+                }
             }
         }
     });
+
+    return Sprite;
 });
