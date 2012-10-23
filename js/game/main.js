@@ -26,7 +26,8 @@ require([
             loader.loadResources(
                 [
                     { name: 'tilemap', type: 'texture', src: 'assets/maps/overworld/lttp-all.png' },
-                    { name: 'tileset', type: 'texture', src: 'assets/maps/overworld/lttp-tiles.png' }
+                    { name: 'tileset', type: 'texture', src: 'assets/maps/overworld/lttp-tiles.png' },
+                    { name: 'link_walking', type: 'texture', src: 'assets/sprites/link-walking.png' }
                 ],
                 function(rsrcs) {
                     console.log(rsrcs);

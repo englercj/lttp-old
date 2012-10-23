@@ -3,10 +3,10 @@ define([
     'game/lib/core/Viewport',
     'game/lib/core/Controls',
     'game/lib/core/TileMap',
-    'game/lib/core/Sprite'//,
+    'game/lib/core/Player'//,
     //Scritps that modify global
     //'game/lib/core/three_fpcontrols'
-], function(Viewport, Controls, TileMap, Sprite) {
+], function(Viewport, Controls, TileMap, Player) {
     var Engine = Class.extend({
         init: function(container, resources) {
             //setup game
@@ -30,6 +30,9 @@ define([
             //this.camera.lookAt(this.scene.position);
             this.scene.add(this.camera);
 
+            //setup player
+            this.player = new Player(this.controls, resources);
+
             // set up the sphere vars
             /*var radius = 50,
                 segments = 16,
@@ -50,39 +53,6 @@ define([
             );
 
             this.scene.add(sphere);*/
-
-            //Test Sprite
-            var txtr = THREE.ImageUtils.loadTexture('assets/sprites/link-walking.png');
-            console.log(txtr);
-            this.sprites = [], i = 0, z = 0;
-            for(var i = 0; i < 28; ++i) {
-                for(var z = 0; z < 17; ++z) {
-                    var spr;
-                    this.sprites.push(spr = new Sprite({
-                        //sprite
-                        texture: txtr,
-                        size: new THREE.Vector2(32, 44),
-                        offset: new THREE.Vector2(0, 0), //offset to first frame in texture (in cols/rows)
-                        area: new THREE.Vector2(8, 2), //number of cols/rows of frames in the texture
-                        zindex: 2, //default: 1
-
-                        //animations
-                        animations: {
-                            movedown: { numFrames: 8, duration: 600 },
-                            moveleft: { offset: new THREE.Vector2(0, 1), numFrames: 8, duration: 8000, loop:false },
-                        },
-
-                        //misc
-                        useScreenCoordinates: true, //default: false
-                        affectedByDistance: false //default: false
-                    }));
-                    spr.setAnimation('movedown');
-                    spr.setPosition(-475 + (i * 35), -400 + (z * 50));
-                    spr.addToScene(this.scene);
-                    window.spr = spr;
-                }
-            }
-            console.log(this.sprites.length);
             
             //create point light
             /*var pLight = new THREE.PointLight(0xFFFFFF);

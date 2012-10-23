@@ -3,6 +3,9 @@ define([
 ], function(Emitter) {
     var Controls = Emitter.extend({
         init: function(viewport, camera, events) {
+            //setup the emitter
+            this._super({ wildcard: true, delimiter: '::', maxListeners: 10 });
+
             this.viewport = viewport;
             this.camera = camera;
 
