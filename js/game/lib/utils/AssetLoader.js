@@ -5,24 +5,24 @@ define([
         init: function() {
 
         },
-        loadResources: function(resources, opts, cb) {
+        loadResources: function(resources, cb) {
             var self = this,
-                monitor = new THREE.LoadingMonitor();
+                loaded = 0;
 
-            if(typeof opts == 'function') {
-                cb = opts;
-                opts = {}
-            }
+            resources.forEach(function(rsrc) {
+                self.loadResource(rsrc, function(err, data) {
+                    if(!err)
+                        resource.data = data;
+                    else
+                        resource.data = null;
 
-            opts = opts || {};
-
-            monitor.addEventListener('progress', function(loaded, total) {
-                //one of the loaders finished
-                if(opts.progress && typeof opts.progress == 'function')
-                    opts.progress(loaded, total);
+                    loaded++;
+                    if(loaded === resources.length)
+                        completed();
+                });
             });
 
-            monitor.addEventListener('load', function() {
+            function completed() {
                 //all of the loaders finished
                 var ret = {};
 
@@ -30,51 +30,60 @@ define([
                     ret[resources[r].name] = resources[r].data;
                 }
 
-                if(cb && typeof cb == 'function')
-                    cb(ret);
-            });
-
-            resources.forEach(function(rsrc) {
-                var ldr = self.loadResource(rsrc, opts);
-
-                if(ldr) monitor.add(ldr);
-            });
+                self.emit('complete', ret);
+                if(cb) cb(ret);
+            };
         },
-        loadResource: function(resource, opts, cb) {
-            //try to guess type
-            if(!resource.type) {
-                if(resource.src.match(/(\.png|\.jpe?g|\.gif|\.bmp)$/) !== null)
-                    resource.type = 'image';
-                else if(resource.src.match(/(\.jso?n)$/))
-                    resource.type = 'json';
-                else if(resource.src.match(/(\.bin)$/))
-                    resource.type = 'binary';
-                else if(resource.src.match(/(\.scene)$/))
-                    resource.type = 'scene';
-                else if(resource.src.match(/(\.geo(metry)?)$/))
-                    resource.type = 'geometry';
-                else if(resource.src.match(/(\.tex(ture)?)$/))
-                    resource.type = 'texture';
-            }
-
+        loadResource: function(resource, cb) {
             //massage type into the class name
-            resource.type = resource.type[0].toUpperCase() + resource.type.substring(1);
-            if(resource.type == 'Json')
-                resource.type = 'JSON';
+            var self = this,
+                type = resource.type[0].toUpperCase() + resource.type.substring(1);
 
-            //if loader doesn't exist then exit out
-            if(!THREE[resource.type + 'Loader'] && cb)
-                cb(null);
+            //special case
+            if(type == 'Model') type = 'JSON';
 
-            //load the resource
-            var loader = new THREE[resource.type + 'Loader']();
-            loader.addEventListener('load', function(evt) {
-                resource.data = evt.content;
-                if(cb) cb(resource);
-            });
-            loader.load(resource.src);
+            //console.log(type);
+            //if loader exists in THREE then use it
+            if(THREE[type + 'Loader']) {
+                //load the resource
+                var loader = new THREE[type + 'Loader']();
 
-            return loader;
+                loader.addEventListener('error', function(msg) {
+                    if(cb) cb(msg);
+                });
+
+                loader.addEventListener('load', function(evt) {
+                    if(cb) cb(null, evt.content);
+                });
+
+                loader.load(resource.src);
+            }
+            //otherwise manually load
+            else {
+                $.ajax({
+                    url: resource.src,
+                    context: this,
+                    dataType: resource.type,
+                    type: 'GET',
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        if(cb) cb(errorThrown || textStatus);
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        if(cb) cb(null, data);
+                    }/*,
+                    progress: function(e) {
+                        //make sure we can compute the length usually
+                        //this is false if Content-Length isn't set
+                        if(e.lengthComputable) {
+                            //calculate the percentage loaded
+                            var pct = (e.loaded / e.total) * 100;
+
+                            this.emit('progress', pct);
+                        }
+                    },
+                    complete: function(jqXHR, textStatus) {}*/
+                });
+            }
         }
     });
 
