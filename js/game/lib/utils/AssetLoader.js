@@ -12,9 +12,9 @@ define([
             resources.forEach(function(rsrc) {
                 self.loadResource(rsrc, function(err, data) {
                     if(!err)
-                        resource.data = data;
+                        rsrc.data = data;
                     else
-                        resource.data = null;
+                        rsrc.data = null;
 
                     loaded++;
                     if(loaded === resources.length)
