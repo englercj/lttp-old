@@ -27,7 +27,8 @@ require([
                 [
                     { name: 'tilemap', type: 'texture', src: 'assets/maps/overworld/lttp-all.png' },
                     { name: 'tileset', type: 'texture', src: 'assets/maps/overworld/lttp-tiles.png' },
-                    { name: 'link_walking', type: 'texture', src: 'assets/sprites/link-walking.png' }
+                    { name: 'link_texture', type: 'texture', src: 'assets/sprites/characters/link.png' },
+                    { name: 'link_json', type: 'json', src: 'assets/json/characters/link.json' }
                 ],
                 function(rsrcs) {
                     console.log(rsrcs);

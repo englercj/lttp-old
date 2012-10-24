@@ -2,31 +2,34 @@ define([
     'game/lib/bases/Sprite'
 ], function(Sprite) {
     var Player = Sprite.extend({
-        init: function(controls, resources) {
+        init: function(options, texture, controls) {
+            //set a couple properties
+            options.texture = texture;
+            this.controls = controls;
+            this.moving = false;
+
             //initialize the visible sprite
-            this._super({
-                texture: resources.link_walking,
-                size: new THREE.Vector2(32, 44),
-                offset: new THREE.Vector2(0, 0), //offset to first frame in texture (in cols/rows)
-                area: new THREE.Vector2(8, 2), //number of cols/rows of frames in the texture
-                zindex: 2, //default: 1
+            this._super(options);
 
-                //animations
-                animations: {
-                    movedown: { numFrames: 8, duration: 600 },
-                    moveleft: { offset: new THREE.Vector2(0, 1), numFrames: 8, duration: 600, loop:false },
-                },
+            //this.setAnimation('idle');
+            this.setPosition(0, 0);
 
-                //misc
-                useScreenCoordinates: true, //default: false
-                affectedByDistance: false //default: false
-            });
-
-            spr.setAnimation('movedown');
-            spr.setPosition(-475 + (i * 35), -400 + (z * 50));
-            spr.addToScene(this.scene);
+            this.bindEvents();
         },
-        something: function() {}
+        bindEvents: function() {
+            var self = this;
+
+            self.controls.on('move', function(dir, moving) {
+                if(self.moving == moving) return; //repeat, ignore
+
+                self.moving = moving;
+
+                if(moving)
+                    self.setAnimation('move' + dir);
+                else
+                    self.setAnimation();
+            });
+        }
     });
 
     return Player;

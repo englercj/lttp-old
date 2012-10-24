@@ -5,18 +5,9 @@ define([
         init: function() {
             //setup the emitter
             this._super({ wildcard: true, delimiter: '::', maxListeners: 10 });
-
-            this.on('derp', function() {
-                console.log(arguments);
-            });
-
-            this.on('*', function() {
-                console.log(arguments);
-            });
         },
         addToScene: function(scene) {
             scene.add(this._mesh);
-            this.emit('derp', 'herp');
         },
         setPosition: function(x, y, z) {
             var zi = (z !== undefined ? z : (this.zindex ? this.zindex : 0));

@@ -18,6 +18,7 @@ define([
             var width = this.viewport.width(), height = this.viewport.height();
             this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);//new THREE.PerspectiveCamera(60, this.viewport.aspect(), 1, 10000);
             this.controls = new Controls(this.viewport, this.camera);//new THREE.FirstPersonControls(this.camera);
+            this.controls.lockCamera = true;
 
             this.map = new TileMap(resources.tilemap, resources.tileset, resources.collisionset, this.viewport);
             this.map.addToScene(this.scene);
@@ -31,7 +32,9 @@ define([
             this.scene.add(this.camera);
 
             //setup player
-            this.player = new Player(this.controls, resources);
+            this.player = new Player(resources.link_json, resources.link_texture, this.controls);
+            this.player.addToScene(this.scene);
+            window.player = this.player;
 
             // set up the sphere vars
             /*var radius = 50,
@@ -97,9 +100,7 @@ define([
             this.controls.update(delta);
 
             //update sprite
-            for(var s = 0, len = this.sprites.length; s < len; ++s) {
-                this.sprites[s].animate(delta);
-            }
+            this.player.animate(delta);
             
             //do trace/collision checks
             

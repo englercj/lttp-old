@@ -9,6 +9,8 @@ define([
             this.viewport = viewport;
             this.camera = camera;
 
+            this.lockCamera = false;
+
             this.moveSpeed = 250;
 
             this.moving = {
@@ -57,7 +59,7 @@ define([
                         var dir = k.replace('move', '');
 
                         this.moving[dir] = true;
-                        this.emit('move', [dir, true]);
+                        this.emit('move', dir, true);
                     } else {
                         this.emit(k);
                     }
@@ -76,12 +78,14 @@ define([
                     if(k.indexOf('move') === 0) {
                         var dir = k.replace('move', '');
                         this.moving[dir] = false;
-                        this.emit('move', [dir, false]);
+                        this.emit('move', dir, false);
                     }
                 }
             }
         },
         update: function(delta) {
+            if(this.lockCamera) return;
+            
             var speed = delta * this.moveSpeed;
 
             if(this.moving.up) this.camera.translateY(speed);
