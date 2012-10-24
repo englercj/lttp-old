@@ -60,7 +60,6 @@ define([
                         var dir = k.replace('move', '');
 
                         //we already got this event (repeated key from holding it down)
-                        console.log(this.moving[dir], dir)
                         if(this.moving[dir]) return;
 
                         this.moving[dir] = true;
