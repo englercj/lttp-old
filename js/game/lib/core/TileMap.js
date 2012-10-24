@@ -17,7 +17,8 @@ define([
         "void main(void) {",
         "   pixelCoord = (uv * viewportSize) + viewOffset;",
         "   texCoord = pixelCoord * inverseTileTextureSize * inverseTileSize;",
-        "   gl_Position = vec4(position.x, position.y, 0.0, 1.0);",
+        //"   gl_Position = vec4(position.x, position.y, 0.0, 1.0);",
+        "   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
         "}"
     ].join("\n");
 
@@ -132,11 +133,11 @@ define([
                 tileset.minFilter = THREE.NearestMipMapNearestFilter;
             }
 
-            /*this._material = new THREE.ShaderMaterial({
-                //attributes: {
-                //    pos: { type: 'v2', value: new THREE.Vector2(0, 0) },
-                //    texture: { type: 'v2', value: new THREE.Vector2(0, 0) }
-                //},
+            this._material = new THREE.ShaderMaterial({
+                /*attributes: {
+                    pos: { type: 'v2', value: [ new THREE.Vector2(-1, -1) ] },
+                    texture: { type: 'v2', value: [ new THREE.Vector2(0, 1) ] },
+                },*/
                 uniforms: {
                     viewportSize: { type: 'v2v', value: [new THREE.Vector2(viewport.width() / this.tileScale, viewport.height() / this.tileScale)] },
                     inverseSpriteTextureSize: { type: 'v2v', value: [new THREE.Vector2(1/tileset.image.width, 1/tileset.image.height)] },
@@ -153,15 +154,11 @@ define([
                 vertexShader: tilemapVS,
                 fragmentShader: tilemapFS,
                 transparent: false
-            });*/
+            });
 
             /*this._material = new THREE.MeshBasicMaterial({
-                color: 0xCC0000
-            });*/
-
-            this._material = new THREE.MeshBasicMaterial({
                 map: tileset
-            });
+            });*/
 
             this._plane = new THREE.PlaneGeometry(
                 tilemap.image.width * this.tileSize * this.tileScale, //width
