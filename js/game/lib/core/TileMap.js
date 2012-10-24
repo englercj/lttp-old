@@ -3,8 +3,8 @@ define([
 ], function(SceneObject) {
     // Shader
     var tilemapVS = [
-        "attribute vec2 pos;",
-        "attribute vec2 texture;",
+        //"attribute vec2 pos;",
+        //"attribute vec2 texture;",
         
         "varying vec2 pixelCoord;",
         "varying vec2 texCoord;",
@@ -15,14 +15,14 @@ define([
         "uniform float inverseTileSize;",
 
         "void main(void) {",
-        "   pixelCoord = (texture * viewportSize) + viewOffset;",
+        "   pixelCoord = (uv * viewportSize) + viewOffset;",
         "   texCoord = pixelCoord * inverseTileTextureSize * inverseTileSize;",
-        "   gl_Position = vec4(pos, 0.0, 1.0);",
+        "   gl_Position = vec4(position.x, position.y, 0.0, 1.0);",
         "}"
     ].join("\n");
 
     var tilemapFS = [
-        "precision highp float;",
+        //"precision highp float;",
 
         "varying vec2 pixelCoord;",
         "varying vec2 texCoord;",
@@ -58,8 +58,10 @@ define([
         init: function(tilemap, tileset, collisionset, viewport) {
             this._super();
 
-            this.tileScale = 1;
+            this.tileScale = 1.0;
             this.tileSize = 16;
+            this.repeat = false;
+            this.filtered = false;
 
             this.tilemap = tilemap;
             this.tileset = tileset;
@@ -111,22 +113,41 @@ define([
             gl.drawArrays(gl.TRIANGLES, 0, 6);
             */
 
+            //Setup Tilemap
+            if(this.repeat) {
+                tilemap.wrapS = tilemap.wrapT = THREE.RepeatWrapping;
+            } else {
+                tilemap.wrapS = tilemap.wrapT = THREE.ClampToEdgeWrapping;
+            }
+            tilemap.magFilter = THREE.NearestFilter;
+            tilemap.minFilter = THREE.NearestMipMapNearestFilter;
+
+            //Setup Tileset
+            tileset.wrapS = tileset.wrapT = THREE.ClampToEdgeWrapping;
+            if(this.filtered) {
+                tileset.magFilter = THREE.LinearFilter;
+                tileset.minFilter = THREE.LinearMipMapLinearFilter;
+            } else {
+                tileset.magFilter = THREE.NearestFilter;
+                tileset.minFilter = THREE.NearestMipMapNearestFilter;
+            }
+
             /*this._material = new THREE.ShaderMaterial({
-                attributes: {
-                    pos: { type: 'v2', value: new THREE.Vector2(0, 0) },
-                    texture: { type: 'v2', value: new THREE.Vector2(0, 0) }
-                },
+                //attributes: {
+                //    pos: { type: 'v2', value: new THREE.Vector2(0, 0) },
+                //    texture: { type: 'v2', value: new THREE.Vector2(0, 0) }
+                //},
                 uniforms: {
-                    viewportSize: { type: 'v2', value: new THREE.Vector2(viewport.width() / this.tileScale, viewport.height() / this.tileScale) },
-                    inverseSpriteTextureSize: { type: 'v2', value: new THREE.Vector2(1/tileset.image.width, 1/tileset.image.height) },
+                    viewportSize: { type: 'v2v', value: [new THREE.Vector2(viewport.width() / this.tileScale, viewport.height() / this.tileScale)] },
+                    inverseSpriteTextureSize: { type: 'v2v', value: [new THREE.Vector2(1/tileset.image.width, 1/tileset.image.height)] },
                     tileSize: { type: 'f', value: this.tileSize },
                     inverseTileSize: { type: 'f', value: 1/this.tileSize },
 
                     tiles: { type: 't', value: tilemap },
                     sprites: { type: 't', value: tileset },
 
-                    viewOffset: { type: 'v2', value: new THREE.Vector2(Math.floor(0), Math.floor(0)) },
-                    inverseTileTextureSize: { type: 'v2', value: new THREE.Vector2(1/tilemap.image.width, 1/tilemap.image.height) },
+                    viewOffset: { type: 'v2', value: new THREE.Vector2(0, 0) },
+                    inverseTileTextureSize: { type: 'v2v', value: [new THREE.Vector2(1/tilemap.image.width, 1/tilemap.image.height)] },
                     repeatTiles: { type: 'i', value: 1 }
                 },
                 vertexShader: tilemapVS,
@@ -139,7 +160,7 @@ define([
             });*/
 
             this._material = new THREE.MeshBasicMaterial({
-                map: THREE.ImageUtils.loadTexture('assets/maps/overworld/lttp-tiles.png')
+                map: tileset
             });
 
             this._plane = new THREE.PlaneGeometry(

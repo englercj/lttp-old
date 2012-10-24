@@ -6,7 +6,8 @@ define([
             //set a couple properties
             options.texture = texture;
             this.controls = controls;
-            this.moving = false;
+
+            this.moveSpeed = 250;
 
             //initialize the visible sprite
             this._super(options);
@@ -19,16 +20,30 @@ define([
         bindEvents: function() {
             var self = this;
 
-            self.controls.on('move', function(dir, moving) {
-                if(self.moving == moving) return; //repeat, ignore
-
-                self.moving = moving;
-
-                if(moving)
-                    self.setAnimation('move' + dir);
-                else
+            self.controls.on('move::*', function(dir, startMoving) {
+                if(!self.controls.isMoving)
                     self.setAnimation();
+                else if(self.controls.moving.up)
+                    self.setAnimation('moveup');
+                else if(self.controls.moving.down)
+                    self.setAnimation('movedown');
+                else if(self.controls.moving.left)
+                    self.setAnimation('moveleft');
+                else if(self.controls.moving.right)
+                    self.setAnimation('moveright');
             });
+        },
+        update: function(delta) {
+            //movement checks
+            var speed = delta * this.moveSpeed;
+            if(this.controls.moving.up) this._mesh.translateY(speed);
+            if(this.controls.moving.down) this._mesh.translateY(-speed);
+
+            if(this.controls.moving.left) this._mesh.translateX(-speed);
+            if(this.controls.moving.right) this._mesh.translateX(speed);
+
+            //animation updates
+            this.animate(delta);
         }
     });
 

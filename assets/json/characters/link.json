@@ -11,7 +11,7 @@
         "moveup": {
             "offset": [0, 2],
             "numFrames": 8,
-            "duration": 8000
+            "duration": 600
         },
         "moveleft": {
             "offset": [0, 1],

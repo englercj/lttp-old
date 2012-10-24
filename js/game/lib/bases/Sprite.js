@@ -15,6 +15,7 @@ define([
                 area: THREE.Vector2,    //number of frame cols and frame rows in the texture
                 offset: THREE.Vector2,  //offset to first frame in texture (cols, rows), default: (0, 0)
                 zindex: Number,         //default: 1
+                filtered: Boolean,      //whether to use linear filtering, default: false
 
                 //animations
                 animations: {
@@ -26,11 +27,7 @@ define([
                         loop: Boolean           //loop the animation, default: true
                     },
                     ...
-                },
-
-                //misc
-                useScreenCoordinates: Boolean, //default: false
-                affectedByDistance: Boolean //default: false
+                }
             }
         */
         init: function(opts) {
@@ -42,6 +39,7 @@ define([
             this.area = opts.area;
             this.offset = (opts.offset !== undefined) ? opts.offset : THREE.Vector2(0, 0); //[x, y] in pixels
             this.zindex = (opts.zindex !== undefined) ? opts.zindex : 1;
+            this.filtered = (opts.filtered !== undefined) ? opts.filtered : false;
 
             //convert array to Vector2
             if(this.size instanceof Array)
@@ -103,10 +101,6 @@ define([
                 this.animations[i]['inverse' + inverses[i].axis] = true;
             }
 
-            //misc
-            this.affectedByDistance = opts.affectedByDistance || false;
-            this.useScreenCoordinates = opts.useScreenCoordinates || false;
-
             //class vars
             this.currentFrameTime = 0;
             this.currentTile = 0;
@@ -117,6 +111,14 @@ define([
                 1 / this.area.x,
                 1 / this.area.y
             );
+            
+            if(this.filtered) {
+                this.texture.magFilter = THREE.LinearFilter;
+                this.texture.minFilter = THREE.LinearMipMapLinearFilter;
+            } else {
+                this.texture.magFilter = THREE.NearestFilter;
+                this.texture.minFilter = THREE.NearestMipMapNearestFilter;
+            }
 
             this.texture.offset.x = (this.offset.x / this.area.x);
             this.texture.offset.y = (this.offset.y / this.area.y);
@@ -193,8 +195,6 @@ define([
 
             var currRow = Math.floor((this.currentTile + add) / (this.currentAnim.area.x + add));
             this.texture.offset.y = (currRow / this.currentAnim.area.y) + (this.offset.y / this.area.y) + (this.currentAnim.offset.y / this.area.y);
-
-            console.log(this.texture.offset);
         }
     });
 

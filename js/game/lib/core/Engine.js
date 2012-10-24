@@ -10,6 +10,7 @@ define([
     var Engine = Class.extend({
         init: function(container, resources) {
             //setup game
+            this.entities = [];
             this.scene = new THREE.Scene();
             this.clock = new THREE.Clock();
             this.renderer = new THREE.WebGLRenderer();
@@ -18,7 +19,7 @@ define([
             var width = this.viewport.width(), height = this.viewport.height();
             this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);//new THREE.PerspectiveCamera(60, this.viewport.aspect(), 1, 10000);
             this.controls = new Controls(this.viewport, this.camera);//new THREE.FirstPersonControls(this.camera);
-            this.controls.lockCamera = true;
+            //this.controls.lockCamera = true;
 
             this.map = new TileMap(resources.tilemap, resources.tileset, resources.collisionset, this.viewport);
             this.map.addToScene(this.scene);
@@ -32,9 +33,9 @@ define([
             this.scene.add(this.camera);
 
             //setup player
-            this.player = new Player(resources.link_json, resources.link_texture, this.controls);
-            this.player.addToScene(this.scene);
-            window.player = this.player;
+            var link = new Player(resources.link_json, resources.link_texture, this.controls);
+            link.addToScene(this.scene);
+            this.entities.push(link);
 
             // set up the sphere vars
             /*var radius = 50,
@@ -99,8 +100,11 @@ define([
             //update controls
             this.controls.update(delta);
 
-            //update sprite
-            this.player.animate(delta);
+            //update entities
+            for(var i = 0, il = this.entities.length; i < il; ++i) {
+                if(this.entities[i] && this.entities[i].update)
+                    this.entities[i].update(delta);
+            }
             
             //do trace/collision checks
             

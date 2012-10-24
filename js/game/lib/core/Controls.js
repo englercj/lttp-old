@@ -16,7 +16,8 @@ define([
             this.moving = {
                 up: false, down: false,
                 left: false, right: false
-            }
+            };
+            this.isMoving = false;
 
             this.keys = {
                 moveup:     [87, 38], //W, and UP-ARROW
@@ -58,8 +59,13 @@ define([
                     if(k.indexOf('move') === 0) {
                         var dir = k.replace('move', '');
 
+                        //we already got this event (repeated key from holding it down)
+                        console.log(this.moving[dir], dir)
+                        if(this.moving[dir]) return;
+
                         this.moving[dir] = true;
-                        this.emit('move', dir, true);
+                        this.isMoving = true;
+                        this.emit('move::start', dir, true);
                     } else {
                         this.emit(k);
                     }
@@ -78,7 +84,8 @@ define([
                     if(k.indexOf('move') === 0) {
                         var dir = k.replace('move', '');
                         this.moving[dir] = false;
-                        this.emit('move', dir, false);
+                        this.isMoving = (this.moving.up || this.moving.down || this.moving.left || this.moving.right);
+                        this.emit('move::end', dir, false);
                     }
                 }
             }
