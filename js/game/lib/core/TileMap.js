@@ -162,6 +162,7 @@ define([
                 uniforms: this._uniforms,
                 vertexShader: tilemapVS,
                 fragmentShader: tilemapFS,
+                wireframe: true,
                 transparent: false
             });
 
@@ -169,12 +170,10 @@ define([
                 map: tileset
             });*/
 
-            this._plane = new THREE.PlaneGeometry(
-                tilemap.image.width * this.tileSize * this.tileScale, //width
-                tilemap.image.height * this.tileSize * this.tileScale//, //height
-                //tilemap.image.width * this.tileScale, //width-segments
-                //tilemap.image.height * this.tileScale //height-segments
-            );
+            var w = tilemap.image.width * this.tileSize * this.tileScale,
+                h = tilemap.image.height * this.tileSize * this.tileScale;
+
+            this._plane = new THREE.PlaneGeometry(w, h, w, h);
 
             this._mesh = new THREE.Mesh(this._plane, this._material);
         },
