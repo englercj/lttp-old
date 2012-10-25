@@ -31,7 +31,6 @@ require([
                     { name: 'link_json', type: 'json', src: 'assets/json/characters/link.json' }
                 ],
                 function(rsrcs) {
-                    console.log(rsrcs);
                     resources = rsrcs;
 
                     $('#btnDownload').hide();

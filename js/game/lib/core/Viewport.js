@@ -1,9 +1,12 @@
-define([], function() {
-    var Viewport = Class.extend({
+define([
+    'game/lib/bases/Emitter'
+], function(Emitter) {
+    var Viewport = Emitter.extend({
         init: function(container, renderer) {
             this.isDocument = false;
             this.renderer = renderer;
             this._$doc = $(document);
+            this._$win = $(window);
             
             if(!container) {
                 this._$container = $(document);
@@ -21,18 +24,22 @@ define([], function() {
             this._$doc.on('pointerlockchange', $.proxy(this.onPointerLockChange, this));
             this._$doc.on('pointerlockcerror', $.proxy(this.onPointerLockError, this));
             
-            this.on('resize', $.proxy(this.onResize, this));
+            this._$container.on('resize', $.proxy(this.onResize, this));
+            this._$win.on('resize', $.proxy(this.onResize, this));
             
-            renderer.setSize(this.width(), this.height());
+            this.width = this._$container.width();
+            this.height = this._$container.height();
+
+            renderer.setSize(this.width, this.height);
             this.append(renderer.domElement);
-            
+
             //this.requestFullScreen();
         },
-        height: function() {return this._$container.height.apply(this._$container, arguments);},
-        width: function() {return this._$container.width.apply(this._$container, arguments);},
+        //height: function() {return this.height;},
+        //width: function() {return this.width;},
         append: function() {return this._$container.append.apply(this._$container, arguments);},
         offset: function() {return this._$container.offset.apply(this._$container, arguments);},
-        on: function() { return this._$container.on.apply(this._$container, arguments);},
+        //on: function(evt, callback) { this._$container.on.apply(this._$container, arguments);},
         focus: function() {
             if(!this.isDocument)
                 return this._$container;
@@ -40,7 +47,7 @@ define([], function() {
                 return this._$contianer.focus();
         },
         aspect: function() {
-            return (this.width() / this.height());
+            return (this.width / this.height);
         },
         requestFullScreen: function() {
             return this._$container[0].requestFullscreen();
@@ -55,7 +62,11 @@ define([], function() {
             return this._$container[0].exitPointerLock();
         },
         onResize: function(e) {
-            this.renderer.setSize(this.width(), this.height());
+            this.width = this._$container.width();
+            this.height = this._$container.height();
+
+            this.renderer.setSize(this.width, this.height);
+            this.emit('resize', this.width, this.height);
         },
         onFullScreenChange: function(e) {
             console.log('fullscreen', e);
@@ -66,7 +77,10 @@ define([], function() {
                 //fullscreen is enabled, lets get pointer lock
                 this._$container.show();
                 this.requestPointerLock();
-                this.renderer.setSize(this.width(), this.height());
+
+                this.width = this._$container.width();
+                this.height = this._$container.height();
+                this.renderer.setSize(this.width, this.height);
             }
         },
         onFullScreenError: function(e) {

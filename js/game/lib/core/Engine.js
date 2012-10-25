@@ -16,7 +16,7 @@ define([
             this.renderer = new THREE.WebGLRenderer();
             this.viewport = new Viewport(container, this.renderer);
 
-            var width = this.viewport.width(), height = this.viewport.height();
+            var width = this.viewport.width, height = this.viewport.height;
             this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);//new THREE.PerspectiveCamera(60, this.viewport.aspect(), 1, 10000);
             this.controls = new Controls(this.viewport, this.camera);//new THREE.FirstPersonControls(this.camera);
             //this.controls.lockCamera = true;

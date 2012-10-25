@@ -15,10 +15,10 @@ define([
         "uniform float inverseTileSize;",
 
         "void main(void) {",
-        "   pixelCoord = (uv * viewportSize) + viewOffset;",
-        "   texCoord = pixelCoord * inverseTileTextureSize * inverseTileSize;",
-        //"   gl_Position = vec4(position.x, position.y, 0.0, 1.0);",
-        "   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
+        "    pixelCoord = (uv * viewportSize) + viewOffset;",
+        "    texCoord = pixelCoord * inverseTileTextureSize * inverseTileSize;",
+        //"    gl_Position = vec4(position.x, position.y, 0.0, 1.0);",
+        "    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
         "}"
     ].join("\n");
 
@@ -35,15 +35,17 @@ define([
         "uniform vec2 inverseSpriteTextureSize;",
         "uniform float tileSize;",
         "uniform int repeatTiles;",
+        "uniform float bias;",
 
         "void main(void) {",
-        "   if(repeatTiles == 0 && (texCoord.x < 0.0 || texCoord.x > 1.0 || texCoord.y < 0.0 || texCoord.y > 1.0)) { discard; }",
-        "   vec4 tile = texture2D(tiles, texCoord);",
-        "   if(tile.x == 1.0 && tile.y == 1.0) { discard; }",
-        "   vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;",
-        "   vec2 spriteCoord = mod(pixelCoord, tileSize);",
-        "   gl_FragColor = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);",
-        //"   gl_FragColor = tile;",
+        "    vec4 tile = texture2D(tiles, texCoord);",
+        "    if(tile.x == 1.0 && tile.y == 1.0) { discard; }",
+        "    vec2 spriteOffset = floor(tile.xy * bias) * tileSize;",
+        "    vec2 spriteCoord = mod(pixelCoord, tileSize);",
+        "    vec4 texture = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);",
+        //"    texture.y = 1.0 - texture.y;",
+        "    gl_FragColor = texture;",
+        //"    gl_FragColor = tile;",
         "}"
     ].join("\n");
 
@@ -59,7 +61,7 @@ define([
         init: function(tilemap, tileset, collisionset, viewport) {
             this._super();
 
-            this.tileScale = 1.0;
+            this.tileScale = 0.625;
             this.tileSize = 16;
             this.repeat = false;
             this.filtered = false;
@@ -115,16 +117,17 @@ define([
             */
 
             //Setup Tilemap
+            tilemap.magFilter = THREE.NearestFilter;
+            tilemap.minFilter = THREE.NearestMipMapNearestFilter;
             if(this.repeat) {
                 tilemap.wrapS = tilemap.wrapT = THREE.RepeatWrapping;
             } else {
                 tilemap.wrapS = tilemap.wrapT = THREE.ClampToEdgeWrapping;
             }
-            tilemap.magFilter = THREE.NearestFilter;
-            tilemap.minFilter = THREE.NearestMipMapNearestFilter;
 
             //Setup Tileset
             tileset.wrapS = tileset.wrapT = THREE.ClampToEdgeWrapping;
+            tileset.flipY = false;
             if(this.filtered) {
                 tileset.magFilter = THREE.LinearFilter;
                 tileset.minFilter = THREE.LinearMipMapLinearFilter;
@@ -133,24 +136,29 @@ define([
                 tileset.minFilter = THREE.NearestMipMapNearestFilter;
             }
 
+            //setup shader uniforms
+            window.uni = this._uniforms = {
+                viewportSize: { type: 'v2', value: new THREE.Vector2(viewport.width / this.tileScale, viewport.height / this.tileScale) },
+                inverseSpriteTextureSize: { type: 'v2', value: new THREE.Vector2(1/tileset.image.width, 1/tileset.image.height) },
+                tileSize: { type: 'f', value: this.tileSize },
+                inverseTileSize: { type: 'f', value: 1/this.tileSize },
+                bias: { type: 'f', value: 256.0 },
+
+                tiles: { type: 't', value: tilemap },
+                sprites: { type: 't', value: tileset },
+
+                viewOffset: { type: 'v2', value: new THREE.Vector2(0, 0) },
+                inverseTileTextureSize: { type: 'v2', value: new THREE.Vector2(1/tilemap.image.width, 1/tilemap.image.height) },
+                repeatTiles: { type: 'i', value: this.repeat ? 1 : 0 }
+            };
+
+            //create the shader material
             this._material = new THREE.ShaderMaterial({
                 /*attributes: {
                     pos: { type: 'v2', value: [ new THREE.Vector2(-1, -1) ] },
                     texture: { type: 'v2', value: [ new THREE.Vector2(0, 1) ] },
                 },*/
-                uniforms: {
-                    viewportSize: { type: 'v2v', value: [new THREE.Vector2(viewport.width() / this.tileScale, viewport.height() / this.tileScale)] },
-                    inverseSpriteTextureSize: { type: 'v2v', value: [new THREE.Vector2(1/tileset.image.width, 1/tileset.image.height)] },
-                    tileSize: { type: 'f', value: this.tileSize },
-                    inverseTileSize: { type: 'f', value: 1/this.tileSize },
-
-                    tiles: { type: 't', value: tilemap },
-                    sprites: { type: 't', value: tileset },
-
-                    viewOffset: { type: 'v2', value: new THREE.Vector2(0, 0) },
-                    inverseTileTextureSize: { type: 'v2v', value: [new THREE.Vector2(1/tilemap.image.width, 1/tilemap.image.height)] },
-                    repeatTiles: { type: 'i', value: 1 }
-                },
+                uniforms: this._uniforms,
                 vertexShader: tilemapVS,
                 fragmentShader: tilemapFS,
                 transparent: false
