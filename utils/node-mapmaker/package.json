@@ -1,0 +1,11 @@
+{
+    "name" : "mapmaker",
+    "version" : "0.3.5",
+    "description" : "Generates the maps used by LTTP",
+    "bin" : "./map.js",
+    "dependencies" : {
+        "canvas": "0.13.1",
+        "optimist": "0.3.5",
+    },
+    "private": true
+}
