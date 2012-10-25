@@ -35,12 +35,11 @@ define([
         "uniform vec2 inverseSpriteTextureSize;",
         "uniform float tileSize;",
         "uniform int repeatTiles;",
-        "uniform float bias;",
 
         "void main(void) {",
-        "    vec4 tile = texture2D(tiles, texCoord);",
-        "    if(tile.x == 1.0 && tile.y == 1.0) { discard; }",
-        "    vec2 spriteOffset = floor(tile.xy * bias) * tileSize;",
+        "    vec4 tile = texture2D(tiles, texCoord);", //load this pixel of the tilemap
+        "    if(tile.x == 1.0 && tile.y == 1.0) { discard; }", //discard if R is 255 and G is 255
+        "    vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;", //generate the offset in the tileset this pixel represents
         "    vec2 spriteCoord = mod(pixelCoord, tileSize);",
         "    vec4 texture = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);",
         //"    texture.y = 1.0 - texture.y;",
@@ -70,6 +69,9 @@ define([
             this.tileset = tileset;
 
             this.viewport = viewport;
+
+            this.imageData = {};
+            this.imageData.tilemap = this.getImageData(this.tilemap.image);
 
             window.tm = this;
 
@@ -145,7 +147,6 @@ define([
                 inverseSpriteTextureSize: { type: 'v2', value: new THREE.Vector2(1/tileset.image.width, 1/tileset.image.height) },
                 tileSize: { type: 'f', value: this.tileSize },
                 inverseTileSize: { type: 'f', value: 1/this.tileSize },
-                bias: { type: 'f', value: 256.0 },
 
                 tiles: { type: 't', value: tilemap },
                 sprites: { type: 't', value: tileset },
@@ -185,6 +186,29 @@ define([
             //calculate max X extent so we dont go off map
             this.maxExtentX = this.tilemap.image.width * this.tileScale * this.tileSize; //biggest X point of the map
             this.maxExtentY = this.tilemap.image.height * this.tileScale * this.tileSize; //biggest Y point of the map
+        },
+        rgbaToHex: function(rgba) {
+            return ((rgba.r << 32) | (rgba.g << 16) | (rgba.b << 8) | (rgba.a)).toString(16);
+        },
+        getPixel: function(from, x, y) {
+            var index = (y * this.imageData[from].width + x) * 4,
+                red = this.imageData[from].data[index],
+                green = this.imageData[from].data[index + 1],
+                blue = this.imageData[from].data[index + 2],
+                alpha = this.imageData[from].data[index + 3],
+                rgba = { r: red, g: green, b: blue, a: alpha };
+
+            rgba.hex = this.rgbaToHex(rgba);
+            return rgba;
+        },
+        getImageData: function(image) {
+            var canvas = document.createElement('canvas');
+            canvas.width = image.width;
+            canvas.height = image.height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(image, 0, 0);
+
+            return ctx.getImageData(0, 0, canvas.width, canvas.height);
         },
         atMax: function(axis) {
             return (this['maxDiff' + axis.toUpperCase()] <= 0);
