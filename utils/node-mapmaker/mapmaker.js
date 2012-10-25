@@ -45,13 +45,12 @@ var MapMaker = exports.MapMaker = function() {
     this.tileCtx = this.tileCanvas.getContext('2d');
     this.spriteCtx = this.spriteCanvas.getContext('2d');
     this.mapCtx = this.mapCanvas.getContext('2d');
-    /*
+    
     var self = this;
-    this.srcImage = new Image();
-    this.srcImage.addEventListener("load", function() {
+    this.srcImage = new Canvas.Image();
+    /*this.srcImage.addEventListener("load", function() {
         self.processImage();
-    }, false);
-    */
+    }, false);*/
 };
 
 util.inherits(MapMaker, events.EventEmitter);
@@ -73,9 +72,9 @@ MapMaker.prototype.parseMap = function(src, tileSize, firstTileId, cb) {
     this.tileCanvas.width = tileSize;
     this.tileCanvas.height = tileSize;
 
-    //this.srcImage.src = src;
-    this.srcImage = src;
-    self.processImage();
+    this.srcImage.src = src;
+
+    return this.processImage();
 };
 
 MapMaker.prototype.processImage = function() {

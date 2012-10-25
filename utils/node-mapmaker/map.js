@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var MapMaker = require('./mapmaker.js').MapMaker,
     argv = require('optimist').usage('Usage: $0 <map-file> [sprite-sheet-size] [tilesize]').argv,
     path = require('path'),
@@ -17,6 +19,8 @@ fs.readFile(path.resolve(argv._[0]), function(err, data) {
     }
 
     var parsed = maker.parseMap(data, tileSize);
+
+    console.log(parsed);
 
     fs.writeFile('map-tilemap.png', parsed.tilemap);
     fs.writeFile('map-tileset.png', parsed.tileset);
