@@ -58,19 +58,20 @@ define([
 
     var TileMap = SceneObject.extend({
         //need to be textures
-        init: function(tilemap, tileset, collisionset, viewport) {
+        init: function(tilemap, tileset, viewport) {
             this._super();
 
-            this.tileScale = 0.625;
+            this.tileScale = 4.0;
             this.tileSize = 16;
             this.repeat = false;
             this.filtered = false;
 
             this.tilemap = tilemap;
             this.tileset = tileset;
-            this.collisionset = collisionset;
 
             this.viewport = viewport;
+
+            window.tm = this;
 
             /*
             var quadVerts = [
@@ -138,7 +139,8 @@ define([
             }
 
             //setup shader uniforms
-            window.uni = this._uniforms = {
+            this.offset = new THREE.Vector2(0, 0);
+            this._uniforms = {
                 viewportSize: { type: 'v2', value: new THREE.Vector2(viewport.width / this.tileScale, viewport.height / this.tileScale) },
                 inverseSpriteTextureSize: { type: 'v2', value: new THREE.Vector2(1/tileset.image.width, 1/tileset.image.height) },
                 tileSize: { type: 'f', value: this.tileSize },
@@ -148,7 +150,7 @@ define([
                 tiles: { type: 't', value: tilemap },
                 sprites: { type: 't', value: tileset },
 
-                viewOffset: { type: 'v2', value: new THREE.Vector2(0, 0) },
+                viewOffset: { type: 'v2', value: this.offset },
                 inverseTileTextureSize: { type: 'v2', value: new THREE.Vector2(1/tilemap.image.width, 1/tilemap.image.height) },
                 repeatTiles: { type: 'i', value: this.repeat ? 1 : 0 }
             };
@@ -169,16 +171,54 @@ define([
                 map: tileset
             });*/
 
-            this._plane = new THREE.PlaneGeometry(
-                tilemap.image.width * this.tileSize * this.tileScale,
-                tilemap.image.height * this.tileSize * this.tileScale,
-                tilemap.image.width * this.tileScale,
-                tilemap.image.height * this.tileScale);
+            this._plane = new THREE.PlaneGeometry(viewport.width, viewport.height, this.tileSize, this.tileSize);
 
             this._mesh = new THREE.Mesh(this._plane, this._material);
+
+            viewport.on('resize', $.proxy(this.onResize, this));
+            this.onResize();
         },
         addTileLayer: function(tilemap, scrollScaleX, scrollScaleY) {
             this.layers.push(new TileMapLayer(tilemap, this));
+        },
+        onResize: function() {
+            //calculate max X extent so we dont go off map
+            this.maxExtentX = this.tilemap.image.width * this.tileScale * this.tileSize; //biggest X point of the map
+            this.maxExtentY = this.tilemap.image.height * this.tileScale * this.tileSize; //biggest Y point of the map
+        },
+        atMax: function(axis) {
+            return (this['maxDiff' + axis.toUpperCase()] <= 0);
+        },
+        atMin: function(axis) {
+            return (this.offset[axis] === 0);
+        },
+        pan: function(x, y) {
+            //update the offset
+            this.offset.x -= x / this.tileScale;
+            this.offset.y -= y / this.tileScale;
+
+            this.maxDiffX = this.maxExtentX - (this.viewport.width + (this.offset.x * this.tileScale)), //biggest X camera can reach without the viewport going offscreen
+            this.maxDiffY = this.maxExtentY - (this.viewport.height + (this.offset.y * this.tileScale)); //biggest Y camera can reach without the viewport going offscreen
+
+            //constrain maximum X
+            if(this.maxDiffX < 0) {
+                this.offset.x += this.maxDiffX / this.tileScale;
+            }
+
+            //constrain maximum Y
+            if(this.maxDiffY < 0) {
+                this.offset.y += this.maxDiffY / this.tileScale;
+            }
+
+            //constrain minimum X
+            if(this.offset.x < 0) {
+                this.offset.x = 0;
+            }
+
+            //constrain minimum Y
+            if(this.offset.y < 0) {
+                this.offset.y = 0;
+            }
         }
     });
 

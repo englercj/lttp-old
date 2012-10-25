@@ -16,26 +16,28 @@ define([
             this.renderer = new THREE.WebGLRenderer();
             this.viewport = new Viewport(container, this.renderer);
 
+            //camera setup
             var width = this.viewport.width, height = this.viewport.height;
             this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);//new THREE.PerspectiveCamera(60, this.viewport.aspect(), 1, 10000);
-            this.controls = new Controls(this.viewport, this.camera);//new THREE.FirstPersonControls(this.camera);
-            //this.controls.lockCamera = true;
-
-            this.map = new TileMap(resources.tilemap, resources.tileset, resources.collisionset, this.viewport);
-            this.map.addToScene(this.scene);
-
-            this.scene.add(new THREE.AmbientLight(0xFFFFFF));
-
-            //setup camera
-            this.camera.position.z = 300;
-            //this.camera.position.y = CONST.UNIT_SIZE; //raise camera off the ground
-            //this.camera.lookAt(this.scene.position);
+            this.camera.position.z = 250;
             this.scene.add(this.camera);
 
+            //map setup
+            this.map = new TileMap(resources.tilemap, resources.tileset, this.viewport);
+            this.map.addToScene(this.scene);
+
+            //controls setup
+            this.controls = new Controls(this.viewport, this.camera, this.map);//new THREE.FirstPersonControls(this.camera);
+            this.controls.lockCamera.x = this.controls.lockCamera.y = true;
+            this.controls.lockMap.x = this.controls.lockMap.y = false;
+
             //setup player
-            var link = new Player(resources.link_json, resources.link_texture, this.controls);
+            var link = new Player(resources.link_json, resources.link_texture, this.controls, this.map, this.viewport);
             link.addToScene(this.scene);
             this.entities.push(link);
+
+            //add ambient light
+            this.scene.add(new THREE.AmbientLight(0xFFFFFF));
 
             // set up the sphere vars
             /*var radius = 50,
