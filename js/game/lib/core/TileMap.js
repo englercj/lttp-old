@@ -119,6 +119,7 @@ define([
             //Setup Tilemap
             tilemap.magFilter = THREE.NearestFilter;
             tilemap.minFilter = THREE.NearestMipMapNearestFilter;
+            tilemap.flipY = false;
             if(this.repeat) {
                 tilemap.wrapS = tilemap.wrapT = THREE.RepeatWrapping;
             } else {
