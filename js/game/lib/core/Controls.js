@@ -37,13 +37,6 @@ define([
             this.bindEvents();
         },
         bindEvents: function() {
-            /*this.viewport.on({
-                resize: $.proxy(this.onResize, this),
-                mousedown: $.proxy(this.onMouseDown, this),
-                mouseup: $.proxy(this.onMouseUp, this),
-                mousemove: $.proxy(this.onMouseMove, this)
-            });*/
-
             this.viewport._$doc.on({
                 keydown: $.proxy(this.onKeyDown, this),
                 keyup: $.proxy(this.onKeyUp, this)

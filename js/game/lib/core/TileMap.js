@@ -3,9 +3,6 @@ define([
 ], function(SceneObject) {
     // Shader
     var tilemapVS = [
-        //"attribute vec2 pos;",
-        //"attribute vec2 texture;",
-        
         "varying vec2 pixelCoord;",
         "varying vec2 texCoord;",
 
@@ -17,7 +14,6 @@ define([
         "void main(void) {",
         "    pixelCoord = (uv * viewportSize) + viewOffset;",
         "    texCoord = pixelCoord * inverseTileTextureSize * inverseTileSize;",
-        //"    gl_Position = vec4(position.x, position.y, 0.0, 1.0);",
         "    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
         "}"
     ].join("\n");
@@ -42,9 +38,7 @@ define([
         "    vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;", //generate the offset in the tileset this pixel represents
         "    vec2 spriteCoord = mod(pixelCoord, tileSize);",
         "    vec4 texture = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);",
-        //"    texture.y = 1.0 - texture.y;",
         "    gl_FragColor = texture;",
-        //"    gl_FragColor = tile;",
         "}"
     ].join("\n");
 
@@ -72,52 +66,6 @@ define([
 
             this.imageData = {};
             this.imageData.tilemap = this.getImageData(this.tilemap.image);
-
-            window.tm = this;
-
-            /*
-            var quadVerts = [
-                //x  y  u  v
-                -1, -1, 0, 1,
-                 1, -1, 1, 1,
-                 1,  1, 1, 0,
-
-                -1, -1, 0, 1,
-                 1,  1, 1, 0,
-                -1,  1, 0, 0
-            ];
-
-            this.quadVertBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.quadVertBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quadVerts), gl.STATIC_DRAW);
-
-            //Attributes
-            gl.enableVertexAttribArray(shader.attribute.position);
-            gl.enableVertexAttribArray(shader.attribute.texture);
-            gl.vertexAttribPointer(shader.attribute.position, 2, gl.FLOAT, false, 16, 0);
-            gl.vertexAttribPointer(shader.attribute.texture, 2, gl.FLOAT, false, 16, 8);
-
-            //Uniforms
-            gl.uniform2fv(shader.uniform.viewportSize, this.scaledViewportSize);
-            gl.uniform2fv(shader.uniform.inverseSpriteTextureSize, this.inverseSpriteTextureSize);
-            gl.uniform1f(shader.uniform.tileSize, this.tileSize);
-            gl.uniform1f(shader.uniform.inverseTileSize, 1/this.tileSize);
-
-            gl.activeTexture(gl.TEXTURE0);
-            gl.uniform1i(shader.uniform.sprites, 0);
-            gl.bindTexture(gl.TEXTURE_2D, this.spriteSheet);
-
-            gl.activeTexture(gl.TEXTURE1);
-            gl.uniform1i(shader.uniform.tiles, 1);
-
-            gl.uniform2f(shader.uniform.viewOffset, Math.floor(x * layer.scrollScaleX), Math.floor(y * layer.scrollScaleY));
-            gl.uniform2fv(shader.uniform.inverseTileTextureSize, layer.inverseTextureSize);
-            gl.uniform1i(shader.uniform.repeatTiles, layer.repeat ? 1 : 0);
-
-            gl.bindTexture(gl.TEXTURE_2D, layer.tileTexture);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 6);
-            */
 
             //Setup Tilemap
             tilemap.magFilter = THREE.NearestFilter;
@@ -158,19 +106,11 @@ define([
 
             //create the shader material
             this._material = new THREE.ShaderMaterial({
-                /*attributes: {
-                    pos: { type: 'v2', value: [ new THREE.Vector2(-1, -1) ] },
-                    texture: { type: 'v2', value: [ new THREE.Vector2(0, 1) ] },
-                },*/
                 uniforms: this._uniforms,
                 vertexShader: tilemapVS,
                 fragmentShader: tilemapFS,
                 transparent: false
             });
-
-            /*this._material = new THREE.MeshBasicMaterial({
-                map: tileset
-            });*/
 
             this._plane = new THREE.PlaneGeometry(viewport.width, viewport.height, this.tileSize, this.tileSize);
 

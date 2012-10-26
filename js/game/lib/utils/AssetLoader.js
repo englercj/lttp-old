@@ -74,18 +74,7 @@ define([
                         }
 
                         if(cb) cb(null, data);
-                    }/*,
-                    progress: function(e) {
-                        //make sure we can compute the length usually
-                        //this is false if Content-Length isn't set
-                        if(e.lengthComputable) {
-                            //calculate the percentage loaded
-                            var pct = (e.loaded / e.total) * 100;
-
-                            this.emit('progress', pct);
-                        }
-                    },
-                    complete: function(jqXHR, textStatus) {}*/
+                    }
                 });
             }
         }

@@ -35,11 +35,8 @@ define([
 
             //this.requestFullScreen();
         },
-        //height: function() {return this.height;},
-        //width: function() {return this.width;},
         append: function() {return this._$container.append.apply(this._$container, arguments);},
         offset: function() {return this._$container.offset.apply(this._$container, arguments);},
-        //on: function(evt, callback) { this._$container.on.apply(this._$container, arguments);},
         focus: function() {
             if(!this.isDocument)
                 return this._$container;
