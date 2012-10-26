@@ -1,7 +1,7 @@
 ## The Legend of Zelda: A Link to the Past (WebGL Edition)
 
 This is a recreation of [Nintendo's The Legend of Zelda: A Link to the Past](http://www.nintendo.com/games/detail/5oMtHuB3aOHoawfC6brZ6myQYnE4flQ_).
-This is _not_ a port of the game, this is _not_ code coversion, this is _not_ the ROM running in an emulator. This is a complete, written from scratch,
+This is _not_ a port of the game, this is _not_ code conversion, this is _not_ the ROM running in an emulator. This is a complete, written from scratch,
 recreation of one of my favorite classic games using WebGL in the browser.
 
 This project is in no way endorsed by [Nintendo](http://www.nintendo.com/). All images, logos, characters, dialog, plot, and other assets taken
