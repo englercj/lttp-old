@@ -1,6 +1,7 @@
 define([
-    'game/lib/core/Entity'
-], function(Entity) {
+    'game/lib/core/Entity',
+    'game/data/types'
+], function(Entity, types) {
     var Player = Entity.extend({
         init: function(options, texture, controls, map, viewport) {
             //initialize entity
@@ -69,12 +70,12 @@ define([
                 x = 0;
             }
 
+            this._doCollisionCheck();
+
             if(x || y) this.moveEntity(x, y);
 
-            //map collision check to see if map movement will make us collide
+            //if we are moving the map, then block them if need be
             if(mx || my) {
-                this._doMapCollisionCheck(mx, my);
-
                 if(this.blocked.x) mx = 0;
                 if(this.blocked.y) my = 0;
             }
@@ -95,8 +96,6 @@ define([
                 newX = this._mesh.position.x + x,
                 newY = this._mesh.position.y + y;
 
-            this._doCollisionCheck(x, y);
-
             //constrain X
             if(!this.blocked.x && newX < maxX && newX > -maxX) {
                 this._mesh.translateX(x);
@@ -104,7 +103,7 @@ define([
             }
 
             //constrain Y
-            if(!this.blocked.x && newY < maxY && newY > -maxY) {
+            if(!this.blocked.y && newY < maxY && newY > -maxY) {
                 this._mesh.translateY(y);
                 this._checkMapLock('y');
             }
@@ -129,25 +128,6 @@ define([
                 this.lockMap[axis] = false;
                 this.offcenter[axis] = false;
             }
-        },
-        //check if we were at X, Y would we collide?
-        _doMapCollisionCheck: function(x, y) {
-            //if we moved the map by x,y would we collide with something?
-            //if yes, set this.blocked[axis] = true and set the this.blocker[axis] = tile;
-
-            var offX = this.map.offset.x - (x / this.map.tileScale), //new X offset of map
-                tilesX = this.viewport.width / this.map.tileScale / this.map.tileSize, //number of tiles accross X of viewport
-                pxX = tilesX + offX, //location of tile to check
-                texX = Math.floor(pxX),//pixel in tilemap
-
-                offY = this.map.offset.y - (y / this.map.tileScale),
-                tilesY = this.viewport.height / this.map.tileScale / this.map.tileSize,
-                pxY = tilesY + offY,
-                texY = this.map.tilemap.image.height - Math.floor(pxY / this.map.tileScale),
-
-                pixel = this.map.getPixel('tilemap', texX, texY);
-
-            console.log(offX, pxX, '(', texX, ',', texY, ')', pixel);
         }
     });
 
