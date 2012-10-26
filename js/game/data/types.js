@@ -1,28 +1,47 @@
 define({
     /////////////////////////////////////////////////////////
+    // Tile Types
+    ///////////////////
+    //Each tile (16x16 blocks) has a type that defines how it interacts
+    //with the player this isn't collisions, but isntead when they
+    //interact with it, what happens? (bomb explode, lift, sword chop, etc)
+    //
+    //there are a maximum of 256 values here, since this must be stored in a 
+    //single byte of the PNG
+    /////////////////////////////////////////////////////////
+    TILE: {
+        EMPTY: 0,
+        CUTABLE: 1,         //sword can cut
+        SMASHABLE: 2,       //hammer can smash
+        TELEPORTING: 3,     //teleports to/from darkworld
+        LIFTABLE: 4,        //easy lifting
+        LIFTABLE_2: 5,      //only liftable with power 2+ (silver gloves)
+        LIFTABLE_3: 6,      //only liftable with power 3+ (golden gloves)
+        LIFTABLE_4: 7,      //reserved
+        LIFTABLE_5: 8,      //reserved
+        DESTRUCTABLE: 9,    //bomb can destroy
+        DESTRUCTABLE_2: 10, //superbomb can destroy
+        LIFTABLE_CUTABLE: 11,//can be lifted or cut
+        MOVABLE: 12,        //can be pushed
+        MOVABLE_2: 13,      //can be pushed with power 2+ (silver gloves)
+        MOVABLE_3: 14       //can be pushed with power 3+ (golden gloves)
+    },
+
+    /////////////////////////////////////////////////////////
     // Subtile Types
     ///////////////////
     //collision works by dividing each "tile" (16x16 blocks) into 4 "subtiles" (8x8 blocks)
-    //each of these subtiles are given a type that define how they behave in interactions
-    //other with entities.
+    //each of these subtiles are given a type that define if a player can pass by or not
+    //
+    //These values range from 0 - 3 since there is only 1 byte in the PNG to store 4 subtiles
+    //so each is given 2 bits to represent its type
     /////////////////////////////////////////////////////////
-    //nonblocking subtiles
-    EMPTY: 1000,
-    CUTABLE: 1001,
-
-    //blocking subtiles
-    BLOCKING: 4000,                 //blocks an entity
-    BLOCKING_LIFTABLE: 4001,        //can be lifted normally
-    BLOCKING_LIFTABLE_2: 4002,      //can be lifted only with lifting power 2+ (silver gloves)
-    BLOCKING_LIFTABLE_3: 4003,      //can be lifted only with lifting power 3+ (golden gloves)
-    BLOCKING_CUTABLE: 4004,         //can be cut by a sword
-    BLOCKING_DESTRUCTABLE: 4005,    //destructable blocks can be destroyed by normal bombs
-    BLOCKING_DESTRUCTABLE_2: 4006,  //destructable2 blocks can be destroyed by super bombs
-    BLOCKING_LIFTABLE_CUTABLE: 4007,//can be lifted or cut
-    BLOCKING_MOVABLE: 4008,         //can be pushed normally
-    BLOCKING_MOVABLE_2: 4009,       //can be pushed with moving power 2+ (silver gloves)
-    BLOCKING_MOVABLE_3: 4010,       //can be pushed with moving power 3+ (golden gloves)
-    BLOCKING_JUMPDOWN: 4011,        //a cliff edge you can jump down
+    SUBTILE: {
+        PASS: 0,
+        SLIDE: 1,
+        BLOCK: 2,
+        JUMPDOWN: 3
+    },
 
     /////////////////////////////////////////////////////////
     // Item Types
@@ -30,19 +49,61 @@ define({
     //An item has many properties, these define how it interacts with other entities, more
     //specifically how it effects other entities.
     /////////////////////////////////////////////////////////
-    //item types
-    WEAPON: 7000,
-    WEAPON_DAMAGING: 7001,          //does damage
-    WEAPON_PARALIZING: 7002,        //paralizes an entity
-    WEAPON_FREEZING: 7003,          //freezes an entity
-    WEAPON_BURNING: 7004,           //burns an entity
-    WEAPON_DAMAGING_PARALIZING: 7005, //damages and paralizes
-    WEAPON_DAMAGING_FREEZING: 7006, //damages and freezes
-    WEAPON_DAMAGING_BURNING: 7007,   //damages and burns
+    ITEM: {
+        NONE: 0,
+        SPAWNING: 1,            //spawns an entity when used
+        PROTECTING: 2,          //protects you in some maner
+        HEALING: 3,             //heals health points
+        REFRESHING: 4,          //heals magic points
+        HEALING_REFRESHING: 5,  //heals magic points
+        LIGHTING: 6,            //casts visual light, and can light torches
+        INVIS: 7,               //makes link invisible
+        TRANSFORM: 8,           //transforms things it is casted on
+        MUSICAL: 9,             //plays music (and calls that damn bird)
+        CATCHING: 10,           //catches flyers (like fairies, bees, etc)
+        TRANSLATING: 11,        //translates broken texts
+        CONTAINER: 12,          //contains items caught by an ITEM_CATCHING item
+        TELEPORTING: 13,        //teleports the player from
+        DIGGING: 14,            //the shovel
+        ENHANCING: 15,          //an item that enhances the the play, but doesn't get activated (boots, gloves, flippers)
+        GATHERABLE: 16,         //an item that can be gathered (hearts, jars, rupees)
+        QUEST: 17,              //quest items (pendants, crystal maidens)
+    },
+
+    /////////////////////////////////////////////////////////
+    // Weapon Types
+    ///////////////////
+    //A weapon has many properties, these define how it interacts with other entities, more
+    //specifically how it effects other entities.
+    /////////////////////////////////////////////////////////
+    WEAPON: {
+        NONE: 0,
+        DAMAGING: 1,          //does damage
+        PARALIZING: 2,        //paralizes an entity
+        FREEZING: 3,          //freezes an entity
+        BURNING: 4,           //burns an entity
+        DESTRUCTIVE: 5,       //can destroy BLOCKING_DESTRUCTABLE
+        DESTRUCTIVE_2: 6,     //can destroy BLOCKING_DESTRUCTABLE_2
+        SMASHING: 7,          //can smash BLOCKING_SMASHABLE
+        DAMAGING_PARALIZING: 10,    //damages and paralizes
+        DAMAGING_FREEZING: 11,      //damages and freezes
+        DAMAGING_BURNING: 12,       //damages and burns
+        DAMAGING_DESTRUCTIVE: 13,   //can destroy BLOCKING_DESTRUCTABLE and deal damage
+        DAMAGING_DESTRUCTIVE_2: 14, //can destroy BLOCKING_DESTRUCTABLE_2, and deal damage
+        DAMAGING_SMASHING: 15       //can smash BLOCKING_SMASHABLE and deal damage
+    }
 
     /////////////////////////////////////////////////////////
     // Entity Types
     ///////////////////
-    //An entity has many properties
+    //An entity has many properties, blah blah blah
     /////////////////////////////////////////////////////////
+    ENTITY: {
+        BORING: 0,
+        PLAYER: 1,
+        ENEMY: 2,
+        FRIENDLY: 3,
+        NEUTRAL: 4,
+        ITEM: 5
+    }
 });
