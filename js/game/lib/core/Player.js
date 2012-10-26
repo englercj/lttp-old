@@ -1,34 +1,27 @@
 define([
-    'game/lib/bases/Sprite'
-], function(Sprite) {
-    var Player = Sprite.extend({
+    'game/lib/core/Entity'
+], function(Entity) {
+    var Player = Entity.extend({
         init: function(options, texture, controls, map, viewport) {
             //set a couple properties
-            options.texture = texture;
+            options.sprite.texture = texture;
             this.controls = controls;
             this.map = map;
             this.viewport = viewport;
 
-            //set some variables
-            this.type = options.type;
-            this.name = options.name;
+            //initialize entity
+            this._super(options);
 
-            this.moveSpeed = 250;
+            //for keeping player centered
             this.centerThreshold = 5;
             this.offcenter = { x: false, y: false };
 
-            //initialize the visible sprite
-            this._super(options.sprite);
-
-            //this.setAnimation('idle');
-            this.setPosition(0, 0);
-
+            //bind events
             this.bindEvents();
 
             //move to the location specified
+            this.setPosition(0, 0);
             this.map.pan(options.location[0], options.location[1]);
-
-            window.play = this;
         },
         bindEvents: function() {
             var self = this;

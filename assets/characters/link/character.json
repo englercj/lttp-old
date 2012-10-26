@@ -1,7 +1,10 @@
 {
-    "type": "",
+    "type": "ENTITY.PLAYER",
     "name": "link",
+    "moveSpeed": 250,
+    "health": 3,
     "location": [0, 0],
+    "weapon": "",
     "sprite": {
         "size": [64, 88],
         "offset": [0, 0],
