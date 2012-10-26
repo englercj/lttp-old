@@ -2,8 +2,8 @@ define([
     'game/lib/bases/Emitter'
 ], function(Emitter) {
     var AssetLoader = Emitter.extend({
-        init: function() {
-
+        init: function(types) {
+            this.types = types;
         },
         loadResources: function(resources, cb) {
             var self = this,
@@ -69,6 +69,10 @@ define([
                         if(cb) cb(errorThrown || textStatus);
                     },
                     success: function(data, textStatus, jqXHR) {
+                        if(data && typeof data == 'object') {
+                            data.type = this.types[data.type];
+                        }
+
                         if(cb) cb(null, data);
                     }/*,
                     progress: function(e) {

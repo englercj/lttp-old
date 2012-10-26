@@ -3,11 +3,12 @@ require([
     'game/lib/utils/util',
     'game/lib/utils/AssetLoader',
     'game/lib/core/Engine',
+    'game/data/types',
     //Scripts that modify global:
     'game/vendor/three/three',
     'game/vendor/three/Stats',
     'game/vendor/three/Detector',
-], function(util, AssetLoader, Engine) {
+], function(util, AssetLoader, Engine, types) {
     $(function() {
         //Detect if webgl is supported, and if not exit
         if (!Detector.webgl) {
@@ -22,13 +23,13 @@ require([
             
             $(this).attr('disabled', true);
             
-            var loader = new AssetLoader();
+            var loader = new AssetLoader(types);
             loader.loadResources(
                 [
                     { name: 'tilemap', type: 'texture', src: 'assets/maps/lightworld/tilemap.png' },
                     { name: 'tileset', type: 'texture', src: 'assets/maps/lightworld/tileset.png' },
                     { name: 'link_texture', type: 'texture', src: 'assets/characters/link/sprite.png' },
-                    { name: 'link_json', type: 'json', src: 'assets/characters/link/sprite.json' }
+                    { name: 'link_data', type: 'json', src: 'assets/characters/link/character.json' }
                 ],
                 function(rsrcs) {
                     resources = rsrcs;
