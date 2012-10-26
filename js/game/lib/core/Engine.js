@@ -39,37 +39,6 @@ define([
             //add ambient light
             this.scene.add(new THREE.AmbientLight(0xFFFFFF));
 
-            // set up the sphere vars
-            /*var radius = 50,
-                segments = 16,
-                rings = 16;
-
-            // create a new mesh with
-            // sphere geometry - we will cover
-            // the sphereMaterial next!
-            var sphere = new THREE.Mesh(
-                new THREE.SphereGeometry(
-                    radius,
-                    segments,
-                    rings
-                ),
-                new THREE.MeshLambertMaterial({
-                    color: 0xCC0000
-                })
-            );
-
-            this.scene.add(sphere);*/
-            
-            //create point light
-            /*var pLight = new THREE.PointLight(0xFFFFFF);
-
-            //set position
-            pLight.position.x = 10;
-            pLight.position.y = 50;
-            pLight.position.z = 130;
-
-            this.scene.add(pLight);*/
-
             this.stats = new Stats();
             this.stats.domElement.style.position = 'absolute';
             this.stats.domElement.style.top = '0px';
@@ -80,7 +49,7 @@ define([
             this._tick();
         },
         //TODO: More intelligent redraw, some expensive calls
-        // (such as .render()) don't need to be called every
+        // (such as .render() and entity updates) don't need to be called every
         //  tick
         _tick: function() {
             //proxy the call so we retain the context
