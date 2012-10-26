@@ -181,8 +181,6 @@ define([
             }
         },
         pan: function(x, y) {
-            if(!x && !y) return;
-
             //update the offset
             this.offset.x -= x / this.tileScale;
             this.offset.y -= y / this.tileScale;

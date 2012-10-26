@@ -55,17 +55,67 @@ define([
             if(!this.blocked.x) this._mesh.translateX(x);
             if(!this.blocked.y) this._mesh.translateY(y);
         },
-        //check if we were at X, Y would we collide?
+        //check if we were to move to X, Y would we collide?
         _doCollisionCheck: function(x, y) {
-            /*//if we moved to x,y would we collide with something?
+            //if we moved the map by x,y would we collide with something?
             //if yes, set this.blocked[axis] = true and set the this.blocker[axis] = tile;
 
-            var offX = this.map.offset.x - (x / this.map.tileScale), //new map offset X
-                tilesX = this.viewport.width / this.map.tileScale, //number of tiles accross X
-                locX = width + Math.floor(offX), //location of current offset
-                pxX = locX / this.map.tilemap.image.width / this.map.tileSize, //pixel in tilemap
+            var offX = this.map.offset.x - (x / this.map.tileScale), //new X offset of map
+                tilesX = this.viewport.width / this.map.tileScale / this.map.tileSize, //number of tiles accross X of viewport
+                pxX = tilesX + offX, //location of tile to check
+                texX = pxX / this.map.tileScale,//pixel in tilemap
+                texXd = texX - Math.floor(texX), //decimal of the texture pixel (for getting the subtile)
 
-                hieght*/
+                offY = this.map.offset.y - (y / this.map.tileScale),
+                tilesY = this.viewport.height / this.map.tileScale / this.map.tileSize,
+                pxY = tilesY + offY,
+                texY = this.map.tilemap.image.height - (pxY / this.map.tileScale),
+                texYd = texY - Math.floor(texY),
+
+                pixel = this.map.getPixel('tilemap', Math.floor(texX), Math.floor(texY)),
+                colliders = [];
+
+
+            //texX decimal < 0.5 == left side of tile, > 0.5 == right side of tile
+            //texY decimal < 0.5 == top side of tile, > 0.5 == bottom side of tile
+            //
+            //subtiles are a 1 byte value where 2 bits are for each subtile in the
+            //order lefttop, righttop, leftbottom, rightbottom
+            //to get righttop: ((pixel.a >> 4) & 3)
+
+            var shift = 0,
+                flag = 3; //binary "11" to and off the 2 lowest bits
+
+            if(texXd < 0.5) shift = [2, 6]; //shift for lefts
+            else shift = [0, 4]; //shifts for rights
+
+            if(texYd < 0.5) shift = shift[1]; //shift for top
+            else shift = shift[0]; //shift for bottom
+
+            var value = ((pixel.a >> shift) & flag);
+
+            //TODO: Make everything empty, since everything is blocking right now
+            value = ~value;
+
+            if(value == types.SUBTILE.BLOCK) {
+                if(x) {
+                    this.blocked.x = true;
+                    this.blocker.x = {
+                        pixel: pixel,
+                        location: new THREE.Vector2(texX, texY)
+                    };
+                }
+
+                if(y) {
+                    this.blocked.y = true;
+                    this.blocker.y = {
+                        pixel: pixel,
+                        location: new THREE.Vector2(texX, texY)
+                    };
+                }
+            }
+
+            //console.log('(', texX, ',', texY, ')', pixel);
         }
     });
 
