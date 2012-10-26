@@ -1,3 +1,0 @@
-http://blog.tojicode.com/2012/08/more-gpu-tile-map-demos-zelda.html
-http://media.tojicode.com/zelda/root/texture/lttp-all.png
-http://media.tojicode.com/zelda/root/texture/lttp-tiles.png
