@@ -3,12 +3,11 @@ require([
     'game/lib/utils/util',
     'game/lib/utils/AssetLoader',
     'game/lib/core/Engine',
-    'game/data/types',
     //Scripts that modify global:
     'game/vendor/three/three',
     'game/vendor/three/Stats',
     'game/vendor/three/Detector',
-], function(util, AssetLoader, Engine, types) {
+], function(util, AssetLoader, Engine) {
     $(function() {
         //Detect if webgl is supported, and if not exit
         if (!Detector.webgl) {
@@ -23,7 +22,7 @@ require([
             
             $(this).attr('disabled', true);
             
-            var loader = new AssetLoader(types);
+            var loader = new AssetLoader();
             loader.loadResources(
                 [
                     { name: 'tilemap', type: 'texture', src: 'assets/maps/lightworld/tilemap.png' },

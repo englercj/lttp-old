@@ -37,10 +37,10 @@ define({
     //so each is given 2 bits to represent its type
     /////////////////////////////////////////////////////////
     SUBTILE: {
-        PASS: 0,
-        SLIDE: 1,
-        BLOCK: 2,
-        JUMPDOWN: 3
+        PASS: 0,        //00
+        JUMPDOWN: 1,    //01
+        RESERVED: 2,    //10
+        BLOCK: 3        //11
     },
 
     /////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ define({
         DAMAGING_DESTRUCTIVE: 13,   //can destroy BLOCKING_DESTRUCTABLE and deal damage
         DAMAGING_DESTRUCTIVE_2: 14, //can destroy BLOCKING_DESTRUCTABLE_2, and deal damage
         DAMAGING_SMASHING: 15       //can smash BLOCKING_SMASHABLE and deal damage
-    }
+    },
 
     /////////////////////////////////////////////////////////
     // Entity Types
@@ -104,6 +104,7 @@ define({
         ENEMY: 2,
         FRIENDLY: 3,
         NEUTRAL: 4,
-        ITEM: 5
+        ITEM: 5,
+        TILE: 6
     }
 });

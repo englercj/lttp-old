@@ -130,6 +130,7 @@ define([
         rgbaToHex: function(rgba) {
             return ((rgba.r << 32) | (rgba.g << 16) | (rgba.b << 8) | (rgba.a)).toString(16);
         },
+        //returns the data for a pixel in the texture image
         getPixel: function(from, x, y) {
             var index = (y * this.imageData[from].width + x) * 4,
                 red = this.imageData[from].data[index],
@@ -150,13 +151,38 @@ define([
 
             return ctx.getImageData(0, 0, canvas.width, canvas.height);
         },
-        atMax: function(axis) {
-            return (this['maxDiff' + axis.toUpperCase()] <= 0);
+        atMax: function(axis, val) {
+            //no value checks if currently at max
+            if(val === undefined) {
+                return (this['maxDiff' + axis.toUpperCase()] <= 0);
+            }
+            //val checks if moving would cause us to be at max
+            else {
+                var AX = axis.toUpperCase(),
+                    ax = axis.toLowerCase(),
+                    dem = (axis == 'x' || axis == 'X') ? 'width' : 'height',
+                    newOff = this.offset[ax] - val,
+                    newMax = this['maxExtent' + AX] - (this.viewport[dem] + newOff);
+
+                return (newMax <= 0);
+            }
         },
-        atMin: function(axis) {
-            return (this.offset[axis] === 0);
+        atMin: function(axis, val) {
+            //no value check if currently at min
+            if(val === undefined) {
+                return (this.offset[axis.toLowerCase()] === 0);
+            }
+            //val checks if moving would cause us to be at min
+            else {
+                var ax = axis.toLowerCase(),
+                    newOff = this.offset[ax] - (val / this.tileScale);
+
+                return (newOff <= 0);
+            }
         },
         pan: function(x, y) {
+            if(!x && !y) return;
+
             //update the offset
             this.offset.x -= x / this.tileScale;
             this.offset.y -= y / this.tileScale;

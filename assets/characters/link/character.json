@@ -1,5 +1,6 @@
 {
     "type": "ENTITY.PLAYER",
+    "subtype": null,
     "name": "link",
     "moveSpeed": 250,
     "health": 3,
