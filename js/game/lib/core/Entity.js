@@ -1,6 +1,7 @@
 define([
-    'game/lib/bases/Sprite'
-], function(Sprite) {
+    'game/lib/bases/Sprite',
+    'game/data/types'
+], function(Sprite, types) {
     var Entity = Sprite.extend({
         init: function(options, texture, controls, map, viewport) {
             this.controls = controls;

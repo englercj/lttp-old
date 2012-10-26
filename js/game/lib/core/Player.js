@@ -1,7 +1,6 @@
 define([
-    'game/lib/core/Entity',
-    'game/data/types'
-], function(Entity, types) {
+    'game/lib/core/Entity'
+], function(Entity) {
     var Player = Entity.extend({
         init: function(options, texture, controls, map, viewport) {
             //initialize entity
