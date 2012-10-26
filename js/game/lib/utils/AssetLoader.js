@@ -1,9 +1,10 @@
 define([
-    'game/lib/bases/Emitter'
-], function(Emitter) {
+    'game/lib/bases/Emitter',
+    'game/data/types',
+    'game/data/items'
+], function(Emitter, types, items) {
     var AssetLoader = Emitter.extend({
-        init: function(types) {
-            this.types = types;
+        init: function() {
         },
         loadResources: function(resources, cb) {
             var self = this,
@@ -69,8 +70,16 @@ define([
                         if(cb) cb(errorThrown || textStatus);
                     },
                     success: function(data, textStatus, jqXHR) {
-                        if(data && typeof data == 'object') {
-                            data.type = this.types[data.type];
+                        //parse this object to have correct types defined
+                        if(typeof data == 'object') {
+                            if(data.type) {
+                                var type = data.type.split('.');
+                                data.type = types[type[0]][type[1]];
+                            }
+
+                            if(data.type == types.ENTITY.ITEM && data.subtype) {
+                                data.subtype = items[data.subtype]
+                            }
                         }
 
                         if(cb) cb(null, data);

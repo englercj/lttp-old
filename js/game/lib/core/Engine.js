@@ -29,12 +29,13 @@ define([
             //controls setup
             this.controls = new Controls(this.viewport, this.camera, this.map);//new THREE.FirstPersonControls(this.camera);
             this.controls.lockCamera.x = this.controls.lockCamera.y = true;
-            this.controls.lockMap.x = this.controls.lockMap.y = false;
 
             //setup player
-            var link = new Player(resources.link_data, resources.link_texture, this.controls, this.map, this.viewport);
-            link.addToScene(this.scene);
-            this.entities.push(link);
+            this.player = new Player(resources.link_data, resources.link_texture, this.controls, this.map, this.viewport);
+            this.player.addToScene(this.scene);
+
+            //create entities (enemies, items, etc)
+            //this.entities.push(link);
 
             //add ambient light
             this.scene.add(new THREE.AmbientLight(0xFFFFFF));
@@ -67,7 +68,10 @@ define([
             //update controls
             this.controls.update(delta);
 
-            //update entities
+            //update player entity
+            this.player.update(delta);
+
+            //update other entities
             for(var i = 0, il = this.entities.length; i < il; ++i) {
                 if(this.entities[i] && this.entities[i].update)
                     this.entities[i].update(delta);

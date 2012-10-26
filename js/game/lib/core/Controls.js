@@ -2,16 +2,14 @@ define([
     'game/lib/bases/Emitter'
 ], function(Emitter) {
     var Controls = Emitter.extend({
-        init: function(viewport, camera, map) {
+        init: function(viewport, camera) {
             //setup the emitter
             this._super({ wildcard: true, delimiter: '::', maxListeners: 10 });
 
             this.viewport = viewport;
             this.camera = camera;
-            this.map = map;
 
             this.lockCamera = { x: false, y: false };
-            this.lockMap = { x: false, y: false };
 
             this.moveSpeed = 250;
 
@@ -98,19 +96,6 @@ define([
                 if(this.moving.left) this.camera.translateX(-speed);
                 if(this.moving.right) this.camera.translateX(speed);
             }
-
-            if(!this.lockMap.y) {
-                if(this.moving.up) y -= speed;
-                if(this.moving.down) y += speed;
-            }
-
-            if(!this.lockMap.x) {
-                if(this.moving.left) x += speed;
-                if(this.moving.right) x -= speed;
-            }
-
-            if((!this.lockMap.x || !this.lockMap.y) && (x || y))
-                this.map.pan(x, y);
         }
     });
 
