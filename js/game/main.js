@@ -25,10 +25,10 @@ require([
             var loader = new AssetLoader();
             loader.loadResources(
                 [
-                    { name: 'tilemap', type: 'texture', src: 'assets/maps/lightworld/lightworld-tilemap.png' },
-                    { name: 'tileset', type: 'texture', src: 'assets/maps/lightworld/lightworld-tileset.png' },
-                    { name: 'link_texture', type: 'texture', src: 'assets/sprites/characters/link.png' },
-                    { name: 'link_json', type: 'json', src: 'assets/json/characters/link.json' }
+                    { name: 'tilemap', type: 'texture', src: 'assets/maps/lightworld/tilemap.png' },
+                    { name: 'tileset', type: 'texture', src: 'assets/maps/lightworld/tileset.png' },
+                    { name: 'link_texture', type: 'texture', src: 'assets/characters/link/sprite.png' },
+                    { name: 'link_json', type: 'json', src: 'assets/characters/link/sprite.json' }
                 ],
                 function(rsrcs) {
                     resources = rsrcs;
