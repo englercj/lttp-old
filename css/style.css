@@ -24,10 +24,10 @@ button {
 }
 
 #game-container:-moz-full-screen, #game-container:-moz-full-screen #game-canvas {
-    height: 896px;
+    height: 600px;
     margin: 0;
     padding: 0;
-    width: 1024px;
+    width: 800px;
 }
 
 #game-container:-moz-full-screen #stats {
@@ -44,12 +44,12 @@ button {
 }
 
 #game canvas {
-    height: 896px;
+    height: 600px;
     left: 0;
     margin: 0;
     position: absolute;
     top: 0;
-    width: 1024px;
+    width: 800px;
 }
 
 #stats {
@@ -71,13 +71,13 @@ button {
 }
 
 #game {
-    height: 896px;
+    height: 600px;
     left: 50%;
-    margin-left: -512px;
+    margin-left: -400px;
     position: absolute;
-    top: -448px;
+    top: -300px;
     visibility: visible;
-    width: 1024px;
+    width: 800px;
 }
 
 #progTotal {
