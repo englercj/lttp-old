@@ -1,0 +1,30 @@
+{
+    "type": "",
+    "name": "link",
+    "location": [0, 0],
+    "sprite": {
+        "size": [64, 88],
+        "offset": [0, 0],
+        "area": [8, 3],
+        "zindex": 2,
+        "animations": {
+            "movedown": {
+                "numFrames": 8,
+                "duration": 600
+            },
+            "moveup": {
+                "offset": [0, 2],
+                "numFrames": 8,
+                "duration": 600
+            },
+            "moveleft": {
+                "offset": [0, 1],
+                "numFrames": 8,
+                "duration": 600
+            },
+            "moveright": {
+                "inverseX": "moveleft"
+            }
+        }
+    }
+}

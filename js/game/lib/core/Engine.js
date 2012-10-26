@@ -32,7 +32,7 @@ define([
             this.controls.lockMap.x = this.controls.lockMap.y = false;
 
             //setup player
-            var link = new Player(resources.link_json, resources.link_texture, this.controls, this.map, this.viewport);
+            var link = new Player(resources.link_data, resources.link_texture, this.controls, this.map, this.viewport);
             link.addToScene(this.scene);
             this.entities.push(link);
 
