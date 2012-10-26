@@ -48,9 +48,8 @@ define([
         start: function() {
             this._tick();
         },
-        //TODO: More intelligent redraw, some expensive calls
-        // (such as .render() and entity updates) don't need to be called every
-        //  tick
+        //TODO: More intelligent redraw, some expensive calls (such as .render() and entity updates)
+        //don't need to be called every tick
         _tick: function() {
             //proxy the call so we retain the context
             requestAnimationFrame($.proxy(this._tick, this));
@@ -59,9 +58,6 @@ define([
             //0 = show all frames, 1 = half frames, 2 = 1/3 frames, 3 = 1/4 frames, etc...
             if(this.throttle) { this.throttle--; return; }
             this.throttle = 0;
-            
-            //simulate physics
-            //this.scene.simulate();
             
             var delta = this.clock.getDelta();
             
@@ -76,8 +72,6 @@ define([
                 if(this.entities[i] && this.entities[i].update)
                     this.entities[i].update(delta);
             }
-            
-            //do trace/collision checks
             
             //render scene
             this.renderer.render(this.scene, this.camera);
