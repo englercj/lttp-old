@@ -52,7 +52,7 @@ define([
             if(this.controls.moving.up) y += speed;
             if(this.controls.moving.down) y -= speed;
 
-            if(!this.map.atMax('y', y) && !this.map.atMin('y', -y) && !this.lockMap.y) {
+            if(!this.map.atMax('y', -y) && !this.map.atMin('y', -y) && !this.lockMap.y) {
                 if(this.controls.moving.up) my -= speed;
                 if(this.controls.moving.down) my += speed;
 
@@ -62,7 +62,7 @@ define([
             if(this.controls.moving.left) x -= speed;
             if(this.controls.moving.right) x += speed;
 
-            if(!this.map.atMax('x', x) && !this.map.atMin('x', -x) && !this.lockMap.x) {
+            if(!this.map.atMax('x', -x) && !this.map.atMin('x', -x) && !this.lockMap.x) {
                 if(this.controls.moving.left) mx += speed;
                 if(this.controls.moving.right) mx -= speed;
 

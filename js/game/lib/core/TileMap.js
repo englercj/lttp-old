@@ -112,7 +112,7 @@ define([
                 transparent: false
             });
 
-            this._plane = new THREE.PlaneGeometry(viewport.width, viewport.height, this.tileSize, this.tileSize);
+            this._plane = new THREE.PlaneGeometry(viewport.width, viewport.height);
 
             this._mesh = new THREE.Mesh(this._plane, this._material);
 
@@ -161,8 +161,8 @@ define([
                 var AX = axis.toUpperCase(),
                     ax = axis.toLowerCase(),
                     dem = (axis == 'x' || axis == 'X') ? 'width' : 'height',
-                    newOff = this.offset[ax] - val,
-                    newMax = this['maxExtent' + AX] - (this.viewport[dem] + newOff);
+                    newOff = this.offset[ax] - (val / this.tileScale),
+                    newMax = this['maxExtent' + AX] - (this.viewport[dem] + (newOff * this.tileScale));
 
                 return (newMax <= 0);
             }
