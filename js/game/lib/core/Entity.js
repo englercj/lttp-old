@@ -56,8 +56,11 @@ define([
             if(!this.blocked.x) this._mesh.translateX(x);
             if(!this.blocked.y) this._mesh.translateY(y);
         },
-        //check if we were to move to X, Y would we collide?
-        _doCollisionCheck: function(x, y) {
+        //the map collision check if we were to move to X, Y would we collide with
+        //a map element this check is neccessary since most elements on the map are not
+        //entities (walls, hills, jump downs, fences, trees, etc.) so normal entity collisions
+        //won't detect these hits. Entities are only created for interactive elements sof the map.
+        _doMapCollisionCheck: function(x, y) {
             //if we moved the map by x,y would we collide with something?
             //if yes, set this.blocked[axis] = true and set the this.blocker[axis] = tile;
 
@@ -85,33 +88,36 @@ define([
             //to get righttop: ((pixel.a >> 4) & 3)
 
             var shift = 0,
-                flag = 3; //binary "11" to and off the 2 lowest bits
+                flag = 3; //binary "11" to "and" off the 2 least significant bits
 
-            if(texXd < 0.5) shift = [2, 6]; //shift for lefts
-            else shift = [0, 4]; //shifts for rights
+            if(texXd < 0.5) shift = [2, 6]; //shift for lefts (leftbottom, lefttop)
+            else shift = [0, 4]; //shifts for rights (rightbottom, righttop)
 
-            if(texYd < 0.5) shift = shift[1]; //shift for top
-            else shift = shift[0]; //shift for bottom
+            if(texYd < 0.5) shift = shift[1]; //shift for top (second element)
+            else shift = shift[0]; //shift for bottom (first element)
 
             var value = ((pixel.a >> shift) & flag);
 
             //TODO: Make everything empty, since everything is blocking right now
             value = ~value;
 
+            //if this is a blocking subtile
             if(value == types.SUBTILE.BLOCK) {
+                //if we are moving in X, block X
                 if(x) {
                     this.blocked.x = true;
                     this.blocker.x = {
                         pixel: pixel,
-                        location: new THREE.Vector2(texX, texY)
+                        tilemapLoc: new THREE.Vector2(texX, texY)
                     };
                 }
 
+                //if we are moving in Y, block Y
                 if(y) {
                     this.blocked.y = true;
                     this.blocker.y = {
                         pixel: pixel,
-                        location: new THREE.Vector2(texX, texY)
+                        tilemapLoc: new THREE.Vector2(texX, texY)
                     };
                 }
             }

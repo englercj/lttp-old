@@ -139,7 +139,7 @@ define([
                 alpha = this.imageData[from].data[index + 3],
                 rgba = { r: red, g: green, b: blue, a: alpha };
 
-            rgba.hex = this.rgbaToHex(rgba);
+            //rgba.hex = this.rgbaToHex(rgba);
             return rgba;
         },
         getImageData: function(image) {
