@@ -69,7 +69,7 @@ define([
                 x = 0;
             }
 
-            this._doCollisionCheck();
+            this._doMapCollisionCheck();
 
             if(x || y) this.moveEntity(x, y);
 
