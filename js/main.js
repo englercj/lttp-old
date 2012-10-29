@@ -4,8 +4,9 @@ require.config({
 
 require([
     'global/class',
-    'global/game-shim'
-], function() {
+    'global/game-shim',
+    'ui'
+], function(ui) {
     var $game = $('#game'),
     $win = $(window);
     
@@ -25,6 +26,15 @@ require([
     }*/
     
     $('.progressbar').progressbar();
+
+
+    ui.init();
+
+    $win.on('keypress', function(e) {
+        if(e.shiftKey && e.which == 43) { //shift and "+"
+            ui.showStartScreen();
+        }
+    })
 
     require(['game/main']);
 });
