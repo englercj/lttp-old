@@ -96,7 +96,7 @@ define([
             if(texYd < 0.5) shift = shift[1]; //shift for top (second element)
             else shift = shift[0]; //shift for bottom (first element)
 
-            var value = ((pixel.a >> shift) & flag);
+            var value = ((pixel.b >> shift) & flag);
 
             //TODO: Make everything empty, since everything is blocking right now
             value = ~value;
