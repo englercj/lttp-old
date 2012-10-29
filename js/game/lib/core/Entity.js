@@ -3,10 +3,11 @@ define([
     'game/data/types'
 ], function(Sprite, types) {
     var Entity = Sprite.extend({
-        init: function(options, texture, controls, map, viewport) {
-            this.controls = controls;
-            this.map = map;
-            this.viewport = viewport;
+        init: function(options, texture, engine) {
+            this.engine = engine;
+            //this.controls = controls;
+            //this.map = map;
+            //this.viewport = viewport;
 
             this.type = options.type;
             this.name = options.name;
@@ -18,6 +19,9 @@ define([
 
             this.blocked = { x: false, y: false };
             this.blocker = { x: null, y: null };
+
+            this.debug = true;
+            this.debuggers = [];
 
             options.sprite = options.sprite || { size: [0, 0], area: [1, 1] };
 
@@ -36,11 +40,13 @@ define([
                 y = 0;
 
             //these values are the inverse of the player movement, since because pickles
-            if(this.controls.moving.up) y -= speed;
-            if(this.controls.moving.down) y += speed;
+            if(this.engine.controls.moving.up) y -= speed;
+            if(this.engine.controls.moving.down) y += speed;
 
-            if(this.controls.moving.left) x += speed;
-            if(this.controls.moving.right) x -= speed;
+            if(this.engine.controls.moving.left) x += speed;
+            if(this.engine.controls.moving.right) x -= speed;
+
+            this._doCollisionCheck(x, y);
 
             if(x || y) this.moveEntity(x, y);
 
@@ -50,33 +56,31 @@ define([
         moveEntity: function(x, y) {
             var newX = this._mesh.position.x + x,
                 newY = this._mesh.position.y + y;
-
-            this._doCollisionCheck(newX, newY);
             
             if(!this.blocked.x) this._mesh.translateX(x);
             if(!this.blocked.y) this._mesh.translateY(y);
         },
-        //the map collision check if we were to move to X, Y would we collide with
-        //a map element this check is neccessary since most elements on the map are not
+        //the map collision checks if we were to move by X, Y units, would we collide with
+        //a map element. This check is neccessary since most elements on the map are not
         //entities (walls, hills, jump downs, fences, trees, etc.) so normal entity collisions
-        //won't detect these hits. Entities are only created for interactive elements sof the map.
+        //won't detect these hits. Entities are only created for interactive elements of the map.
         _doMapCollisionCheck: function(x, y) {
             //if we moved the map by x,y would we collide with something?
-            //if yes, set this.blocked[axis] = true and set the this.blocker[axis] = tile;
+            //if yes, set "this.blocked[axis] = true" and set the "this.blocker[axis] = tile";
 
-            var offX = this.map.offset.x - (x / this.map.tileScale), //new X offset of map
-                tilesX = this.viewport.width / this.map.tileScale / this.map.tileSize, //number of tiles accross X of viewport
+            var offX = this.engine.map.offset.x - (x / this.engine.map.tileScale), //new X offset of map
+                tilesX = this.engine.viewport.width / this.engine.map.tileScale / this.engine.map.tileSize, //number of tiles accross X of viewport
                 pxX = tilesX + offX, //location of tile to check
-                texX = pxX / this.map.tileScale,//pixel in tilemap
+                texX = pxX / this.engine.map.tileScale,//pixel in tilemap
                 texXd = texX - Math.floor(texX), //decimal of the texture pixel (for getting the subtile)
 
-                offY = this.map.offset.y - (y / this.map.tileScale),
-                tilesY = this.viewport.height / this.map.tileScale / this.map.tileSize,
+                offY = this.engine.map.offset.y - (y / this.engine.map.tileScale),
+                tilesY = this.engine.viewport.height / this.engine.map.tileScale / this.engine.map.tileSize,
                 pxY = tilesY + offY,
-                texY = this.map.tilemap.image.height - (pxY / this.map.tileScale),
+                texY = this.engine.map.tilemap.image.height - (pxY / this.engine.map.tileScale),
                 texYd = texY - Math.floor(texY),
 
-                pixel = this.map.getPixel('tilemap', Math.floor(texX), Math.floor(texY)),
+                pixel = this.engine.map.getPixel('tilemap', Math.floor(texX), Math.floor(texY)),
                 colliders = [];
 
 
@@ -102,6 +106,8 @@ define([
             value = ~value;
 
             //if this is a blocking subtile
+            this.blocked.x = this.blocked.y = false;
+            this.blocker.x = this.blocker.y = null;
             if(value == types.SUBTILE.BLOCK) {
                 //if we are moving in X, block X
                 if(x) {
@@ -122,7 +128,30 @@ define([
                 }
             }
 
-            //console.log('(', texX, ',', texY, ')', pixel);
+            if(this.debug) {
+                for(var i = 0, il = this.debuggers.length; ++i) {
+                    if(this.debuggers[i])
+                        this.engine.destroyMesh(this.debuggers[i]);
+                }
+
+                this.debuggers.length = 0;
+
+                if(this.blocked.x) {
+                    if(x < 0) { //moving left
+
+                    } else { //moving right
+
+                    }
+                }
+
+                if(this.blocked.y) {
+                    if(y < 0) { //moving up
+
+                    } else { //moving down
+
+                    }
+                }
+            }
         }
     });
 

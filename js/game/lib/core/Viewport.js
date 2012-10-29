@@ -37,11 +37,25 @@ define([
         },
         append: function() {return this._$container.append.apply(this._$container, arguments);},
         offset: function() {return this._$container.offset.apply(this._$container, arguments);},
+        setCamera: function(camera) {
+            this.camera = camera;
+        },
         focus: function() {
             if(!this.isDocument)
                 return this._$container;
             else
                 return this._$contianer.focus();
+        },
+        toScreenXY: function(position) {
+            var pos = position.clone();
+            projScreenMat = new THREE.Matrix4();
+            projScreenMat.multiply(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
+            projScreenMat.multiplyVector3(pos);
+
+            return {
+                x: ((pos.x + 1) * (this.width / 2)) + this._$container.offset().left,
+                y: ((-pos.y + 1) * (this.height / 2)) + this._$container.offset().top
+            };
         },
         aspect: function() {
             return (this.width / this.height);

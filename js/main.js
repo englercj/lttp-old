@@ -3,9 +3,9 @@ require.config({
 });
 
 require([
+    'ui',
     'global/class',
-    'global/game-shim',
-    'ui'
+    'global/game-shim'
 ], function(ui) {
     var $game = $('#game'),
     $win = $(window);
@@ -26,8 +26,7 @@ require([
     }*/
     
     $('.progressbar').progressbar();
-
-
+    
     ui.init();
 
     $win.on('keypress', function(e) {

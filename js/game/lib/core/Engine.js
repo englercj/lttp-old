@@ -21,6 +21,7 @@ define([
             this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 1000);//new THREE.PerspectiveCamera(60, this.viewport.aspect(), 1, 10000);
             this.camera.position.z = 250;
             this.scene.add(this.camera);
+            this.viewport.setCamera(this.camera);
 
             //map setup
             this.map = new TileMap(resources.tilemap, resources.tileset, this.viewport);
@@ -31,7 +32,7 @@ define([
             this.controls.lockCamera.x = this.controls.lockCamera.y = true;
 
             //setup player
-            this.player = new Player(resources.link_data, resources.link_texture, this.controls, this.map, this.viewport);
+            this.player = new Player(resources.link_data, resources.link_texture, this);
             this.player.addToScene(this.scene);
 
             //create entities (enemies, items, etc)
@@ -48,6 +49,13 @@ define([
         },
         start: function() {
             this._tick();
+        },
+        destroyMesh: function(mesh) {
+            this.scene.remove(mesh);
+            this.renderer.deallocateObject(mesh);
+        },
+        destroyTexture: function(tex) {
+            this.renderer.deallocateTexture(tex);
         },
         //TODO: More intelligent redraw, some expensive calls (such as .render() and entity updates)
         //don't need to be called every tick
