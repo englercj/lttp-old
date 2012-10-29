@@ -24,9 +24,18 @@ Here is a list of external dependencies and what they are used for. Each is rele
 * [game-shim](https://github.com/toji/game-shim) - For normalizing many browser-specific functions
 * [require.js](http://requirejs.org/) - Provides dependency loading/management
 * [modernizr v2.6.1](http://modernizr.com/) - For browser feature detection
+* [Return of Ganon Font](http://www.zone38.net/font/#ganon) - For dialog and other text
 
 All of these dependencies are included in this repository and there is no need to download or add them individually.
 Note that jQuery and jQuery-UI attempt to load from Google CDN, and fallback to the local files if that fails.
+
+### Acknowledgments
+
+Below is a list of tutorials, code snippetes, and other resources I used to develope many of the methods used in this game.
+I wanted to be sure to credit them all, if I miss someone please let me know.
+
+* [Texture Animation](https://github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/Texture-Animation.html) by [stemkoski](https://github.com/stemkoski)
+* [GPU Tilemaps](http://blog.tojicode.com/2012/08/more-gpu-tile-map-demos-zelda.html) by [Toji](https://github.com/toji)
 
 ### License and Legal
 
