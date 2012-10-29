@@ -2,9 +2,9 @@ define([
     'game/lib/core/Entity'
 ], function(Entity) {
     var Player = Entity.extend({
-        init: function(options, texture, controls, map, viewport) {
+        init: function(options, texture, engine) {
             //initialize entity
-            this._super(options, texture, controls, map, viewport);
+            this._super(options, texture, engine);
 
             //for keeping player centered
             this.centerThreshold = 5;
@@ -16,7 +16,7 @@ define([
 
             //move to the location specified
             this.setPosition(0, 0);
-            this.map.pan(options.location[0], options.location[1]);
+            this.engine.map.pan(options.location[0], options.location[1]);
 
             window.play = this;
         },
@@ -49,27 +49,27 @@ define([
                 mx = 0,
                 my = 0;
 
-            if(this.controls.moving.up) y += speed;
-            if(this.controls.moving.down) y -= speed;
+            if(this.engine.controls.moving.up) y += speed;
+            if(this.engine.controls.moving.down) y -= speed;
 
-            if(!this.map.atMax('y', -y) && !this.map.atMin('y', -y) && !this.lockMap.y) {
-                if(this.controls.moving.up) my -= speed;
-                if(this.controls.moving.down) my += speed;
+            if(!this.engine.map.atMax('y', -y) && !this.engine.map.atMin('y', -y) && !this.lockMap.y) {
+                if(this.engine.controls.moving.up) my -= speed;
+                if(this.engine.controls.moving.down) my += speed;
 
                 y = 0;
             }
             
-            if(this.controls.moving.left) x -= speed;
-            if(this.controls.moving.right) x += speed;
+            if(this.engine.controls.moving.left) x -= speed;
+            if(this.engine.controls.moving.right) x += speed;
 
-            if(!this.map.atMax('x', -x) && !this.map.atMin('x', -x) && !this.lockMap.x) {
-                if(this.controls.moving.left) mx += speed;
-                if(this.controls.moving.right) mx -= speed;
+            if(!this.engine.map.atMax('x', -x) && !this.engine.map.atMin('x', -x) && !this.lockMap.x) {
+                if(this.engine.controls.moving.left) mx += speed;
+                if(this.engine.controls.moving.right) mx -= speed;
 
                 x = 0;
             }
 
-            this._doMapCollisionCheck();
+            this._doMapCollisionCheck(x, y);
 
             if(x || y) this.moveEntity(x, y);
 
@@ -79,7 +79,7 @@ define([
                 if(this.blocked.y) my = 0;
             }
 
-            if(mx || my) this.map.pan(mx, my);
+            if(mx || my) this.engine.map.pan(mx, my);
 
             //animation updates
             this.animate(delta);
@@ -88,8 +88,8 @@ define([
             //override entity movement, since this entity is bound to the screen
             //we need to do extra checks. It looks very similar but has some extra
             //stuff in there
-            var w2 = this.viewport.width / 2,
-                h2 = this.viewport.height / 2,
+            var w2 = this.engine.viewport.width / 2,
+                h2 = this.engine.viewport.height / 2,
                 maxX = w2 - (this.size.x / 2), //half width - half texture width
                 maxY = h2 - (this.size.y / 2),
                 newX = this._mesh.position.x + x,
