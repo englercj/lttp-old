@@ -1,3 +1,9 @@
+@font-face {
+    font-family: ReturnOfGanon;
+    src: url(../assets/fonts/retganon.ttf);
+    font-weight: 400;
+}
+
 body {
     background-color: #EBEBEB;
     color: black;
@@ -14,6 +20,11 @@ button {
     padding: 0 8px;
 }
 
+p, .rog {
+    font-family: ReturnOfGanon,Consolas,'Lucida Console','DejaVu Sans Mono',monospace;
+}
+
+/* CSS below this point is garbage... */
 #game canvas {
     background-color: #CCC;
     display: block;
