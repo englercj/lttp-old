@@ -2,9 +2,9 @@ define([
     'game/lib/core/Entity'
 ], function(Entity) {
     var Player = Entity.extend({
-        init: function(options, texture, engine) {
+        init: function(resource, engine) {
             //initialize entity
-            this._super(options, texture, engine);
+            this._super(resource, engine);
 
             //for keeping player centered
             this.centerThreshold = 5;
@@ -15,8 +15,8 @@ define([
             this.bindEvents();
 
             //move to the location specified
-            this.setPosition(0, 0);
-            this.engine.map.pan(options.location[0], options.location[1]);
+            //this.setPosition(resource.data.location[0], resource.data.location[1]);
+            //this.engine.map.pan(options.location[0], options.location[1]);
 
             window.play = this;
         },

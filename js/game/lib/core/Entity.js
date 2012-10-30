@@ -3,19 +3,19 @@ define([
     'game/data/types'
 ], function(Sprite, types) {
     var Entity = Sprite.extend({
-        init: function(options, texture, engine) {
+        init: function(resource, engine) {
             this.engine = engine;
             //this.controls = controls;
             //this.map = map;
             //this.viewport = viewport;
 
-            this.type = options.type;
-            this.name = options.name;
-            this.moveSpeed = options.moveSpeed || 200;
-            this.health = options.health || 3;
+            this.type = resource.data.type;
+            this.name = resource.data.name;
+            this.moveSpeed = resource.data.moveSpeed || 200;
+            this.health = resource.data.health || 3;
 
-            this.items = options.items || [];
-            this.loot = options.loot || [];
+            this.items = resource.data.items || [];
+            this.loot = resource.data.loot || [];
 
             this.blocked = { x: false, y: false };
             this.blocker = { x: null, y: null };
@@ -23,15 +23,15 @@ define([
             this.debug = true;
             this.debuggers = [];
 
-            options.sprite = options.sprite || { size: [0, 0], area: [1, 1] };
+            resource.data.sprite = resource.data.sprite || { size: [0, 0], area: [1, 1] };
 
-            options.sprite.texture = texture || new THREE.Texture();
+            resource.data.sprite.texture = resource.texture || new THREE.Texture();
 
             //initialize visual sprite
-            this._super(options.sprite);
+            this._super(resource.data.sprite);
 
             //this.setAnimation('idle');
-            this.setPosition(0, 0);
+            this.setPosition(resource.data.location[0], resource.data.location[1]);
         },
         update: function(delta) {
             //calculate actual sprite movement accross the world
