@@ -21,9 +21,6 @@ define([
             this.blocked = { x: false, y: false };
             this.blocker = { x: null, y: null };
 
-            this.debug = true;
-            this.debuggers = [];
-
             this.ray = new THREE.Ray();
 
             resource.data.sprite = resource.data.sprite || { size: [0, 0], area: [1, 1] };
@@ -225,7 +222,7 @@ define([
                 }
             }
 
-            if(this.debug) {
+            /*if(this.debug) {
                 for(var i = 0, il = this.debuggers.length; i < il; ++i) {
                     if(this.debuggers[i])
                         this.engine.destroyMesh(this.debuggers[i]);
@@ -248,7 +245,7 @@ define([
 
                     }
                 }
-            }
+            }*/
         }
     });
 

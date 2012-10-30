@@ -27,8 +27,6 @@ define([
             //move to the location specified
             //this.setPosition(resource.data.location[0], resource.data.location[1]);
             //this.engine.map.pan(options.location[0], options.location[1]);
-
-            window.play = this;
         },
         bindEvents: function() {
             var self = this;
