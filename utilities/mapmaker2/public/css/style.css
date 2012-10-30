@@ -1,0 +1,30 @@
+.col2 {
+    float: left;
+    width: 48%;
+}
+
+.clear { clear: both; }
+
+canvas { vertical-align:top; }
+
+.tool {
+    width: 32px;
+    height: 32px;
+    background-position: left top;
+    background-repeat: repeat;
+}
+
+.tool:hover {
+    width: 30px;
+    height: 30px;
+    border: solid 1px #00A1FF;
+}
+
+.tool.selected {
+    width: 30px;
+    height: 30px;
+    border: solid 1px #0F0;
+}
+
+.tool.jumpdown { background:rgba(255, 255, 0, 0.5); }
+.tool.jumpdown { background:rgba(255, 255, 0, 0.5); }

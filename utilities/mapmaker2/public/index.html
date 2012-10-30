@@ -13,15 +13,17 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="css/jquery-ui.dot-luv.css">
+        <link rel="stylesheet" href="css/dot-luv/jquery-ui-1.9.1.custom.min.css">
+
+        <script src="/socket.io/socket.io.js"></script>
 
         <!-- jQuery -->
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
 
         <!-- jQuery UI -->
-        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>
-        <script>window.jQuery.ui || document.write('<script src="js/vendor/jquery-ui.min.js"><\/script>')</script>
+        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+        <script>window.jQuery.ui || document.write('<script src="js/vendor/jquery-ui-1.9.1.custom.min.js"><\/script>')</script>
 
         <!-- jQuery Plugins -->
         <script src="js/vendor/jquery.ajax-progress.js"></script>
@@ -34,7 +36,7 @@
         <section id="tabs">
             <ul>
                 <li><a href="#generator">Map Generator</a></li>
-                <li><a href="#editor">Map Generator</a></li>
+                <li><a href="#editor">Collision Editor</a></li>
             </ul>
             <div id="generator">
                 <form id="makemap" enctype="multipart/form-data">
@@ -48,16 +50,34 @@
                     <input type="file" name="map" id="fileMap" />
                     <br/>
                     <input type="button" value="Mapify" id="btnMapify" />
+                    <input type="button" value="Edit Collision Data" id="btnEdit" disabled />
+                    <input type="button" value="Test Images" id="btnTest" />
                 </form>
-                <progress id="progUpload"></progress>
 
+                <br/>
+                <!--<div id="progUpload" class="progress"></div>-->
+                <div id="status"></div>
+
+                <br/>
+                Tileset:<br/>
                 <img id="imgTileset" />
+                <br/>
+                Tilemap:<br/>
                 <img id="imgTilemap" />
+
+                <br class="clear"/>
             </div>
             <div id="editor">
-                
+                <div id="tools">
+                    <span class="tool empty" data-tool-id="0"></span>
+                    <span class="tool jumpdown" data-tool-id="1"></span>
+                    <span class="tool reserved" data-tool-id="2"></span>
+                    <span class="tool block" data-tool-id="3"></span>
+                </div>
+                <canvas id="minimap"></canvas>
+                <canvas id="map"></canvas>
+                <br class="clear"/>
             </div>
         </section>
-    
-
-</body></html>
+    </body>
+</html>

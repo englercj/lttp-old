@@ -1,7 +1,7 @@
 var path = require('path'),
     fs = require('fs'),
     async = require('async'),
-    //sio = require('socket.io'),
+    sio = require('socket.io'),
     MapMaker = require('./mapmaker').MapMaker,
     express = require('express');
 
@@ -18,7 +18,7 @@ var Api = exports.Api = function(conf) {
 Api.prototype.start = function() {
     if(!this.server) {
         this.server = this.app.listen(this.config.server.port, this.config.server.host);
-        //this.io = sio.listen(this.server);
+        this.io = sio.listen(this.server);
 
         this._configure();
         this._setupRoutes();
@@ -47,7 +47,7 @@ Api.prototype.createMaps = function(file, tilesize, sheetsize, cb) {
     console.log('Generating maps...');
     fs.readFile(file, function(err, data) {
         if(err) {
-            console.log(err);
+            console.log('Read Error:', err);
             if(cb) cb(err);
             return;
         }
@@ -55,30 +55,37 @@ Api.prototype.createMaps = function(file, tilesize, sheetsize, cb) {
         var maker = new MapMaker(),
             canvases,
             fns = [],
-            base = path.basename(file).replace(path.extname(file), '');
+            base = path.basename(file).replace(path.extname(file), ''),
+            progress = 0;
 
-        maker.setSpriteSheetSize(sheetsize);
-        canvases = maker.parseMap(data, tilesize);
+        maker.on('progress', function(total) {
+            progress++;
 
-        ['tilemap', 'tileset'].forEach(function(s) {
-            fns.push(function(_cb) {
-                var p = path.join(self.temp, base + '-' + s + '.png'),
-                    outStream = fs.createWriteStream(p),
-                    pngStream = canvases[s].pngStream();
-
-                pngStream.pipe(outStream);
-                pngStream.on('end', function() {
-                    _cb(null, p)
-                });
-                pngStream.on('error', function(err) {
-                    _cb(err);
-                });
-            });
+            //self.io.sockets.in(base).emit('progress', { complete: progress, total: total });
         });
 
-        async.parallel(fns, function(err, paths) {
-            console.log('Done!');
-            if(cb) cb(err, paths);
+        maker.setSpriteSheetSize(sheetsize);
+        maker.parseMap(data, tilesize, function(err, canvases) {
+            ['tilemap', 'tileset'].forEach(function(s) {
+                fns.push(function(_cb) {
+                    var p = path.join(self.temp, base + '-' + s + '.png'),
+                        outStream = fs.createWriteStream(p),
+                        pngStream = canvases[s].pngStream();
+
+                    pngStream.pipe(outStream);
+                    pngStream.on('end', function() {
+                        _cb(null, p)
+                    });
+                    pngStream.on('error', function(err) {
+                        _cb(err);
+                    });
+                });
+            });
+
+            async.parallel(fns, function(err, paths) {
+                console.log('Done!');
+                if(cb) cb(err, paths, canvases);
+            });
         });
     });
 };
@@ -86,23 +93,43 @@ Api.prototype.createMaps = function(file, tilesize, sheetsize, cb) {
 Api.prototype._configure = function() {
     this.app.use(express.static('public'));
     this.app.use(express.bodyParser({ keepExtensions: true, uploadDir: this.temp }));
-    //this.io.set('log level', this.config.sioLogLevel);
+    this.io.set('log level', this.config.sioLogLevel);
 };
 
 Api.prototype._setupRoutes = function() {
     var self = this;
 
-    self.app.post('/makemap/:tilesize?/:sheetsize?', function(req, res) {
+    self.app.post('/makemap/:tilesize?/:sheetsize?/:socketId?', function(req, res) {
         if(!req.files.map) {
             res.send(400);
         } else {
+            var id = path.basename(req.files.map.path).replace(path.extname(req.files.map.path), '');
+            
+            if(req.params.socketId) {
+                var rooms = self.io.sockets.manager.roomClients[req.params.socketId];
+
+                for(var r in rooms) {
+                    if(r) self.io.sockets.socket(req.params.socketId).leave(r);
+                }
+
+                self.io.sockets.socket(req.params.socketId).join(id);
+            }
+
+            res.send(id);
+
             self.createMaps(req.files.map.path, req.params.tilesize, req.params.sheetsize, function(err, paths) {
-                res.json({
+                self.io.sockets.in(id).emit('complete', {
                     //urls for the generated files
                     tilemap: '/temp/' + path.basename(paths[0]),
                     tileset: '/temp/' + path.basename(paths[1])
                 });
             });
         }
+    });
+
+    self.io.sockets.on('connection', function(socket) {
+        socket.emit('id', socket.id);
+        socket.on('subscribe', function(data) { socket.join(data); });
+        socket.on('unsubscribe', function(data) { socket.leave(data); });
     });
 };

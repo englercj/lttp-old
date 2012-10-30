@@ -24,6 +24,8 @@ freely, subject to the following restrictions:
 >Note from Chad Engler:
 > This is tweaked to run on Node.js using node-canvas
 > This modified version will draw each tile upside down, so it will work with my shader
+> This version will run each processTile() in parallel
+> Use cluster module and have workers for each processTile()???
 >>>>>>>>>
 */
 var Canvas = require('canvas'),
@@ -62,6 +64,16 @@ MapMaker.prototype.setSpriteSheetSize = function(sheetSize) {
 };
 
 MapMaker.prototype.parseMap = function(src, tileSize, firstTileId, cb) {
+    if(typeof tileSize == 'function') {
+        cb = tileSize;
+        tileSize = 16;
+    }
+
+    if(typeof firstTileId == 'function') {
+        cb = firstTileId;
+        firstTileId = null;
+    }
+
     this.sprites = {};
     this.tileSize = tileSize;
     this.tilesPerRow = Math.floor(this.spriteCanvas.width / tileSize);
@@ -75,21 +87,38 @@ MapMaker.prototype.parseMap = function(src, tileSize, firstTileId, cb) {
 
     this.srcImage.src = src;
 
-    return this.processImage();
+    this.processImage(cb);
 };
 
-MapMaker.prototype.processImage = function() {
+MapMaker.prototype.processImage = function(cb) {
     var mapWidth = this.srcImage.width / this.tileSize;
     var mapHeight = this.srcImage.height / this.tileSize;
     this.mapCanvas.width = mapWidth;
     this.mapCanvas.height = mapHeight;
 
-    var x, y;
+    var x, y, fns = [], self = this, total = mapHeight * mapWidth;
     for(y = 0; y < mapHeight; ++y) {
         for(x = 0; x < mapWidth; ++x) {
-            this.processTile(x, y);
+            (function(x, y) {
+                fns.push(function(_cb) {
+                    self.processTile(x, y, function() {
+                        self.emit('progress', total);
+                        _cb();
+                    });
+                });
+            })(x, y);
         }
     }
+
+    async.parallel(fns, function(err, results) {
+        if(cb) {
+            cb(err, {
+                tileset: self.spriteCanvas,
+                tilemap: self.mapCanvas
+            });
+        }
+    });
+
     /*
     var spriteImg = document.getElementById("spriteImg");
     var mapImg = document.getElementById("mapImg");
@@ -98,10 +127,9 @@ MapMaker.prototype.processImage = function() {
     mapImg.src = this.mapCanvas.toDataURL("image/png");
     */
     //this.emit('parsed', this.spriteCanvas.toBuffer(), this.spriteCanvas.toBuffer());
-    return { tileset: this.spriteCanvas, tilemap: this.mapCanvas };
 };
 
-MapMaker.prototype.processTile = function(x, y) {
+MapMaker.prototype.processTile = function(x, y, cb) {
     //rotate upside down, and draw
     this.tileCtx.save();
     this.tileCtx.translate(0, this.tileSize);
@@ -114,8 +142,19 @@ MapMaker.prototype.processTile = function(x, y) {
 
     this.tileCtx.restore();
 
+    //need to do collision intelligence here
+    //valid values are:
+    //0 = empty
+    //1 = jumpdown
+    //2 = reserved
+    //3 = block
+
     this.mapCtx.fillStyle="rgb(" + sprite.x + "," + sprite.y + ", 0)";
     this.mapCtx.fillRect(x,y,1,1);
+
+    process.nextTick(function() {
+        if(cb) cb();
+    });
 
     /* Why was this thing drawing 2 times?
     this.tileCtx.drawImage(this.srcImage, 
@@ -134,8 +173,8 @@ MapMaker.prototype.cacheSprite = function() {
         };
 
         this.spriteCtx.drawImage(this.tileCanvas, 
-        0, 0, this.tileSize, this.tileSize, 
-        sprite.x * this.tileSize, sprite.y * this.tileSize, this.tileSize, this.tileSize);
+            0, 0, this.tileSize, this.tileSize, 
+            sprite.x * this.tileSize, sprite.y * this.tileSize, this.tileSize, this.tileSize);
 
         this.nextTileId++;
         this.sprites[hash] = sprite;
