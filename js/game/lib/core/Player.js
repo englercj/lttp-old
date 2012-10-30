@@ -6,6 +6,16 @@ define([
             //initialize entity
             this._super(resource, engine);
 
+            this.maxMagic = resource.data.maxMagic || 70;
+            this.magic = resource.data.magic || 70;
+            this.inventory = resource.data.inventory || {
+                rupees: 0,
+                bombs: 0,
+                arrows: 0,
+                heart_pieces: 0
+            };
+            this.equipted = null;
+
             //for keeping player centered
             this.centerThreshold = 5;
             this.offcenter = { x: false, y: false };
@@ -40,6 +50,11 @@ define([
             //TODO: need to also check for trying to move, but can't and do those pushing animations
         },
         update: function(delta) {
+            //animation updates
+            this.animate(delta);
+
+            if(this.freeze) return;
+
             //calculate movement accross the world, if we are not at (or going into)
             //the map min/max for that axis then move the map. If we do hit a min/max
             //then move the map
@@ -49,40 +64,31 @@ define([
                 mx = 0,
                 my = 0;
 
-            if(this.engine.controls.moving.up) y += speed;
-            if(this.engine.controls.moving.down) y -= speed;
-
             if(!this.engine.map.atMax('y', -y) && !this.engine.map.atMin('y', -y) && !this.lockMap.y) {
                 if(this.engine.controls.moving.up) my -= speed;
                 if(this.engine.controls.moving.down) my += speed;
-
-                y = 0;
+            } else {
+                if(this.engine.controls.moving.up) y += speed;
+                if(this.engine.controls.moving.down) y -= speed;
             }
-            
-            if(this.engine.controls.moving.left) x -= speed;
-            if(this.engine.controls.moving.right) x += speed;
 
             if(!this.engine.map.atMax('x', -x) && !this.engine.map.atMin('x', -x) && !this.lockMap.x) {
                 if(this.engine.controls.moving.left) mx += speed;
                 if(this.engine.controls.moving.right) mx -= speed;
-
-                x = 0;
+            } else {
+                if(this.engine.controls.moving.left) x -= speed;
+                if(this.engine.controls.moving.right) x += speed;
             }
 
-            this._doMapCollisionCheck(x, y);
+            this._doMapCollisionCheck(x || mx, y || my);
+
+            //if blocked, then set to 0
+            if(this.blocked.x) x = mx = 0;
+            if(this.blocked.y) y = my = 0;
 
             if(x || y) this.moveEntity(x, y);
 
-            //if we are moving the map, then block them if need be
-            if(mx || my) {
-                if(this.blocked.x) mx = 0;
-                if(this.blocked.y) my = 0;
-            }
-
             if(mx || my) this.engine.map.pan(mx, my);
-
-            //animation updates
-            this.animate(delta);
         },
         moveEntity: function(x, y) {
             //override entity movement, since this entity is bound to the screen

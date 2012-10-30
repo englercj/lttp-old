@@ -16,6 +16,7 @@ define([
                 offset: THREE.Vector2,  //offset to first frame in texture (cols, rows), default: (0, 0)
                 zindex: Number,         //default: 1
                 filtered: Boolean,      //whether to use linear filtering, default: false
+                segments: THREE.Vector2,//number of x/y segments for the mesh
 
                 //animations
                 animations: {
@@ -37,9 +38,10 @@ define([
             this.texture = opts.texture;
             this.size = opts.size; //[width, height] in pixels
             this.area = opts.area;
-            this.offset = (opts.offset !== undefined) ? opts.offset : THREE.Vector2(0, 0); //[x, y] in pixels
+            this.offset = (opts.offset !== undefined) ? opts.offset : new THREE.Vector2(0, 0); //[x, y] in pixels
             this.zindex = (opts.zindex !== undefined) ? opts.zindex : 1;
             this.filtered = (opts.filtered !== undefined) ? opts.filtered : false;
+            this.segments = (opts.segments !== undefined) ? opts.segments : new THREE.Vector2(1, 1);
 
             //convert array to Vector2
             if(this.size instanceof Array)
@@ -50,6 +52,9 @@ define([
 
             if(this.area instanceof Array)
                 this.area = new THREE.Vector2(this.area[0], this.area[1]);
+
+            if(this.segments instanceof Array)
+                this.segments = new THREE.Vector2(this.segments[0], this.segments[1]);
 
             //animations
             this.animations = {}, inverses = {};
@@ -124,7 +129,7 @@ define([
             this.texture.offset.y = (this.offset.y / this.area.y);
 
             //actual sprite
-            this._plane = new THREE.PlaneGeometry(this.size.x, this.size.y, 1, 1);
+            this._plane = new THREE.PlaneGeometry(this.size.x, this.size.y, this.segments.x, this.segments.y);
             this._material = new THREE.MeshBasicMaterial({ map: this.texture, transparent: true });
             this._mesh = new THREE.Mesh(this._plane, this._material);
             this._mesh.position.set(0, 0, this.zindex);

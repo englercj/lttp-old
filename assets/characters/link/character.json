@@ -6,10 +6,21 @@
     "health": 3,
     "location": [0, 0],
     "weapon": "",
+    "health": 1.5,
+    "maxHealth": 3,
+    "magic": 35,
+    "maxMagic": 70,
+    "inventory": {
+        "rupees": 0,
+        "bombs": 0,
+        "arrows": 0,
+        "heart_pieces": 0
+    },
     "sprite": {
         "size": [64, 88],
         "offset": [0, 0],
         "area": [8, 3],
+        "segments": [5, 8],
         "zindex": 2,
         "animations": {
             "movedown": {

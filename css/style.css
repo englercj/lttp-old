@@ -78,23 +78,26 @@ p, .rog, #dialog, #hud {
     position: absolute;
 }
 
-#meter {
+#hud .meter {
     background: left top url(../assets/ui/magic_meter.png) no-repeat;
     width: 32px;
     height: 84px;
 }
 
-#meter.upgraded {
+#hud .meter.upgraded {
     background: left top url(../assets/ui/magic_meter_2.png) no-repeat;
     width: 32px;
     height: 86px;
 }
 
-#meter .meter-value {
-    background: #30E838;
+#hud .meter .meter-value {
+    background: center bottom url(../assets/ui/magic_meter_value.png) no-repeat;
+    width: 20px;
+    height: 70px;
+    margin: 6px 0  0 6px;
 }
 
-#item {
+#hud .item {
     background: left top url(../assets/ui/item-frame.png) no-repeat;
     width: 44px;
     height: 44px;
@@ -102,7 +105,7 @@ p, .rog, #dialog, #hud {
     left: 40px;
 }
 
-#rupees, #bombs, #arrows {
+#hud .rupees, #hud .bombs, #hud .arrows {
     background-position: center top;
     background-repeat: no-repeat;
     padding-top: 20px;
@@ -116,11 +119,11 @@ p, .rog, #dialog, #hud {
     text-indent: -7px;
 }
 
-#rupees { background-image: url(../assets/ui/indicator-rupees.png); left: 130px; }
-#bombs { background-image: url(../assets/ui/indicator-bombs.png); left: 200px; }
-#arrows { background-image: url(../assets/ui/indicator-arrows.png); left: 270px; }
+#hud .rupees { background-image: url(../assets/ui/indicator-rupees.png); left: 130px; }
+#hud .bombs { background-image: url(../assets/ui/indicator-bombs.png); left: 200px; }
+#hud .arrows { background-image: url(../assets/ui/indicator-arrows.png); left: 270px; }
 
-#life {
+#hud .life {
     font-style: normal;
     text-shadow:
         1px 1px 0 #000,
@@ -130,7 +133,7 @@ p, .rog, #dialog, #hud {
     font-size: 22px;
 }
 
-#life .dash {
+#hud .life .dash {
     background: left top url(../assets/ui/life-dash.png) no-repeat;
     width: 24px;
     height: 4px;
@@ -138,11 +141,11 @@ p, .rog, #dialog, #hud {
     margin-bottom: 5px;
 }
 
-#life .hearts {
+#hud .life .hearts {
     width:180px;
 }
 
-#life .hearts .heart {
+#hud .life .hearts .heart {
     background: center top url(../assets/ui/heart-full.png) no-repeat;
     width: 14px;
     height: 14px;
@@ -152,9 +155,9 @@ p, .rog, #dialog, #hud {
 }
 
 /*#life .hearts .heart.3-4 { background-image: url(../assets/ui/heart-4-3.png); }*/
-#life .hearts .heart.half { background-image: url(../assets/ui/heart-half.png); }
+#hud .life .hearts .heart.half { background-image: url(../assets/ui/heart-half.png); }
 /*#life .hearts .heart.1-4 { background-image: url(../assets/ui/heart-1-4.png); }*/
-#life .hearts .heart.empty { background-image: url(../assets/ui/heart-empty.png); }
+#hud .life .hearts .heart.empty { background-image: url(../assets/ui/heart-empty.png); }
 
 /* CSS below this point is garbage... */
 #game canvas {

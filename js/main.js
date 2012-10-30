@@ -1,6 +1,6 @@
-require.config({
+/*require.config({
     waitSeconds: 2000
-});
+});*/
 
 require([
     'global/class',

@@ -4,7 +4,7 @@ define([
     'game/lib/core/Controls',
     'game/lib/core/TileMap',
     'game/lib/core/Player',
-    'game/lib/utils/UI'
+    'game/lib/core/UI'
     //Scritps that modify global
     //'game/lib/core/three_fpcontrols'
 ], function(Viewport, Controls, TileMap, Player, UI) {
@@ -12,7 +12,7 @@ define([
         init: function(elements, resources) {
             //setup game
             this.entities = [];
-            this.ui = new UI(elements);
+            this.ui = new UI(elements, this);
             this.scene = new THREE.Scene();
             this.clock = new THREE.Clock();
             this.renderer = new THREE.WebGLRenderer();
@@ -44,7 +44,7 @@ define([
             this.player = new Player(resources.entities.link, this);
             this.player.addToScene(this.scene);
 
-            //create entities (enemies, items, etc)
+            //create entities (enemies, items, bushes, etc)
             //this.entities.push(link);
 
             //add ambient light
@@ -65,6 +65,20 @@ define([
         },
         destroyTexture: function(tex) {
             this.renderer.deallocateTexture(tex);
+        },
+        destroyEntity: function(ent) {
+            this.destroyMesh(ent._mesh);
+
+            if(ent.texture)
+                this.destroyTexture(ent.texture);
+        },
+        loadZone: function(zone) { //loads and places all the entities in a zone
+
+        },
+        unloadZone: function(zone) { //cleans up all the entities in a zone
+            for(var i = 0, il = this.entities.length; i < il; ++i) {
+                this.destryEntity(this.entities[i]);
+            }
         },
         //TODO: More intelligent redraw, some expensive calls (such as .render() and entity updates)
         //don't need to be called every tick
@@ -93,6 +107,10 @@ define([
                 if(this.entities[i] && this.entities[i].update)
                     this.entities[i].update(delta);
             }
+            
+            //update UI
+            //TODO: this should only update when dirty, not all the time
+            this.ui.update(delta);
             
             //render scene
             this.renderer.render(this.scene, this.camera);
