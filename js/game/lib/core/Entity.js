@@ -12,6 +12,7 @@ define([
             this.type = resource.data.type;
             this.name = resource.data.name;
             this.moveSpeed = resource.data.moveSpeed || 200;
+            this.maxHealth = resource.data.maxHealth || 3;
             this.health = resource.data.health || 3;
 
             this.items = resource.data.items || [];
@@ -22,6 +23,8 @@ define([
 
             this.debug = true;
             this.debuggers = [];
+
+            this.ray = new THREE.Ray();
 
             resource.data.sprite = resource.data.sprite || { size: [0, 0], area: [1, 1] };
 
@@ -34,6 +37,11 @@ define([
             this.setPosition(resource.data.location[0], resource.data.location[1]);
         },
         update: function(delta) {
+            //animation updates
+            this.animate(delta);
+
+            if(this.freeze) return;
+
             //calculate actual sprite movement accross the world
             var speed = delta * this.moveSpeed,
                 x = 0,
@@ -49,16 +57,105 @@ define([
             this._doCollisionCheck(x, y);
 
             if(x || y) this.moveEntity(x, y);
-
-            //animation updates
-            this.animate(delta);
         },
         moveEntity: function(x, y) {
-            var newX = this._mesh.position.x + x,
-                newY = this._mesh.position.y + y;
-            
             if(!this.blocked.x) this._mesh.translateX(x);
             if(!this.blocked.y) this._mesh.translateY(y);
+        },
+        die: function() {
+            console.log('ENTITY DIED!', this);
+            var self = this;
+
+            //remove weapon, do death animation/sounds, drop loot, and destroy
+            this.weapon = null;
+            this.engine.ui.playSound(this.sounds.death);
+            this.setAnimation('death');
+
+            this.once('animDone', function() {
+                self.dropLoot();
+                self.engine.destroyEntity(self);
+            });
+        },
+        damage: function(dmg, knockback, dir) {
+            this.health -= dmg;
+
+            if(this.health <= 0) {
+                //death of entity
+                this.die();
+            } else {
+                var self = this;
+
+                //free movement for the duration of damage animation
+                this.freeze = true;
+                this.setAnimation('damage' + dir);
+
+                this.once('animDone', function() {
+                    this.freeze = false;
+                    this.setAnimation('idle' + dir);
+                });
+
+                //do knockback effect
+                if(knockback) {
+                    var x = 0, y = 0;
+
+                    if(dir == 'up') y -= knockback;
+                    if(dir == 'down') y += knockback;
+
+                    if(dir == 'left') x += knockback;
+                    if(dir == 'right') x -= knockback;
+
+                    this.moveEntity(x, y);
+                }
+            }
+        },
+        _doEntityCollisionCheck: function() {
+            var origin = this._mesh.position.clone();
+
+            //loop through each vertex of the mesh's geometry
+            for(var v = 0, vl = this._mesh.geometry.vertices.length; v < vl; ++v) {
+                //some calculations for each vertex
+                var localV = this._mesh.geometry.vertices[v].clone(),
+                    globalV = this._mesh.matrix.multiplyVector3(localV),
+                    directionV = globalV.subSelf(this._mesh.position),
+                    collisions = [];
+
+                this.ray.set(origin, directionV);
+
+                //check for a collision for each entity
+                for(var e = 0, el = this.engine.entities.length; e < el; ++e) {
+                    var entity = this.engine.entities[e],
+                        hits = this.ray.intersectObject(entity._mesh);
+
+                    /*for(var i = 0, il = hits.length; i < il; ++i) {
+                        hits[i].entity = entity;
+                        collisions.push(hits[i]);
+                    }*/
+
+                    //for now we only care about the first hit on this object
+                    //that is only one per entity
+                    if(hits.length) {
+                        hits[0].entity = entity;
+                        hits[0].direction = 'left'; //this needs to be based on directionV
+                        collisions.push(hits[0]);
+                    }
+                }
+
+                //sort the collisions
+                collisions.sort(function(a, b) {
+                    return a.distance - b.distance;
+                });
+
+                //if any collisions
+                if(collisions.length > 0 && collisions[0].distance < directionV.length()) {
+                    for(var c = 0, cl = collisions.length; c < cl; ++c) {
+                        var hit = collisions[c];
+
+                        //check if this entity should take damage
+                        if(hit.entity.weapon) 
+                            this.damage(hit.entity.weapon.damage, hit.entity.weapon.knockback, hit.direction);
+                    }
+                }
+            }
         },
         //the map collision checks if we were to move by X, Y units, would we collide with
         //a map element. This check is neccessary since most elements on the map are not

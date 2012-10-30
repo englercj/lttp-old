@@ -34,7 +34,7 @@ require([
                 ],
                 function(rsrcs) {
                     resources = rsrcs;
-
+                    
                     $('#btnDownload').hide();
                     $('#btnStart').show();
                 }
