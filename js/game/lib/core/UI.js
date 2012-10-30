@@ -39,6 +39,7 @@ define([
 
             this._$dialog.html(lines.join('<br/>')).show();
         },
+        hideDialog: function() { this._$dialog.hide(); },
         showHUD: function() { this._$hud.show(); },
         hideHUD: function() { this._$hud.hide(); },
         update: function(delta) {
