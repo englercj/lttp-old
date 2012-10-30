@@ -152,7 +152,7 @@ p, .rog, #dialog, #hud {
 }
 
 /*#life .hearts .heart.3-4 { background-image: url(../assets/ui/heart-4-3.png); }*/
-#life .hearts .heart.half { background-image: url(../assets/ui/heart-1-2.png); }
+#life .hearts .heart.half { background-image: url(../assets/ui/heart-half.png); }
 /*#life .hearts .heart.1-4 { background-image: url(../assets/ui/heart-1-4.png); }*/
 #life .hearts .heart.empty { background-image: url(../assets/ui/heart-empty.png); }
 
