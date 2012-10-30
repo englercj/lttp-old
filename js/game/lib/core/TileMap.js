@@ -51,7 +51,7 @@ define([
 
     var TileMap = SceneObject.extend({
         //need to be textures
-        init: function(tilemap, tileset, viewport) {
+        init: function(resource, viewport) {
             this._super();
 
             this.tileScale = 4.0;
@@ -59,8 +59,9 @@ define([
             this.repeat = false;
             this.filtered = false;
 
-            this.tilemap = tilemap;
-            this.tileset = tileset;
+            this.tilemap = resource.tilemap;
+            this.tileset = resource.tileset;
+            this.meta = resource.meta;
 
             this.viewport = viewport;
 
@@ -68,39 +69,39 @@ define([
             this.imageData.tilemap = this.getImageData(this.tilemap.image);
 
             //Setup Tilemap
-            tilemap.magFilter = THREE.NearestFilter;
-            tilemap.minFilter = THREE.NearestMipMapNearestFilter;
+            this.tilemap.magFilter = THREE.NearestFilter;
+            this.tilemap.minFilter = THREE.NearestMipMapNearestFilter;
             //tilemap.flipY = false;
             if(this.repeat) {
-                tilemap.wrapS = tilemap.wrapT = THREE.RepeatWrapping;
+                this.tilemap.wrapS = this.tilemap.wrapT = THREE.RepeatWrapping;
             } else {
-                tilemap.wrapS = tilemap.wrapT = THREE.ClampToEdgeWrapping;
+                this.tilemap.wrapS = this.tilemap.wrapT = THREE.ClampToEdgeWrapping;
             }
 
             //Setup Tileset
-            tileset.wrapS = tileset.wrapT = THREE.ClampToEdgeWrapping;
-            tileset.flipY = false;
+            this.tileset.wrapS = this.tileset.wrapT = THREE.ClampToEdgeWrapping;
+            this.tileset.flipY = false;
             if(this.filtered) {
-                tileset.magFilter = THREE.LinearFilter;
-                tileset.minFilter = THREE.LinearMipMapLinearFilter;
+                this.tileset.magFilter = THREE.LinearFilter;
+                this.tileset.minFilter = THREE.LinearMipMapLinearFilter;
             } else {
-                tileset.magFilter = THREE.NearestFilter;
-                tileset.minFilter = THREE.NearestMipMapNearestFilter;
+                this.tileset.magFilter = THREE.NearestFilter;
+                this.tileset.minFilter = THREE.NearestMipMapNearestFilter;
             }
 
             //setup shader uniforms
-            this.offset = new THREE.Vector2(0, 0);
+            this.offset = new THREE.Vector2(this.meta.location[0], this.meta.location[1]);
             this._uniforms = {
                 viewportSize: { type: 'v2', value: new THREE.Vector2(viewport.width / this.tileScale, viewport.height / this.tileScale) },
-                inverseSpriteTextureSize: { type: 'v2', value: new THREE.Vector2(1/tileset.image.width, 1/tileset.image.height) },
+                inverseSpriteTextureSize: { type: 'v2', value: new THREE.Vector2(1/this.tileset.image.width, 1/this.tileset.image.height) },
                 tileSize: { type: 'f', value: this.tileSize },
                 inverseTileSize: { type: 'f', value: 1/this.tileSize },
 
-                tiles: { type: 't', value: tilemap },
-                sprites: { type: 't', value: tileset },
+                tiles: { type: 't', value: this.tilemap },
+                sprites: { type: 't', value: this.tileset },
 
                 viewOffset: { type: 'v2', value: this.offset },
-                inverseTileTextureSize: { type: 'v2', value: new THREE.Vector2(1/tilemap.image.width, 1/tilemap.image.height) },
+                inverseTileTextureSize: { type: 'v2', value: new THREE.Vector2(1/this.tilemap.image.width, 1/this.tilemap.image.height) },
                 repeatTiles: { type: 'i', value: this.repeat ? 1 : 0 }
             };
 

@@ -33,7 +33,7 @@ define([
             this.viewport.setCamera(this.camera);
 
             //map setup
-            this.map = new TileMap(resources.tilemap, resources.tileset, this.viewport);
+            this.map = new TileMap(resources.maps.lightworld, this.viewport);
             this.map.addToScene(this.scene);
 
             //controls setup
@@ -41,7 +41,7 @@ define([
             this.controls.lockCamera.x = this.controls.lockCamera.y = true;
 
             //setup player
-            this.player = new Player(resources.link_data, resources.link_texture, this);
+            this.player = new Player(resources.entities.link, this);
             this.player.addToScene(this.scene);
 
             //create entities (enemies, items, etc)

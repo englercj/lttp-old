@@ -27,8 +27,19 @@ define([
                 //all of the loaders finished
                 var ret = {};
 
-                for(var r in resources) {
-                    ret[resources[r].name] = resources[r].data;
+                //this will convert the dot-notation string into actual object properties
+                for(var r = 0, rl = resources.length; r < rl; ++r) {
+                    var res = resources[r],
+                        props = res.name.split('.'),
+                        o = ret;
+
+                    for(var p = 0, pl = props.length - 1; p < pl; ++p) {
+                        if(!o[props[p]]) o[props[p]] = {};
+
+                        o = o[props[p]];
+                    }
+
+                    o[props[props.length - 1]] = res.data;
                 }
 
                 self.emit('complete', ret);
