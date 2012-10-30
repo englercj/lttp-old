@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Lttp Mapper</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/jquery-ui.dot-luv.css">
+
+        <!-- jQuery -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
+
+        <!-- jQuery UI -->
+        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>
+        <script>window.jQuery.ui || document.write('<script src="js/vendor/jquery-ui.min.js"><\/script>')</script>
+
+        <!-- jQuery Plugins -->
+        <script src="js/vendor/jquery.ajax-progress.js"></script>
+
+        <!-- main js modules -->
+        <script src="js/mapeditor.js"></script>
+        <script src="js/ui.js"></script>
+    </head>
+    <body>
+        <section id="tabs">
+            <ul>
+                <li><a href="#generator">Map Generator</a></li>
+                <li><a href="#editor">Map Generator</a></li>
+            </ul>
+            <div id="generator">
+                <form id="makemap" enctype="multipart/form-data">
+                    <label for="tilesize">Tile Size:</label>
+                    <input type="number" name="tilesize" id="tilesize" value="16" />
+                    <br/>
+                    <label for="tilesize">Tileset Sheet Size:</label>
+                    <input type="number" name="tilesheet" id="tilesheet" value="1024" />
+                    <br/>
+                    <label for="fileMap">Map Image:</label>
+                    <input type="file" name="map" id="fileMap" />
+                    <br/>
+                    <input type="button" value="Mapify" id="btnMapify" />
+                </form>
+                <progress id="progUpload"></progress>
+
+                <img id="imgTileset" />
+                <img id="imgTilemap" />
+            </div>
+            <div id="editor">
+                
+            </div>
+        </section>
+    
+
+</body></html>
