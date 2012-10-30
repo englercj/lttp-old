@@ -61,16 +61,31 @@ p, .rog, #dialog, #hud {
 #hud {
     color: #FFF;
     font-style: italic;
+    text-align: center;
+
+    height: 150px;
+    top: -275px;
+
+    width: 700px;
+    left: 50%;
+    margin-left: -350px;
+    position: absolute;
+
+    z-index: 100;
+}
+
+#hud > div {
+    position: absolute;
 }
 
 #meter {
-    background: left top url(../assets/ui/magic_meter.png) no-repeat Transparent;
+    background: left top url(../assets/ui/magic_meter.png) no-repeat;
     width: 32px;
     height: 84px;
 }
 
 #meter.upgraded {
-    background: left top url(../assets/ui/magic_meter_2.png) no-repeat Transparent;
+    background: left top url(../assets/ui/magic_meter_2.png) no-repeat;
     width: 32px;
     height: 86px;
 }
@@ -79,7 +94,69 @@ p, .rog, #dialog, #hud {
     background: #30E838;
 }
 
+#item {
+    background: left top url(../assets/ui/item-frame.png) no-repeat;
+    width: 44px;
+    height: 44px;
 
+    left: 40px;
+}
+
+#rupees, #bombs, #arrows {
+    background-position: center top;
+    background-repeat: no-repeat;
+    padding-top: 20px;
+    font-style: italic;
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 22px;
+    text-shadow: 1px 1px 0 #000;
+    text-indent: -7px;
+}
+
+#rupees { background-image: url(../assets/ui/indicator-rupees.png); left: 130px; }
+#bombs { background-image: url(../assets/ui/indicator-bombs.png); left: 200px; }
+#arrows { background-image: url(../assets/ui/indicator-arrows.png); left: 270px; }
+
+#life {
+    font-style: normal;
+    text-shadow:
+        1px 1px 0 #000,
+        2px 2px 0 #000;
+
+    left: 550px;
+    font-size: 22px;
+
+    top: -10px;
+}
+
+#life .dash {
+    background: left top url(../assets/ui/life-dash.png) no-repeat;
+    width: 24px;
+    height: 4px;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+#life .hearts {
+    width:180px;
+}
+
+#life .hearts .heart {
+    background: center top url(../assets/ui/heart-full.png) no-repeat;
+    width: 14px;
+    height: 14px;
+    margin: 2px;
+    display: block;
+    float: left;
+}
+
+#life .hearts .heart.3-4 { background-image: url(../assets/ui/heart-4-3.png); }
+#life .hearts .heart.1-2 { background-image: url(../assets/ui/heart-1-2.png); }
+#life .hearts .heart.1-4 { background-image: url(../assets/ui/heart-1-4.png); }
+#life .hearts .heart.empty { background-image: url(../assets/ui/heart-empty.png); }
 
 /* CSS below this point is garbage... */
 #game canvas {

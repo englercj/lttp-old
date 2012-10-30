@@ -28,6 +28,8 @@ define([
 
             this._$dialog.html(lines.join('<br/>')).show();
         },
+        showHUD: function() { this._$hud.show(); },
+        hideHUD: function() { this._$hud.hide(); },
         cutscenes: {
             opening: function() {
 
