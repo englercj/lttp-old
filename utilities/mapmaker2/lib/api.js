@@ -39,6 +39,9 @@ Api.prototype.createMaps = function(file, tilesize, sheetsize, cb) {
     tilesize = tilesize || 16;
     sheetsize = sheetsize || 1024;
 
+    if(typeof tilesize == 'string') tilesize = parseInt(tilesize, 10);
+    if(typeof sheetsize == 'string') sheetsize = parseInt(sheetsize, 10);
+
     var self = this;
 
     console.log('Generating maps...');
@@ -57,22 +60,25 @@ Api.prototype.createMaps = function(file, tilesize, sheetsize, cb) {
         maker.setSpriteSheetSize(sheetsize);
         canvases = maker.parseMap(data, tilesize);
 
-        ['-tilemap.png', '-tileset.png'].forEach(function(s) {
+        ['tilemap', 'tileset'].forEach(function(s) {
             fns.push(function(_cb) {
-                var p = path.join(self.temp, base + s),
+                var p = path.join(self.temp, base + '-' + s + '.png'),
                     outStream = fs.createWriteStream(p),
-                    pngStream = canvases.tilemap.pngStream();
+                    pngStream = canvases[s].pngStream();
 
                 pngStream.pipe(outStream);
                 pngStream.on('end', function() {
                     _cb(null, p)
+                });
+                pngStream.on('error', function(err) {
+                    _cb(err);
                 });
             });
         });
 
         async.parallel(fns, function(err, paths) {
             console.log('Done!');
-            if(cb) cb(err);
+            if(cb) cb(err, paths);
         });
     });
 };
@@ -90,11 +96,11 @@ Api.prototype._setupRoutes = function() {
         if(!req.files.map) {
             res.send(400);
         } else {
-            self.createMaps(req.files.map.path, req.params.tilesize, req.params.sheetsize, function(err) {
+            self.createMaps(req.files.map.path, req.params.tilesize, req.params.sheetsize, function(err, paths) {
                 res.json({
                     //urls for the generated files
-                    tilemap: '/temp/' + path.basename(req.files.map.path) + '-tilemap.png',
-                    tileset: '/temp/' + path.basename(req.files.map.path) + '-tileset.png'
+                    tilemap: '/temp/' + path.basename(paths[0]),
+                    tileset: '/temp/' + path.basename(paths[1])
                 });
             });
         }
