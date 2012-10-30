@@ -9,28 +9,33 @@ define([
         FIGHTER_SWORD: {
             type: types.WEAPON.DAMAGING,
             damage: 1,
-            range: 2
+            range: 2,
+            knockback: 5
         },
         MASTER_SWORD: {
             type: types.WEAPON.DAMAGING,
             damage: 2,
-            range: 2
+            range: 2,
+            knockback: 5
         },
         TEMPERED_SWORD: {
             type: types.WEAPON.DAMAGING,
             damage: 4,
-            range: 2
+            range: 2,
+            knockback: 5
         },
         GOLDEN_SWORD: {
             type: types.WEAPON.DAMAGING,
             damage: 8,
-            range: 2
+            range: 2,
+            knockback: 5
         },
         SWORD_BEAM:{
             type: types.WEAPON.DAMAGING,
             damage: 1,
             range: 10,
-            projectile: true
+            projectile: true,
+            knockback: 5
         },
         BOOMERANG: {
             type: types.WEAPON.DAMAGING_PARALIZING,
@@ -38,7 +43,8 @@ define([
             range: 10,
             projectile: true,
             roundtrip: true,
-            speed: 350
+            speed: 350,
+            knockback: 1
         },
         MAGICAL_BOOMERANG: {
             type: types.WEAPON.DAMAGING_PARALIZING,
@@ -46,14 +52,16 @@ define([
             range: null,
             projectile: true,
             roundTrip: true,
-            speed: 350
+            speed: 350,
+            knockback: 1
         },
         HOOKSHOT: {
             type: types.WEAPON.PARALIZING,
             range: 10,
             projectile: true,
             roundTrip: true,
-            speed: 350
+            speed: 350,
+            knockback: 1
         },
         BOMB: {
             type: types.WEAPON.DAMAGING_DESTRUCTIVE,
@@ -61,7 +69,8 @@ define([
             range: 3,
             speed: 350,
             timeout: 3,
-            thrown: true
+            thrown: true,
+            knockback: 5
         },
         SUPER_BOMB: {
             type: types.WEAPON.DAMAGING_DESTRUCTIVE_2,
@@ -69,19 +78,22 @@ define([
             range: 4,
             speed: 350,
             timeout: 3,
-            thrown: true
+            thrown: true,
+            knockback: 5
         },
         HAMMER: {
             type: types.WEAPON.DAMAGING_SMASHING,
             damage: 4,
-            range: 1
+            range: 1,
+            knockback: 5
         },
         BOW_ARROW: {
             type: types.WEAPON.DAMAGING,
             damage: 2,
             range: 10,
             projectile: true,
-            speed: 400
+            speed: 400,
+            knockback: 5
         },
         BOW_SILVER_ARROW: {
             type: types.WEAPON.DAMAGING,
@@ -89,7 +101,8 @@ define([
             range: 10,
             projectile: true,
             speed: 400,
-            bossImmune: true
+            bossImmune: true,
+            knockback: 5
         },
         ROD_FIRE: {
             type: types.WEAPON.DAMAGING_BURNING,
@@ -97,7 +110,8 @@ define([
             range: 10,
             projectile: true,
             speed: 400,
-            cost: 2
+            cost: 2,
+            knockback: 5
         },
         ROD_ICE: {
             type: types.WEAPON.DAMAGING_FREEZING,
@@ -105,7 +119,8 @@ define([
             range: 10,
             projectile: true,
             speed: 400,
-            cost: 2
+            cost: 2,
+            knockback: 5
         },
         MEDALLION_BOMBOS: {
             type: types.WEAPON.DAMAGING,
@@ -131,19 +146,22 @@ define([
         STINGER: { //for bees
             type: types.WEAPON.DAMAGING,
             damage: 0.25,
-            range: 0
+            range: 0,
+            knockback: 2
         },
         LIFTED_BUSH: {
             type: types.WEAPON.DAMAGING,
             damage: 1,
             range: 10,
-            thrown: true
+            thrown: true,
+            knockback: 5
         },
-        LIFTED_MISC: {
+        LIFTED_MISC: { //like pots, rocks, etc
             type: types.WEAPON.DAMAGING,
             damage: 4,
             range: 10,
-            thrown: true
+            thrown: true,
+            knockback: 5
         },
         /////////////////////////////////////////////////////////
         // Usable Items
