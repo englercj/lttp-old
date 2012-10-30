@@ -3,18 +3,27 @@ define([
     'game/lib/core/Viewport',
     'game/lib/core/Controls',
     'game/lib/core/TileMap',
-    'game/lib/core/Player'//,
+    'game/lib/core/Player',
+    'game/lib/utils/UI'
     //Scritps that modify global
     //'game/lib/core/three_fpcontrols'
-], function(Viewport, Controls, TileMap, Player) {
+], function(Viewport, Controls, TileMap, Player, UI) {
     var Engine = Class.extend({
-        init: function(container, resources) {
+        init: function(elements, resources) {
             //setup game
             this.entities = [];
+            this.ui = new UI(elements);
             this.scene = new THREE.Scene();
             this.clock = new THREE.Clock();
             this.renderer = new THREE.WebGLRenderer();
-            this.viewport = new Viewport(container, this.renderer);
+            this.viewport = new Viewport(elements.container, this.renderer);
+
+            //show mudora text
+            this.ui.showDialog([
+                '`~`^`~`^`^`',
+                '`^`~`~`^`~',
+                '`^`~`~`^`~`'
+            ]);
 
             //camera setup
             var width = this.viewport.width, height = this.viewport.height;

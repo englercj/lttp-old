@@ -45,7 +45,12 @@ require([
             e.preventDefault();
             
             if(!engine) {
-                engine = new Engine('#game', resources);
+                engine = new Engine({
+                    container: '#game',
+                    hud: '#hud',
+                    dialog: '#dialog',
+                    cutscenes: '#cutscenes'
+                }, resources);
                 engine.start();
                 
                 //$('#btnStart').text('Show Game');
