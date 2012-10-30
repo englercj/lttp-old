@@ -10,6 +10,10 @@ define([
 ], function(Viewport, Controls, TileMap, Player, UI) {
     var Engine = Class.extend({
         init: function(elements, resources) {
+            this.debug = true;
+
+            if(this.debug) window.engine = this;
+
             //setup game
             this.entities = [];
             this.ui = new UI(elements, this);
