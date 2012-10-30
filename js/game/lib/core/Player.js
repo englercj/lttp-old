@@ -24,16 +24,16 @@ define([
             var self = this;
 
             //set moving animations
-            self.controls.on('move::*', function(dir, startMoving) {
-                if(!self.controls.isMoving)
+            self.engine.controls.on('move::*', function(dir, startMoving) {
+                if(!self.engine.controls.isMoving)
                     self.setAnimation();
-                else if(self.controls.moving.up)
+                else if(self.engine.controls.moving.up)
                     self.setAnimation('moveup');
-                else if(self.controls.moving.down)
+                else if(self.engine.controls.moving.down)
                     self.setAnimation('movedown');
-                else if(self.controls.moving.left)
+                else if(self.engine.controls.moving.left)
                     self.setAnimation('moveleft');
-                else if(self.controls.moving.right)
+                else if(self.engine.controls.moving.right)
                     self.setAnimation('moveright');
             });
 

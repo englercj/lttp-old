@@ -129,7 +129,7 @@ define([
             }
 
             if(this.debug) {
-                for(var i = 0, il = this.debuggers.length; ++i) {
+                for(var i = 0, il = this.debuggers.length; i < il; ++i) {
                     if(this.debuggers[i])
                         this.engine.destroyMesh(this.debuggers[i]);
                 }

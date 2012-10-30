@@ -24,14 +24,23 @@
         <![endif]-->
 
         <!-- Main Content Section -->
-                <div id="progTotal" class="progressbar"><span class="ui-progressbar-text"></span></div>
-                <div id="progPart" class="progressbar"><span class="ui-progressbar-text"></span></div>
-                <button id="btnDownload">Download Resources</button>
-                <button id="btnStart">Launch Game</button>
+        <div id="progTotal" class="progressbar"><span class="ui-progressbar-text"></span></div>
+        <div id="progPart" class="progressbar"><span class="ui-progressbar-text"></span></div>
+        <button id="btnDownload">Download Resources</button>
+        <button id="btnStart">Launch Game</button>
 
         <section id="game-container">
-            <div id="game">
+            <div id="hud">
+                <div id="meter"><div class="meter-value"></div></div>
+                <div id="item"></div>
+                <div id="rupees"></div>
+                <div id="bombs"></div>
+                <div id="arrows"></div>
+                <div id="life"></div>
             </div>
+            <div id="game"></div>
+            <div id="dialog"></div>
+            <div id="cutscenes"></div>
         </section>
 
         <!-- jQuery -->

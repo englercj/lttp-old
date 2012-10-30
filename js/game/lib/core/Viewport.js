@@ -1,6 +1,7 @@
 define([
+    'game/lib/utils/util',
     'game/lib/bases/Emitter'
-], function(Emitter) {
+], function(util, Emitter) {
     var Viewport = Emitter.extend({
         init: function(container, renderer) {
             this.isDocument = false;
@@ -11,11 +12,9 @@ define([
             if(!container) {
                 this._$container = $(document);
                 this.isDocument = true;
+            } else {
+                this._$container = util.jquerify(container);
             }
-            else if(!container.jquery)
-                this._$container = $(container);
-            else
-                this._$container = container;
             
             this._$container.attr('tabindex', -1);
             
