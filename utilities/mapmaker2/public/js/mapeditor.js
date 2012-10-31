@@ -102,8 +102,6 @@
         }
 
         function drawMap() {
-            var flag = 3;
-
             for(var x = 0; x < viewSize.x; ++x) {
                 for(var y = 0; y < viewSize.y; ++y) {
                     var pixel = getTilemapPixel(offset.x + x, offset.y + y);
@@ -115,30 +113,33 @@
                     ctxMap.drawImage(tilecanvas, 0, 0, tileSize, tileSize, x * tileSize, y * tileSize, tileSize, tileSize);
 
                     //left top, right top, left bottom, right bottom
-                    //[((pixel.b >> 6) & 3), ((pixel.b >> 4) & 3), ((pixel.b >> 2) & 3), (pixel.b & 3)]
-                    
-                    //draw collision type
-                    if(pixel.b == 0)
-                        ctxMap.fillStyle = 'rgba(200, 0, 0, 0.9)';
+                    var subtiles = [((pixel.b >> 6) & 3), ((pixel.b >> 4) & 3), ((pixel.b >> 2) & 3), (pixel.b & 3)];
 
-                    //jumpdown
-                    if(pixel.b == 1)
-                        ctxMap.fillStyle = 'rgba(0, 200, 0, 0.9)';
+                    for(var s = 0, sl = subtiles.length; s < sl; ++s) {
+                        var x2 = s % Math.sqrt(sl),
+                            y2 = Math.floor(s / sl);
 
-                    //reserved
-                    if(pixel.b == 2)
-                        ctxMap.fillStyle = 'rgba(0, 0, 200, 0.9)';
+                        ctxMap.fillStyle = 'rgba(255, 255, 255, 0.5)';
 
-                    //block
-                    if(pixel.b == 3)
-                        ctxMap.fillStyle = 'rgba(200, 0, 0, 0.9)';
+                        //draw collision type
+                        if(pixel.b == 0)
+                            ctxMap.fillStyle = 'rgba(255, 0, 0, 0.9)';
 
-                    //unknown
-                    if(pixel.b == 3)
-                        ctxMap.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                        //jumpdown
+                        if(pixel.b == 1)
+                            ctxMap.fillStyle = 'rgba(0, 200, 0, 0.9)';
 
-                    ctxMap.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-                    ctxMap.drawImage(stripes, x * tileSize, y * tileSize);
+                        //reserved
+                        if(pixel.b == 2)
+                            ctxMap.fillStyle = 'rgba(0, 0, 200, 0.9)';
+
+                        //block
+                        if(pixel.b == 3)
+                            ctxMap.fillStyle = 'rgba(200, 0, 0, 0.9)';
+
+                        ctxMap.fillRect(x2 * tileSize, y2 * tileSize, tileSize / sl, tileSize / sl);
+                        ctxMap.drawImage(stripes, x2 * tileSize, y2 * tileSize);
+                    }
                 }
             }
         }
