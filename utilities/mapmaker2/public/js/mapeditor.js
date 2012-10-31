@@ -162,7 +162,7 @@
         function updateMapCollisionPoint(x, y) {
             var tx = Math.floor(x / 2),
                 ty = Math.floor(y / 2),
-                pixel = getTilemapPixel(tx, ty),
+                pixel = getTilemapPixel(offset.x + tx, offset.y + ty),
 
                 xpos = (x / 2) - tx, //will be 0 (left) or 0.5 (right)
                 ypos = (y / 2) - ty, //will be 0 (top) or 0.5 (bottom)
@@ -182,7 +182,7 @@
             //set these bits
             pixel.b |= (activeTool << shift);
 
-            setTilemapPixel(tx, ty, pixel);
+            setTilemapPixel(offset.x + tx, offset.y + ty, pixel);
             drawMinimap();
         }
 
