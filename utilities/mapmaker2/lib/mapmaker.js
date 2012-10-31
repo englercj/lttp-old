@@ -148,8 +148,27 @@ MapMaker.prototype.processTile = function(x, y, cb) {
     //1 = jumpdown
     //2 = reserved
     //3 = block
+    var blue = 0,
+        shifts = [[2, 6], [0, 4]],
+        pixels = this.tileCtx.getImageData(0, 0, this.tileSize, this.tileSize);
 
-    this.mapCtx.fillStyle="rgb(" + sprite.x + "," + sprite.y + ", 0)";
+    //if there is any black then make it completely blocking
+    //this is a naive way to guess if this tile blocks. hopefully
+    //this can get smarter in the future
+    for(var p = 0; p < pixels.data.length; p += 4) {
+        if(pixels.data[p] < 50 && //red
+            pixels.data[p + 1] < 50 && //green
+            pixels.data[p + 2] < 50) //blue
+        {
+            var y2 = Math.floor((p / 4) / this.tileSize), //y coord
+                x2 = (p / 4) - (y2 * this.tileSize), //x coord
+                shift = shifts[Math.round(x2 / this.tileSize)][Math.round(y2 / this.tileSize)];
+
+            blue |= (3 << shift);
+        }
+    }
+
+    this.mapCtx.fillStyle='rgb(' + sprite.x + ',' + sprite.y + ', ' + blue + ')';
     this.mapCtx.fillRect(x,y,1,1);
 
     process.nextTick(function() {
