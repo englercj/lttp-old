@@ -8,23 +8,31 @@
 canvas { vertical-align:top; }
 
 .tool {
-    width: 32px;
-    height: 32px;
+    height: 25px;
+    width: 85px;
+    padding: 3px;
+
     background-position: left top;
     background-repeat: repeat;
+    display: inline-block;
+
+    color: #FFF;
+    font-size: 0.8em;
+    text-align: center;
+    cursor: pointer;
 }
 
 .tool:hover {
-    width: 30px;
-    height: 30px;
-    border: solid 1px #00A1FF;
+    padding: 1px;
+    border: solid 2px #00A1FF;
 }
 
 .tool.selected {
-    width: 30px;
-    height: 30px;
-    border: solid 1px #0F0;
+    padding: 1px;
+    border: solid 2px #0F0;
 }
 
-.tool.jumpdown { background:rgba(255, 255, 0, 0.5); }
-.tool.jumpdown { background:rgba(255, 255, 0, 0.5); }
+.tool.empty { background:rgba(255, 255, 255, 1); color: #111; }
+.tool.jumpdown { background:rgba(0, 200, 0, 1); }
+.tool.reserved { background:rgba(0, 0, 200, 1); }
+.tool.block { background:rgba(200, 0, 0, 1); }

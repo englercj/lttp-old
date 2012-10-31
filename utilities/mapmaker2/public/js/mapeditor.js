@@ -1,5 +1,6 @@
 (function($, window, undefined) {
     $(function() {
+        //TODO: this is gross, need to organize it
         var $map = $('#map'),
             $minimap = $('#minimap'),
             tilecanvas = document.createElement('canvas'),
@@ -11,7 +12,11 @@
             offset = { x: 0, y: 0 },
             dragMinimap = null,
             viewSize = { x: 96, y: 48 },
-            stripes = new Image();
+            stripes = new Image(),
+            tileSize = 16,
+            activeTool = null,
+            lastSlice = null,
+            dragMap = false;
 
         window.initEditor = function initEditor(tilesz) {
             maps = {
@@ -19,7 +24,10 @@
                 tileset: $('#imgTileset')[0]
             };
 
-            tileSize = tilesz;
+            if(typeof tilesz == 'string')
+                tileSize = parseInt(tilesz, 10);
+            else
+                tileSize = tilesz;
 
             window.drawMinimap = drawMinimap;
             window.drawMap = drawMap;
@@ -96,50 +104,137 @@
             drawMap();
         });
 
+        $('.tool').on('click', function(e) {
+            $('.tool').removeClass('selected');
+            activeTool = $(this).addClass('selected').data('toolid');
+        });
+
+        $('#btnDlTm').on('click', function(e) {
+            ctxMinimap.putImageData(tilemapData, 0, 0);
+            window.open($minimap[0].toDataURL());
+            drawMinimap();
+        });
+
+        $map.on('mousedown', function(e) {
+            dragMap = true;
+        });
+
+        $map.on('mouseup', function(e) {
+            if(dragMap) dragMap = false;
+        });
+
+        $map.on('mousemove', function(e) {
+            var pos = $map.position(),
+                sz = tileSize / 2,
+                x = Math.floor((e.pageX - pos.left) / sz),
+                y = Math.floor((e.pageY - pos.top) / sz);
+
+            //this is the first slice, setup the slice canvas
+            if(lastSlice) {
+                //we haven't moved to a new subtile, don't redraw it
+                if(x == lastSlice.x && y == lastSlice.y) return;
+
+                //if dragging then paint collisions
+                if(dragMap) updateMapCollisionPoint(x, y);
+
+                //we have moved to a new subtile, restore this full tile before drawing the tool
+                drawMapTile(Math.floor(lastSlice.x / 2), Math.floor(lastSlice.y / 2));
+            }
+
+            //save this position so we can redraw this single tile later
+            lastSlice = { x: x, y: y };
+
+            //draw the subtile sized tool
+            ctxMap.fillStyle = getToolColor(activeTool);
+            ctxMap.fillRect(x * sz, y * sz, sz, sz);
+            ctxMap.drawImage(stripes, x * sz, y * sz);
+        });
+
+        $map.on('click', function(e) {
+            var pos = $map.position(),
+                sz = tileSize / 2,
+                x = Math.floor((e.pageX - pos.left) / sz),
+                y = Math.floor((e.pageY - pos.top) / sz);
+
+            updateMapCollisionPoint(x, y);
+        });
+
+        function updateMapCollisionPoint(x, y) {
+            var tx = Math.floor(x / 2),
+                ty = Math.floor(y / 2),
+                pixel = getTilemapPixel(tx, ty),
+
+                xpos = (x / 2) - tx, //will be 0 (left) or 0.5 (right)
+                ypos = (y / 2) - ty, //will be 0 (top) or 0.5 (bottom)
+                shift = 0;
+
+            if(xpos < 0.5) shift = [2, 6]; //shift for lefts (leftbottom, lefttop)
+            else shift = [0, 4]; //shifts for rights (rightbottom, righttop)
+
+            if(ypos < 0.5) shift = shift[1]; //shift for top (second element)
+            else shift = shift[0]; //shift for bottom (first element)
+
+            var value = (activeTool << shift);
+
+            //clear these bits
+            pixel.b &= ~(3 << shift);
+
+            //set these bits
+            pixel.b |= (activeTool << shift);
+
+            setTilemapPixel(tx, ty, pixel);
+            drawMinimap();
+        }
+
         function drawMinimap() {
-            ctxMinimap.drawImage(maps.tilemap, 0, 0);
+            //ctxMinimap.drawImage(maps.tilemap, 0, 0);
+            ctxMinimap.putImageData(tilemapData, 0, 0);
             ctxMinimap.strokeRect(offset.x, offset.y, viewSize.x, viewSize.y);
         }
 
         function drawMap() {
             for(var x = 0; x < viewSize.x; ++x) {
                 for(var y = 0; y < viewSize.y; ++y) {
-                    var pixel = getTilemapPixel(offset.x + x, offset.y + y);
+                    drawMapTile(x, y);
+                }
+            }
+        }
 
-                    //flip the image
-                    ctxTile.drawImage(maps.tileset, pixel.r * tileSize, pixel.g * tileSize, tileSize, tileSize, 0, 0, tileSize, tileSize);
+        function drawMapTile(x, y) {
+            var pixel = getTilemapPixel(offset.x + x, offset.y + y);
 
-                    //draw to map tile
-                    ctxMap.drawImage(tilecanvas, 0, 0, tileSize, tileSize, x * tileSize, y * tileSize, tileSize, tileSize);
+            //flip the tile image
+            ctxTile.drawImage(maps.tileset, pixel.r * tileSize, pixel.g * tileSize, tileSize, tileSize, 0, 0, tileSize, tileSize);
 
-                    //left top, right top, left bottom, right bottom
-                    var subtiles = [((pixel.b >> 6) & 3), ((pixel.b >> 4) & 3), ((pixel.b >> 2) & 3), (pixel.b & 3)];
+            //draw tile to map
+            ctxMap.drawImage(tilecanvas, 0, 0, tileSize, tileSize, x * tileSize, y * tileSize, tileSize, tileSize);
 
-                    for(var s = 0, sl = subtiles.length; s < sl; ++s) {
-                        var x2 = s % Math.sqrt(sl),
-                            y2 = Math.floor(s / sl);
+            //draw collision types
+            if(pixel.b) {
+                //left top, right top, left bottom, right bottom
+                var subtiles = [((pixel.b >> 6) & 3), ((pixel.b >> 4) & 3), ((pixel.b >> 2) & 3), (pixel.b & 3)],
+                    numTiles = Math.sqrt(subtiles.length);
 
-                        ctxMap.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                for(var s = 0, sl = subtiles.length; s < sl; ++s) {
+                    if(!subtiles[s]) continue;
 
-                        //draw collision type
-                        if(pixel.b == 0)
-                            ctxMap.fillStyle = 'rgba(255, 0, 0, 0.9)';
+                    var x2 = s % numTiles,
+                        y2 = Math.floor(s / numTiles);
 
-                        //jumpdown
-                        if(pixel.b == 1)
-                            ctxMap.fillStyle = 'rgba(0, 200, 0, 0.9)';
+                    ctxMap.fillStyle = getToolColor(subtiles[s]);
 
-                        //reserved
-                        if(pixel.b == 2)
-                            ctxMap.fillStyle = 'rgba(0, 0, 200, 0.9)';
+                    ctxMap.fillRect(
+                        (x * tileSize) + (x2 * (tileSize / numTiles)),
+                        (y * tileSize) + (y2 * (tileSize / numTiles)),
+                        tileSize / numTiles,
+                        tileSize / numTiles
+                    );
 
-                        //block
-                        if(pixel.b == 3)
-                            ctxMap.fillStyle = 'rgba(200, 0, 0, 0.9)';
-
-                        ctxMap.fillRect(x2 * tileSize, y2 * tileSize, tileSize / sl, tileSize / sl);
-                        ctxMap.drawImage(stripes, x2 * tileSize, y2 * tileSize);
-                    }
+                    ctxMap.drawImage(
+                        stripes,
+                        (x * tileSize) + (x2 * (tileSize / numTiles)),
+                        (y * tileSize) + (y2 * (tileSize / numTiles))
+                    );
                 }
             }
         }
@@ -154,6 +249,27 @@
 
             //rgba.hex = this.rgbaToHex(rgba);
             return rgba;
+        }
+
+        function setTilemapPixel(x, y, pixel) {
+            var index = (y * tilemapData.width + x) * 4;
+
+            tilemapData.data[index] = pixel.r;
+            tilemapData.data[index + 1] = pixel.g;
+            tilemapData.data[index + 2] = pixel.b;
+            tilemapData.data[index + 3] = pixel.a;
+        }
+
+        function getToolColor(id, opacity) {
+            opacity = opacity || 0.7;
+
+            switch(id) {
+                case 0: return 'rgba(255, 255, 255, ' + opacity + ')'; //white, empty
+                case 1: return 'rgba(0, 200, 0, ' + opacity + ')'; //green, jumpdown
+                case 2: return 'rgba(0, 0, 200, ' + opacity + ')'; //blue, reserved
+                case 3: return 'rgba(200, 0, 0, ' + opacity + ')'; //red, block
+                default: return 'rgba(255, 255, 255, ' + opacity + ')'; //purple
+            }
         }
     });
 })(jQuery, window);
