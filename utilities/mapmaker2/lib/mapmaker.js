@@ -40,6 +40,7 @@ var MapMaker = exports.MapMaker = function() {
     this.tileSize = 16;
     this.nextTileId = 0;
     this.tilesPerRow = 0;
+    this.blockThreshold = 65;
 
     this.tileCanvas = new Canvas(); //document.createElement("canvas");
     this.spriteCanvas = new Canvas(); //document.createElement("canvas");
@@ -156,9 +157,9 @@ MapMaker.prototype.processTile = function(x, y, cb) {
     //this is a naive way to guess if this tile blocks. hopefully
     //this can get smarter in the future
     for(var p = 0; p < pixels.data.length; p += 4) {
-        if(pixels.data[p] < 50 && //red
-            pixels.data[p + 1] < 50 && //green
-            pixels.data[p + 2] < 50) //blue
+        if(pixels.data[p] < this.blockThreshold && //red
+            pixels.data[p + 1] < this.blockThreshold && //green
+            pixels.data[p + 2] < this.blockThreshold) //blue
         {
             var y2 = Math.floor((p / 4) / this.tileSize), //y coord
                 x2 = (p / 4) - (y2 * this.tileSize), //x coord

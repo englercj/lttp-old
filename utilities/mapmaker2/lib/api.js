@@ -127,6 +127,17 @@ Api.prototype._setupRoutes = function() {
         }
     });
 
+    self.app.post('/uploadmaps', function(req, res) {
+        if(!req.files.upTilemap || !req.files.upTileset) {
+            res.send(400);
+        } else {
+            res.json({
+                tilemap: '/temp/' + path.basename(req.files.upTilemap.path),
+                tileset: '/temp/' + path.basename(req.files.upTileset.path)
+            });
+        }
+    });
+
     self.io.sockets.on('connection', function(socket) {
         socket.emit('id', socket.id);
         socket.on('subscribe', function(data) { socket.join(data); });

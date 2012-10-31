@@ -74,11 +74,25 @@
                     <span class="tool reserved" data-toolid="2">Reserved</span>
                     <span class="tool block" data-toolid="3">Block</span>
                     <button id="btnDlTm">Download Tilemap</button>
+                    <button id="btnUploadEdit">Upload Tilemap and Tileset</button>
                 </div>
                 <canvas id="minimap"></canvas>
                 <canvas id="map"></canvas>
                 <br class="clear"/>
             </div>
         </section>
+        <div id="dlgUpload" title="Upload Tilemap and Tileset">
+            <form id="uploadedit" enctype="multipart/form-data">
+                <label for="upTilesize">Tile Size:</label><br/>
+                <input type="number" name="upTilesize" id="upTilesize" value="16" />
+                <br/><br/>
+                <label for="upTilemap">Tilemap Image:</label><br/>
+                <input type="file" name="upTilemap" id="upTilemap" />
+                <br/><br/>
+                <label for="upTileset">Tileset Image:</label><br/>
+                <input type="file" name="upTileset" id="upTileset" />
+                <br/>
+            </form>
+        </div>
     </body>
 </html>

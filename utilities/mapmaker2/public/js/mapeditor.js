@@ -16,12 +16,21 @@
             tileSize = 16,
             activeTool = null,
             lastSlice = null,
-            dragMap = false;
+            dragMap = false,
+            init = false,
+            $dlgUplEdit = $('#dlgUpload').dialog({
+                modal: true, autoOpen: false,
+                width: 400, height: 450,
+                buttons: {
+                    Upload: doUploadToEditor,
+                    Cancel: function() { $(this). dialog('close'); }
+                }
+            });
 
-        window.initEditor = function initEditor(tilesz) {
+        window.initEditor = function initEditor(tilesz, tm, ts) {
             maps = {
-                tilemap: $('#imgTilemap')[0],
-                tileset: $('#imgTileset')[0]
+                tilemap: tm,
+                tileset: ts
             };
 
             if(typeof tilesz == 'string')
@@ -56,11 +65,14 @@
                     height: viewSize.y * tileSize
                 });
                 drawMap();
+                init = true;
             }, false);
             stripes.src = '/img/stripes.png';
         };
 
         $minimap.on('mousedown', function(e) {
+            if(!init) return;
+
             var pos = $minimap.position();
             if(e.pageX > (pos.left + offset.x) && e.pageX < (pos.left + offset.x + viewSize.x) &&
                 e.pageY > (pos.top + offset.y) && e.pageY < (pos.top + offset.y + viewSize.y)) 
@@ -70,6 +82,8 @@
         });
 
         $minimap.on('mousemove', function(e) {
+            if(!init) return;
+
             if(dragMinimap) {
                 var diffX = e.clientX - dragMinimap.x,
                     diffY = e.clientY - dragMinimap.y;
@@ -85,10 +99,14 @@
         });
 
         $minimap.on('mouseup', function(e) {
+            if(!init) return;
+
             if(dragMinimap) dragMinimap = null;
         });
 
         $minimap.on('click', function(e) {
+            if(!init) return;
+
             var pos = $minimap.position();
 
             offset.x = Math.round(e.pageX - pos.left - (viewSize.x / 2));
@@ -115,15 +133,25 @@
             drawMinimap();
         });
 
+        $('#btnUploadEdit').on('click', function() {
+            $dlgUplEdit.dialog('open');
+        });
+
         $map.on('mousedown', function(e) {
+            if(!init) return;
+
             dragMap = true;
         });
 
         $map.on('mouseup', function(e) {
+            if(!init) return;
+
             if(dragMap) dragMap = false;
         });
 
         $map.on('mousemove', function(e) {
+            if(!init) return;
+
             var pos = $map.position(),
                 sz = tileSize / 2,
                 x = Math.floor((e.pageX - pos.left) / sz),
@@ -151,6 +179,8 @@
         });
 
         $map.on('click', function(e) {
+            if(!init) return;
+
             var pos = $map.position(),
                 sz = tileSize / 2,
                 x = Math.floor((e.pageX - pos.left) / sz),
@@ -270,6 +300,37 @@
                 case 3: return 'rgba(200, 0, 0, ' + opacity + ')'; //red, block
                 default: return 'rgba(255, 255, 255, ' + opacity + ')'; //purple
             }
+        }
+
+        function doUploadToEditor() {
+            var $form = $('#uploadedit'),
+                formData = new FormData($form[0]);
+
+            $.ajax({
+                url: '/uploadmaps',
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(data, textStatus, jqXHR) {
+                    var imgTilemap = new Image(),
+                        imgTileset = new Image(),
+                        tsz = $('#upTilesize').val();
+
+                    imgTilemap.addEventListener('load', function() {
+                        imgTileset.addEventListener('load', function() {
+                            initEditor(tsz, imgTilemap, imgTileset);
+                            $dlgUplEdit.dialog('close');
+                        }, false);
+                        imgTileset.src = data.tileset;
+                    }, false);
+                    imgTilemap.src = data.tilemap;
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('DERP!', errorThrown);
+                }
+            });
         }
     });
 })(jQuery, window);

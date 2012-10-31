@@ -35,7 +35,7 @@
         });
 
         $('#btnEdit').on('click', function() {
-            initEditor($('#tilesize').val());
+            initEditor($('#tilesize').val(), $('#imgTilemap')[0], $('#imgTileset')[0]);
             $('#tabs').tabs('option', 'active', 1);
         });
 
