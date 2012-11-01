@@ -32,11 +32,24 @@ Note that jQuery and jQuery-UI attempt to load from Google CDN, and fallback to 
 
 ### Acknowledgments
 
-Below is a list of tutorials, code snippetes, and other resources I used to develope many of the methods used in this game.
+Below is a list of tutorials, code snippetes, and other resources I used to develop many of the methods used in this game.
 I wanted to be sure to credit them all, if I miss someone please let me know.
 
 * [Texture Animation](https://github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/Texture-Animation.html) by [stemkoski](https://github.com/stemkoski)
 * [GPU Tilemaps](http://blog.tojicode.com/2012/08/more-gpu-tile-map-demos-zelda.html) by [Toji](https://github.com/toji)
+* [LTTP Collisions](http://gamedev.stackexchange.com/questions/8336/how-was-collision-detection-handled-in-the-legend-of-zelda-a-link-to-the-past) - useful stack exchange question
+
+### Resources
+
+Below is a list of resources I used for game content. This including sprites, sounds, technical data, walkthroughs, mob information,
+and misc details of the game:
+
+* [The Spriter's Resource](http://www.spriters-resource.com/snes/zeldalinkpast/index.html) - only used a couple sprites from here, quality isn't very good
+* [LTTP Maps](http://ian-albert.com/games/legend_of_zelda_a_link_to_the_past_maps/) - maps of all the dungeons
+* [SNES Maps](http://vgmaps.com/Atlas/SuperNES/index.htm#LegendOfZeldaALinkToThePast) - maps of all the dungeons
+* [Zelda Wiki](http://www.zeldawiki.org/The_Legend_of_Zelda:_A_Link_to_the_Past) - Great source of information on game content and mechanics
+* [Zelda Elements](http://www.zeldaelements.net/games/c/a_link_to_the_past/) - Another good wiki-like source
+* [nes-snes-sprites.com](http://www.nes-snes-sprites.com/LegendofZeldaTheALinktothePast.html) - used for most character sprites
 
 ### License and Legal
 
