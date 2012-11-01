@@ -1,3 +1,12 @@
 {
-    "location": [2140.5625, 1179.5]
+    "location": [2140.5625, 1179.5],
+    "zones": [
+        {
+            "name": "",
+            "vertices": [],
+            "entities": [],
+            "exits": [],
+            "overlay": null
+        }
+    ]
 }
