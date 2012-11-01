@@ -62,20 +62,28 @@ define([
                 mx = 0,
                 my = 0;
 
+            //clamp speed to fix issues with collision calculations when framerate gets low
+            if(speed > 0) speed = Math.min(speed, 10);
+            else if(speed < 0) speed = Math.max(speed, -10);
+
+            if(this.engine.controls.moving.up) y += speed;
+            if(this.engine.controls.moving.down) y -= speed;
+
             if(!this.engine.map.atMax('y', -y) && !this.engine.map.atMin('y', -y) && !this.lockMap.y) {
                 if(this.engine.controls.moving.up) my -= speed;
                 if(this.engine.controls.moving.down) my += speed;
-            } else {
-                if(this.engine.controls.moving.up) y += speed;
-                if(this.engine.controls.moving.down) y -= speed;
+
+                y = 0;
             }
+
+            if(this.engine.controls.moving.left) x -= speed;
+            if(this.engine.controls.moving.right) x += speed;
 
             if(!this.engine.map.atMax('x', -x) && !this.engine.map.atMin('x', -x) && !this.lockMap.x) {
                 if(this.engine.controls.moving.left) mx += speed;
                 if(this.engine.controls.moving.right) mx -= speed;
-            } else {
-                if(this.engine.controls.moving.left) x -= speed;
-                if(this.engine.controls.moving.right) x += speed;
+
+                x = 0;
             }
 
             this._doMapCollisionCheck(x || mx, y || my);
@@ -111,6 +119,37 @@ define([
                 this._checkMapLock('y');
             }
 
+        },
+        //used to move a player over time
+        movePlayer: function(sx, sy) {
+            var x = 0,
+                y = 0,
+                mx = 0,
+                my = 0;
+
+            if(this.engine.controls.moving.up) y += sy;
+            if(this.engine.controls.moving.down) y -= sy;
+
+            if(!this.engine.map.atMax('y', -y) && !this.engine.map.atMin('y', -y) && !this.lockMap.y) {
+                if(this.engine.controls.moving.up) my -= sy;
+                if(this.engine.controls.moving.down) my += sy;
+
+                y = 0;
+            }
+
+            if(this.engine.controls.moving.left) x -= sx;
+            if(this.engine.controls.moving.right) x += sx;
+
+            if(!this.engine.map.atMax('x', -x) && !this.engine.map.atMin('x', -x) && !this.lockMap.x) {
+                if(this.engine.controls.moving.left) mx += sx;
+                if(this.engine.controls.moving.right) mx -= sx;
+
+                x = 0;
+            }
+
+            if(x || y) this.moveEntity(x, y);
+
+            if(mx || my) this.engine.map.pan(mx, my);
         },
         checkMapLock: function() {
             this._checkMapLock('x');

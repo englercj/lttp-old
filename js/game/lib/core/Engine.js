@@ -23,11 +23,11 @@ define([
             this.viewport = new Viewport(elements.container, this.renderer);
 
             //show mudora text
-            this.ui.showDialog([
+            /*this.ui.showDialog([
                 '`~`^`~`^`^`',
                 '`^`~`~`^`~',
                 '`^`~`~`^`~`'
-            ]);
+            ]);*/
 
             //camera setup
             var width = this.viewport.width, height = this.viewport.height;
