@@ -159,31 +159,54 @@ define([
         //entities (walls, hills, jump downs, fences, trees, etc.) so normal entity collisions
         //won't detect these hits. Entities are only created for interactive elements of the map.
         _doMapCollisionCheck: function(x, y) {
+            if(!x && !y) return;
+
             //if we moved the map by x,y would we collide with something?
             //if yes, set "this.blocked[axis] = true" and set the "this.blocker[axis] = tile";
 
-            var offX = this.engine.map.offset.x - (x / this.engine.map.tileScale), //new X offset of map
-                tilesX = this.engine.viewport.width / this.engine.map.tileScale / this.engine.map.tileSize, //number of tiles accross X of viewport
-                pxX = tilesX + offX, //location of tile to check
-                texX = pxX / this.engine.map.tileScale,//pixel in tilemap
-                texXd = texX - Math.floor(texX), //decimal of the texture pixel (for getting the subtile)
+            var vpSize = this.engine.map._uniforms.viewportSize.value.clone().divideScalar(this.engine.map.tileSize), //number of tiles in viewport
+                pos = this._mesh.position.clone().addSelf({ x: x, y: y }), //mesh tiles offset
+                off = this.engine.map.offset.clone().divideScalar(this.engine.map.tileSize); //map tiles offset
 
-                offY = this.engine.map.offset.y - (y / this.engine.map.tileScale),
-                tilesY = this.engine.viewport.height / this.engine.map.tileScale / this.engine.map.tileSize,
-                pxY = tilesY + offY,
-                texY = this.engine.map.tilemap.image.height - (pxY / this.engine.map.tileScale),
+            //make position number of tiles
+            if(pos.x < 0)
+                pos.x = pos.x - (this.size.x / 2);
+            else
+                pos.x = pos.x + (this.size.x / 2);
+
+            if(pos.x < 0)
+                pos.y = pos.y - (this.size.y / 2);
+            else
+                pos.y = pos.y + (this.size.y / 2);
+
+            pos.divideScalar(this.engine.map.tileScale).divideScalar(this.engine.map.tileSize);
+
+            //pxCoord
+            vpSize.addSelf(off).addSelf(pos);//.divideScalar(2);
+            vpSize.y = this.engine.map.tilemap.image.height - vpSize.y;
+
+            //need to get decimals off to test which part of the tile
+            //we are on
+            var texX = vpSize.x,
+                texY = vpSize.y,
+                texXd = texX - Math.floor(texX),
                 texYd = texY - Math.floor(texY),
-
                 pixel = this.engine.map.getPixel('tilemap', Math.floor(texX), Math.floor(texY)),
                 colliders = [];
 
-
+            console.log(x, y, vpSize);
+            console.log(pixel);
             //texX decimal < 0.5 == left side of tile, > 0.5 == right side of tile
             //texY decimal < 0.5 == top side of tile, > 0.5 == bottom side of tile
             //
             //subtiles are a 1 byte value where 2 bits are for each subtile in the
             //order lefttop, righttop, leftbottom, rightbottom
             //to get righttop: ((pixel.a >> 4) & 3)
+
+            this.blocked.x = this.blocked.y = false;
+            this.blocker.x = this.blocker.y = null;
+
+            if(!pixel.b) return;
 
             var shift = 0,
                 flag = 3; //binary "11" to "and" off the 2 least significant bits
@@ -197,18 +220,16 @@ define([
             var value = ((pixel.b >> shift) & flag);
 
             //TODO: Make everything empty, since everything is blocking right now
-            value = ~value;
+            //value = ~value;
 
             //if this is a blocking subtile
-            this.blocked.x = this.blocked.y = false;
-            this.blocker.x = this.blocker.y = null;
             if(value == types.SUBTILE.BLOCK) {
                 //if we are moving in X, block X
                 if(x) {
                     this.blocked.x = true;
                     this.blocker.x = {
                         pixel: pixel,
-                        tilemapLoc: new THREE.Vector2(texX, texY)
+                        tilemapLoc: vpSize
                     };
                 }
 
@@ -217,7 +238,7 @@ define([
                     this.blocked.y = true;
                     this.blocker.y = {
                         pixel: pixel,
-                        tilemapLoc: new THREE.Vector2(texX, texY)
+                        tilemapLoc: vpSize
                     };
                 }
             }
