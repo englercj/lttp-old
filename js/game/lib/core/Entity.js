@@ -18,6 +18,8 @@ define([
             this.items = resource.data.items || [];
             this.loot = resource.data.loot || [];
 
+            this.sounds = resource.data.sounds || {};
+
             this.blocked = { x: false, y: false };
             this.blocker = { x: null, y: null };
 
@@ -44,6 +46,10 @@ define([
                 x = 0,
                 y = 0;
 
+            //clamp speed to fix issues with collision calculations when framerate gets low
+            if(speed > 0) speed = Math.min(speed, 10);
+            else if(speed < 0) speed = Math.max(speed, -10);
+
             //these values are the inverse of the player movement, since because pickles
             if(this.engine.controls.moving.up) y -= speed;
             if(this.engine.controls.moving.down) y += speed;
@@ -51,7 +57,7 @@ define([
             if(this.engine.controls.moving.left) x += speed;
             if(this.engine.controls.moving.right) x -= speed;
 
-            this._doCollisionCheck(x, y);
+            this._doMapCollisionCheck(x, y);
 
             if(x || y) this.moveEntity(x, y);
         },
@@ -84,6 +90,7 @@ define([
 
                 //free movement for the duration of damage animation
                 this.freeze = true;
+                this.engine.ui.playSound(this.sounds.damage);
                 this.setAnimation('damage' + dir);
 
                 this.once('animDone', function() {
@@ -164,50 +171,73 @@ define([
             //if we moved the map by x,y would we collide with something?
             //if yes, set "this.blocked[axis] = true" and set the "this.blocker[axis] = tile";
 
-            var vpSize = this.engine.map._uniforms.viewportSize.value.clone().divideScalar(this.engine.map.tileSize), //number of tiles in viewport
-                pos = this._mesh.position.clone().addSelf({ x: x, y: y }), //mesh tiles offset
-                off = this.engine.map.offset.clone().divideScalar(this.engine.map.tileSize); //map tiles offset
+            var mesh = this._mesh.clone();
 
-            //make position number of tiles
+            mesh.translateX(x);
+            mesh.translateY(y);
+
+            var vpSize = this.engine.map._uniforms.viewportSize.value.clone().divideScalar(this.engine.map.tileSize).divideScalar(2), //half the number of tiles in viewport
+                pos = mesh.position, //mesh tiles offset
+                off = this.engine.map.offset.clone().divideScalar(this.engine.map.tileSize), //map tiles offset
+                loc = new THREE.Vector2(); //map tiles offset
+
+            //position is really the "origin" of the entity, it is the center point.
+            //checking the origin when moving up is perfect, but when moving down we
+            //need to check at the entity's feet; not the center point. To achieve this
+            //we give an offset of (entity height / 2).
+            if(y > 0)
+                pos.y += (this.size.y / 4); //bias of 10 to make it look good
+
+            //in the same manner as above we want the x checks to always be on the sides
             if(pos.x < 0)
-                pos.x = pos.x - (this.size.x / 2);
-            else
-                pos.x = pos.x + (this.size.x / 2);
+                pos.x += (this.size.x / 2);
+            else if(pos.x > 0)
+                pos.x -= 3 * (this.size.x / 4);
 
-            if(pos.x < 0)
-                pos.y = pos.y - (this.size.y / 2);
-            else
-                pos.y = pos.y + (this.size.y / 2);
-
+            //do some division to make position be in "number of tiles" instead of "pixels from center"
             pos.divideScalar(this.engine.map.tileScale).divideScalar(this.engine.map.tileSize);
 
+            //inverse the Y since offset is counted from the other direction
+            pos.y = -pos.y;
+
+            //y needs to be inversed
+            //vpSize.y = vpSize.y;
+
             //pxCoord
-            vpSize.addSelf(off).addSelf(pos);//.divideScalar(2);
-            vpSize.y = this.engine.map.tilemap.image.height - vpSize.y;
+            loc.addSelf(off).addSelf(vpSize).addSelf(pos);//.subSelf({ x: 6.25, y: 4.6875 });
+            loc.y = this.engine.map.tilemap.image.height - loc.y; //this value is from bottom-left, but we need top-left offset
 
             //need to get decimals off to test which part of the tile
             //we are on
-            var texX = vpSize.x,
-                texY = vpSize.y,
+            var texX = loc.x,
+                texY = loc.y,
                 texXd = texX - Math.floor(texX),
-                texYd = texY - Math.floor(texY),
-                pixel = this.engine.map.getPixel('tilemap', Math.floor(texX), Math.floor(texY)),
+                texYd = texY - Math.floor(texY);
+
+            //these calculations are the tiniest bit off, so do some manual rounding
+            if(texXd > 0.8) { texX++; texXd = 0; }
+            if(texYd > 0.8) { texY++; texYd = 0; }
+
+            var pixel = this.engine.map.getPixel('tilemap', Math.floor(texX), Math.floor(texY)),
                 colliders = [];
 
-            console.log(x, y, vpSize);
-            console.log(pixel);
+            //console.log(x, y, loc);
+            //console.log(pixel);
+
+            this.blocked.x = this.blocked.y = false;
+            this.blocker.x = this.blocker.y = null;
+
+            if(!pixel.b) {
+                //console.log('NO BLUE!', x, texX, texXd, pixel);
+                return;
+            }
+
             //texX decimal < 0.5 == left side of tile, > 0.5 == right side of tile
             //texY decimal < 0.5 == top side of tile, > 0.5 == bottom side of tile
             //
             //subtiles are a 1 byte value where 2 bits are for each subtile in the
             //order lefttop, righttop, leftbottom, rightbottom
             //to get righttop: ((pixel.a >> 4) & 3)
-
-            this.blocked.x = this.blocked.y = false;
-            this.blocker.x = this.blocker.y = null;
-
-            if(!pixel.b) return;
-
             var shift = 0,
                 flag = 3; //binary "11" to "and" off the 2 least significant bits
 
@@ -226,47 +256,37 @@ define([
             if(value == types.SUBTILE.BLOCK) {
                 //if we are moving in X, block X
                 if(x) {
+                    console.log(x, loc, pixel);
                     this.blocked.x = true;
                     this.blocker.x = {
                         pixel: pixel,
-                        tilemapLoc: vpSize
+                        tilemapLoc: loc
                     };
-                }
+                } //else console.log('NOT BLOCKING X!', x, loc, pixel);
 
                 //if we are moving in Y, block Y
                 if(y) {
+                    console.log(y, loc, pixel);
                     this.blocked.y = true;
                     this.blocker.y = {
                         pixel: pixel,
-                        tilemapLoc: vpSize
+                        tilemapLoc: loc
                     };
-                }
+                } //else console.log('NOT BLOCKING Y!', y, loc, pixel);
             }
+            //if this is a jumpdown tile
+            else if(value == types.SUBTILE.JUMPDOWN && this.movePlayer) {
+                //do jumpdown
+                //this.freeze = true;
+                this.engine.ui.playSound(this.sounds.jumpdown);
+                //this.setAnimation('jumpdown');
+                this.movePlayer(0, 200); //47 is the size of a cliff
 
-            /*if(this.debug) {
-                for(var i = 0, il = this.debuggers.length; i < il; ++i) {
-                    if(this.debuggers[i])
-                        this.engine.destroyMesh(this.debuggers[i]);
-                }
-
-                this.debuggers.length = 0;
-
-                if(this.blocked.x) {
-                    if(x < 0) { //moving left
-
-                    } else { //moving right
-
-                    }
-                }
-
-                if(this.blocked.y) {
-                    if(y < 0) { //moving up
-
-                    } else { //moving down
-
-                    }
-                }
-            }*/
+                /*this.once('animDone', function() {
+                    this.freeze = false;
+                    this.setAnimation('idle' + dir);
+                });*/
+            }
         }
     });
 
