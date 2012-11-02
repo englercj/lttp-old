@@ -23,22 +23,22 @@
         "segments": [5, 8],
         "zindex": 2,
         "animations": {
-            "movedown": {
+            "move_down": {
                 "numFrames": 8,
                 "duration": 600
             },
-            "moveup": {
+            "move_up": {
                 "offset": [0, 2],
                 "numFrames": 8,
                 "duration": 600
             },
-            "moveleft": {
+            "move_left": {
                 "offset": [0, 1],
                 "numFrames": 8,
                 "duration": 600
             },
-            "moveright": {
-                "inverseX": "moveleft"
+            "move_right": {
+                "inverseX": "move_left"
             }
         }
     }

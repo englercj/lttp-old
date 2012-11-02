@@ -20,6 +20,8 @@ define([
 
             this.sounds = resource.data.sounds || {};
 
+            this.lastDirection = null;
+
             this.blocked = { x: false, y: false };
             this.blocker = { x: null, y: null };
 
@@ -39,6 +41,22 @@ define([
 
             //this.setAnimation('idle');
             this.setPosition(resource.data.location[0], resource.data.location[1]);
+
+            this.bindEvents();
+        },
+        bindEvents: function() {
+            var self = this;
+
+            //set moving animations
+            self.engine.controls.on('move::*', function(dir, startMoving) {
+                if(!self.engine.controls.isMoving) {
+                    self.setAnimation('idle_' + this.lastDirection);
+                }
+                else {
+                    this.lastDirection = dir;
+                    self.setAnimation('move_' + dir);
+                }
+            });
         },
         update: function(delta) {
             //animation updates
@@ -96,7 +114,7 @@ define([
                 //free movement for the duration of damage animation
                 this.freeze = true;
                 this.engine.ui.playSound(this.sounds.damage);
-                this.setAnimation('damage' + dir);
+                this.setAnimation('damage_' + dir);
 
                 this.once('animDone', function() {
                     this.freeze = false;
@@ -188,13 +206,7 @@ define([
             var pixel = util.getImagePixel(this.engine.map.layers[0].imageData.tilemap, Math.floor(texX), Math.floor(texY)),
                 colliders = [];
 
-            //console.log(pos);
-            //console.log(pixel);
-
-            if(!pixel.blue) {
-                //console.log('NO BLUE!', x, texX, texXd, pixel);
-                return;
-            }
+            if(!pixel.blue) return;
 
             //texX decimal < 0.5 == left side of tile, > 0.5 == right side of tile
             //texY decimal < 0.5 == top side of tile, > 0.5 == bottom side of tile
@@ -326,17 +338,15 @@ define([
                     //do jumpdown
                     //this.freeze = true;
                     this.engine.ui.playSound(this.sounds.jumpdown);
-                    //this.setAnimation('jumpdown');
+                    //this.setAnimation('jumpdown_' + this.lastDirection);
                     this.moveEntity(0, (y > 0 ? 200 : -200));
 
                     /*this.once('animDone', function() {
                         this.freeze = false;
-                        this.setAnimation('idle' + dir);
+                        this.setAnimation('idle_' + this.lastDirection);
                     });*/
                 }
             }
-
-            console.log(this.blocked);
         }
     });
 
