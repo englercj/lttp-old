@@ -16,6 +16,9 @@ define([
             };
             this.equipted = null;
 
+            //link the player moving to the controls
+            this.moving = this.engine.controls.moving;
+
             //for keeping player centered
             this.centerThreshold = 5;
             this.offcenter = { x: false, y: false };
@@ -35,93 +38,26 @@ define([
             self.engine.controls.on('move::*', function(dir, startMoving) {
                 if(!self.engine.controls.isMoving)
                     self.setAnimation();
-                else if(self.engine.controls.moving.up)
+                else if(self.moving.up)
                     self.setAnimation('moveup');
-                else if(self.engine.controls.moving.down)
+                else if(self.moving.down)
                     self.setAnimation('movedown');
-                else if(self.engine.controls.moving.left)
+                else if(self.moving.left)
                     self.setAnimation('moveleft');
-                else if(self.engine.controls.moving.right)
+                else if(self.moving.right)
                     self.setAnimation('moveright');
             });
 
-            //TODO: need to also check for trying to move, but can't and do those pushing animations
-        },
-        update: function(delta) {
-            //animation updates
-            this.animate(delta);
-
-            if(this.freeze) return;
-
-            //calculate movement accross the world, if we are not at (or going into)
-            //the map min/max for that axis then move the map. If we do hit a min/max
-            //then move the map
-            var speed = delta * this.moveSpeed,
-                x = 0,
-                y = 0,
-                mx = 0,
-                my = 0;
-
-            //clamp speed to fix issues with collision calculations when framerate gets low
-            if(speed > 0) speed = Math.min(speed, 10);
-            else if(speed < 0) speed = Math.max(speed, -10);
-
-            if(this.engine.controls.moving.up) y += speed;
-            if(this.engine.controls.moving.down) y -= speed;
-
-            if(!this.engine.map.atMax('y', -y) && !this.engine.map.atMin('y', -y) && !this.lockMap.y) {
-                if(this.engine.controls.moving.up) my -= speed;
-                if(this.engine.controls.moving.down) my += speed;
-
-                y = 0;
-            }
-
-            if(this.engine.controls.moving.left) x -= speed;
-            if(this.engine.controls.moving.right) x += speed;
-
-            if(!this.engine.map.atMax('x', -x) && !this.engine.map.atMin('x', -x) && !this.lockMap.x) {
-                if(this.engine.controls.moving.left) mx += speed;
-                if(this.engine.controls.moving.right) mx -= speed;
-
-                x = 0;
-            }
-
-            this._doMapCollisionCheck(x || mx, y || my);
-
-            //if blocked, then set to 0
-            if(this.blocked.x) x = mx = 0;
-            if(this.blocked.y) y = my = 0;
-
-            if(x || y) this.moveEntity(x, y);
-
-            if(mx || my) this.engine.map.pan(mx, my);
+            //TODO: when blocked, show pushing animation
         },
         moveEntity: function(x, y) {
-            //override entity movement, since this entity is bound to the screen
-            //we need to do extra checks. It looks very similar but has some extra
-            //stuff in there
-            var w2 = this.engine.viewport.width / 2,
-                h2 = this.engine.viewport.height / 2,
-                maxX = w2 - (this.size.x / 2), //half width - half texture width
-                maxY = h2 - (this.size.y / 2),
-                newX = this._mesh.position.x + x,
-                newY = this._mesh.position.y + y;
+            this._super(x, y);
 
-            //constrain X
-            if(!this.blocked.x && newX < maxX && newX > -maxX) {
-                this._mesh.translateX(x);
-                this._checkMapLock('x');
-            }
-
-            //constrain Y
-            if(!this.blocked.y && newY < maxY && newY > -maxY) {
-                this._mesh.translateY(y);
-                this._checkMapLock('y');
-            }
-
+            if(!this.blocked.x) this.engine.camera.translateX(x);
+            if(!this.blocked.y) this.engine.camera.translateY(y);
         },
         //used to move a player over time
-        movePlayer: function(sx, sy) {
+        /*movePlayer: function(sx, sy) {
             var x = 0,
                 y = 0,
                 mx = 0,
@@ -150,27 +86,7 @@ define([
             if(x || y) this.moveEntity(x, y);
 
             if(mx || my) this.engine.map.pan(mx, my);
-        },
-        checkMapLock: function() {
-            this._checkMapLock('x');
-            this._checkMapLock('y');
-        },
-        _checkMapLock: function(axis) {
-            //when the player offcenters himself the map background
-            //movement for that axis needs to lock, until he recenters
-            //on the map
-
-            if(!this.offcenter[axis] && this._mesh.position[axis] !== 0) {
-                this.offcenter[axis] = true;
-                this.lockMap[axis] = true;
-            }
-            //check if he is close to axis center and if so, put him at 0 and unlock map
-            else if(this._mesh.position[axis] > -this.centerThreshold && this._mesh.position[axis] < this.centerThreshold) {
-                this._mesh.position[axis] = 0;
-                this.lockMap[axis] = false;
-                this.offcenter[axis] = false;
-            }
-        }
+        },*/
     });
 
     return Player;

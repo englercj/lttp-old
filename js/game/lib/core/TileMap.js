@@ -1,18 +1,22 @@
+/*
+    This tilemap class operates by rendering a plane that is textured by the tilemap.
+    A plane is rendered for each layer
+*/
 define([
-    'game/lib/bases/SceneObject'
-], function(SceneObject) {
+    'game/lib/bases/SceneObject',
+    'game/lib/utils/util'
+], function(SceneObject, util) {
     // Shader
     var tilemapVS = [
         "varying vec2 pixelCoord;",
         "varying vec2 texCoord;",
 
-        "uniform vec2 viewOffset;",
-        "uniform vec2 viewportSize;",
+        "uniform vec2 mapSize;",
         "uniform vec2 inverseTileTextureSize;",
         "uniform float inverseTileSize;",
 
         "void main(void) {",
-        "    pixelCoord = (uv * viewportSize) + viewOffset;",
+        "    pixelCoord = (uv * mapSize);",
         "    texCoord = pixelCoord * inverseTileTextureSize * inverseTileSize;",
         "    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
         "}"
@@ -42,31 +46,106 @@ define([
         "}"
     ].join("\n");
 
-    var TileMapLayer = Class.extend({
-        init: function(tilemap, parent) {
-            this.tilemap = tilemap;
-            this.parent = parent;
+    var TileMap = Class.extend({
+        init: function(engine, opts) {
+            this._super(engine);
+
+            this.layers = [];
+            opts = opts || {};
+
+            this.tileScale = opts.tileScale || 4.0;
+            this.tileSize = opts.tileSize || 16;
+            this.tilemapSize = new THREE.Vector2();
+        },
+        addLayer: function(resource, opts) {
+            if(typeof opts == 'string') {
+                var temp = opts;
+                opts = { name: temp };
+            }
+
+            opts = opts || {};
+            opts.tileScale = this.tileScale;
+            opts.tileSize = this.tileSize;
+            opts.zIndex = (opts.zIndex !== undefined) ? opts.zIndex : this.layers.length;
+
+            var layer = new TileMapLayer(this.engine, resource, opts, this);
+            this.layers.push(layer);
+
+            //TODO: right now this only tracks the latest layer, should it be the biggest layer?
+            this.tilemapSize.set(layer.tilemap.image.width, layer.tilemap.image.height);
+
+            //incase they add the map to the scene first, then add layers
+            if(this.scene)
+                layer.addToScene(this.scene);
+        },
+        //removes the first layer matching the index, or name passed
+        //returns the layer removed, or undefined if not found.
+        removeLayer: function(which) {
+            var lyr;
+            //index to remove
+            if(typeof which == 'number') {
+                lyr = this.layers.splice(which, 1)[0];
+            }
+            //name of layer to remove
+            else {
+                var index;
+                this.eachLayer(function(layer, i) {
+                    if(layer.name == which) {
+                        index = i;
+                        return false; //break
+                    }
+                });
+
+                if(index) lyr = this.layers.splice(index, 1)[0];
+            }
+
+            return lyr;
+        },
+        addToScene: function(scene) {
+            this.scene = this;
+
+            //incase they add layers first, then add the map to the scene
+            this.eachLayer(function(layer) {
+                if(!layer.scene || layer.scene != scene)
+                    layer.addToScene(scene);
+            });
+        },
+        pan: function() {
+            this.eachLayer(function(layer) {
+                layer.pan.apply(layer, arguments);
+            });
+        },
+        eachLayer: function(fn) {
+            for(var i = 0, il = this.layers.length; i < il; ++i) {
+                if(fn.call(this, this.layers[i], i, this.layers) === false)
+                    break;
+            }
         }
     });
 
-    var TileMap = SceneObject.extend({
-        //need to be textures
-        init: function(resource, viewport) {
-            this._super();
+    var TileMapLayer = SceneObject.extend({
+        init: function(engine, resource, opts, parent) {
+            this._super(engine);
+            this.parent = parent;
 
-            this.tileScale = 4.0;
-            this.tileSize = 16;
-            this.repeat = false;
-            this.filtered = false;
+            //set options
+            this.tileScale = opts.tileScale || 4.0;
+            this.tileSize = opts.tileSize || 16;
+            this.zIndex = (opts.zIndex !== undefined) ? opts.zIndex : 0;
+            this.repeat = (opts.repeat !== undefined) ? opts.repeat : false;
+            this.filtered = (opts.repeat !== undefined) ? opts.filtered : false;
+            this.name = opts.name;
 
+            //set maps
             this.tilemap = resource.tilemap;
             this.tileset = resource.tileset;
             this.meta = resource.meta;
 
-            this.viewport = viewport;
-
-            this.imageData = {};
-            this.imageData.tilemap = this.getImageData(this.tilemap.image);
+            //cache image data
+            this.imageData = {
+                tilemap: util.getImageData(this.tilemap.image),
+                tileset: util.getImageData(this.tileset.image)
+            };
 
             //Setup Tilemap
             this.tilemap.magFilter = THREE.NearestFilter;
@@ -90,9 +169,8 @@ define([
             }
 
             //setup shader uniforms
-            this.offset = new THREE.Vector2(this.meta.location[0], this.meta.location[1]);
             this._uniforms = {
-                viewportSize: { type: 'v2', value: new THREE.Vector2(viewport.width / this.tileScale, viewport.height / this.tileScale) },
+                mapSize: { type: 'v2', value: new THREE.Vector2(this.tilemap.image.width * this.tileSize, this.tilemap.image.height * this.tileSize) },
                 inverseSpriteTextureSize: { type: 'v2', value: new THREE.Vector2(1/this.tileset.image.width, 1/this.tileset.image.height) },
                 tileSize: { type: 'f', value: this.tileSize },
                 inverseTileSize: { type: 'f', value: 1/this.tileSize },
@@ -100,7 +178,6 @@ define([
                 tiles: { type: 't', value: this.tilemap },
                 sprites: { type: 't', value: this.tileset },
 
-                viewOffset: { type: 'v2', value: this.offset },
                 inverseTileTextureSize: { type: 'v2', value: new THREE.Vector2(1/this.tilemap.image.width, 1/this.tilemap.image.height) },
                 repeatTiles: { type: 'i', value: this.repeat ? 1 : 0 }
             };
@@ -113,101 +190,13 @@ define([
                 transparent: false
             });
 
-            this._plane = new THREE.PlaneGeometry(viewport.width, viewport.height);
+            this._plane = new THREE.PlaneGeometry(
+                this.tilemap.image.width * this.tileSize * this.tileScale,
+                this.tilemap.image.height * this.tileSize * this.tileScale
+            );
 
             this._mesh = new THREE.Mesh(this._plane, this._material);
-
-            viewport.on('resize', $.proxy(this.onResize, this));
-            this.onResize();
-        },
-        addTileLayer: function(tilemap, scrollScaleX, scrollScaleY) {
-            this.layers.push(new TileMapLayer(tilemap, this));
-        },
-        onResize: function() {
-            //calculate max X extent so we dont go off map
-            this.maxExtentX = this.tilemap.image.width * this.tileScale * this.tileSize; //biggest X point of the map
-            this.maxExtentY = this.tilemap.image.height * this.tileScale * this.tileSize; //biggest Y point of the map
-        },
-        rgbaToHex: function(rgba) {
-            return ((rgba.r << 32) | (rgba.g << 16) | (rgba.b << 8) | (rgba.a)).toString(16);
-        },
-        //returns the data for a pixel in the texture image
-        getPixel: function(from, x, y) {
-            var index = (y * this.imageData[from].width + x) * 4,
-                red = this.imageData[from].data[index],
-                green = this.imageData[from].data[index + 1],
-                blue = this.imageData[from].data[index + 2],
-                alpha = this.imageData[from].data[index + 3],
-                rgba = { r: red, g: green, b: blue, a: alpha };
-
-            //rgba.hex = this.rgbaToHex(rgba);
-            return rgba;
-        },
-        getImageData: function(image) {
-            var canvas = document.createElement('canvas');
-            canvas.width = image.width;
-            canvas.height = image.height;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(image, 0, 0);
-
-            return ctx.getImageData(0, 0, canvas.width, canvas.height);
-        },
-        atMax: function(axis, val) {
-            //no value checks if currently at max
-            if(val === undefined) {
-                return (this['maxDiff' + axis.toUpperCase()] <= 0);
-            }
-            //val checks if moving would cause us to be at max
-            else {
-                var AX = axis.toUpperCase(),
-                    ax = axis.toLowerCase(),
-                    dem = (axis == 'x' || axis == 'X') ? 'width' : 'height',
-                    newOff = this.offset[ax] - (val / this.tileScale),
-                    newMax = this['maxExtent' + AX] - (this.viewport[dem] + (newOff * this.tileScale));
-
-                return (newMax <= 0);
-            }
-        },
-        atMin: function(axis, val) {
-            //no value check if currently at min
-            if(val === undefined) {
-                return (this.offset[axis.toLowerCase()] === 0);
-            }
-            //val checks if moving would cause us to be at min
-            else {
-                var ax = axis.toLowerCase(),
-                    newOff = this.offset[ax] - (val / this.tileScale);
-
-                return (newOff <= 0);
-            }
-        },
-        pan: function(x, y) {
-            //update the offset
-            this.offset.x -= x / this.tileScale;
-            this.offset.y -= y / this.tileScale;
-
-            this.maxDiffX = this.maxExtentX - (this.viewport.width + (this.offset.x * this.tileScale)), //biggest X camera can reach without the viewport going offscreen
-            this.maxDiffY = this.maxExtentY - (this.viewport.height + (this.offset.y * this.tileScale)); //biggest Y camera can reach without the viewport going offscreen
-
-            //constrain maximum X
-            if(this.maxDiffX < 0) {
-                this.offset.x += this.maxDiffX / this.tileScale;
-            }
-
-            //constrain maximum Y
-            if(this.maxDiffY < 0) {
-                this.offset.y += this.maxDiffY / this.tileScale;
-            }
-
-            //constrain minimum X
-            if(this.offset.x < 0) {
-                this.offset.x = 0;
-            }
-
-            //constrain minimum Y
-            if(this.offset.y < 0) {
-                this.offset.y = 0;
-            }
+            this._mesh.z = this.zIndex;
         }
     });
 

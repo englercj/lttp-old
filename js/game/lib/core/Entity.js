@@ -1,10 +1,10 @@
 define([
     'game/lib/bases/Sprite',
-    'game/data/types'
-], function(Sprite, types) {
+    'game/data/types',
+    'game/lib/utils/util'
+], function(Sprite, types, util) {
     var Entity = Sprite.extend({
         init: function(resource, engine) {
-            this.engine = engine;
             //this.controls = controls;
             //this.map = map;
             //this.viewport = viewport;
@@ -23,6 +23,11 @@ define([
             this.blocked = { x: false, y: false };
             this.blocker = { x: null, y: null };
 
+            this.moving = {
+                up: false, down: false,
+                left: false, right: false
+            };
+
             this.ray = new THREE.Ray();
 
             resource.data.sprite = resource.data.sprite || { size: [0, 0], area: [1, 1] };
@@ -30,7 +35,7 @@ define([
             resource.data.sprite.texture = resource.texture || new THREE.Texture();
 
             //initialize visual sprite
-            this._super(resource.data.sprite);
+            this._super(resource.data.sprite, engine);
 
             //this.setAnimation('idle');
             this.setPosition(resource.data.location[0], resource.data.location[1]);
@@ -51,13 +56,13 @@ define([
             else if(speed < 0) speed = Math.max(speed, -10);
 
             //these values are the inverse of the player movement, since because pickles
-            if(this.engine.controls.moving.up) y -= speed;
-            if(this.engine.controls.moving.down) y += speed;
+            if(this.moving.up) y += speed;
+            if(this.moving.down) y -= speed;
 
-            if(this.engine.controls.moving.left) x += speed;
-            if(this.engine.controls.moving.right) x -= speed;
+            if(this.moving.left) x -= speed;
+            if(this.moving.right) x += speed;
 
-            this._doMapCollisionCheck(x, y);
+            this.checkMapCollision(x, y);
 
             if(x || y) this.moveEntity(x, y);
         },
@@ -138,6 +143,7 @@ define([
                     //for now we only care about the first hit on this object
                     //that is only one per entity
                     if(hits.length) {
+                        console.log('HIT! DirectionV:', directionV);
                         hits[0].entity = entity;
                         hits[0].direction = 'left'; //this needs to be based on directionV
                         collisions.push(hits[0]);
@@ -161,73 +167,31 @@ define([
                 }
             }
         },
-        //the map collision checks if we were to move by X, Y units, would we collide with
-        //a map element. This check is neccessary since most elements on the map are not
-        //entities (walls, hills, jump downs, fences, trees, etc.) so normal entity collisions
-        //won't detect these hits. Entities are only created for interactive elements of the map.
-        _doMapCollisionCheck: function(x, y) {
-            if(!x && !y) return;
-
-            //if we moved the map by x,y would we collide with something?
-            //if yes, set "this.blocked[axis] = true" and set the "this.blocker[axis] = tile";
-
-            var mesh = this._mesh.clone();
-
-            mesh.translateX(x);
-            mesh.translateY(y);
-
-            var vpSize = this.engine.map._uniforms.viewportSize.value.clone().divideScalar(this.engine.map.tileSize).divideScalar(2), //half the number of tiles in viewport
-                pos = mesh.position, //mesh tiles offset
-                off = this.engine.map.offset.clone().divideScalar(this.engine.map.tileSize), //map tiles offset
-                loc = new THREE.Vector2(); //map tiles offset
-
-            //position is really the "origin" of the entity, it is the center point.
-            //checking the origin when moving up is perfect, but when moving down we
-            //need to check at the entity's feet; not the center point. To achieve this
-            //we give an offset of (entity height / 2).
-            if(y > 0)
-                pos.y += (this.size.y / 4); //bias of 10 to make it look good
-
-            //in the same manner as above we want the x checks to always be on the sides
-            if(pos.x < 0)
-                pos.x += (this.size.x / 2);
-            else if(pos.x > 0)
-                pos.x -= 3 * (this.size.x / 4);
-
-            //do some division to make position be in "number of tiles" instead of "pixels from center"
+        _getMapBlock: function(pos, tilemapSize) {
+            //do some division to make position be in "tiles from center" instead of "pixels from center"
             pos.divideScalar(this.engine.map.tileScale).divideScalar(this.engine.map.tileSize);
 
-            //inverse the Y since offset is counted from the other direction
+            //inverse the Y since we are getting offset from top not bottom like the position does
             pos.y = -pos.y;
 
-            //y needs to be inversed
-            //vpSize.y = vpSize.y;
-
-            //pxCoord
-            loc.addSelf(off).addSelf(vpSize).addSelf(pos);//.subSelf({ x: 6.25, y: 4.6875 });
-            loc.y = this.engine.map.tilemap.image.height - loc.y; //this value is from bottom-left, but we need top-left offset
+            //pos is now the offset from the center, to make it from the top left
+            //we subtract half the size of the tilemap
+            pos.addSelf(tilemapSize);
 
             //need to get decimals off to test which part of the tile
             //we are on
-            var texX = loc.x,
-                texY = loc.y,
+            var texX = pos.x,
+                texY = pos.y,
                 texXd = texX - Math.floor(texX),
                 texYd = texY - Math.floor(texY);
 
-            //these calculations are the tiniest bit off, so do some manual rounding
-            if(texXd > 0.8) { texX++; texXd = 0; }
-            if(texYd > 0.8) { texY++; texYd = 0; }
-
-            var pixel = this.engine.map.getPixel('tilemap', Math.floor(texX), Math.floor(texY)),
+            var pixel = util.getImagePixel(this.engine.map.layers[0].imageData.tilemap, Math.floor(texX), Math.floor(texY)),
                 colliders = [];
 
-            //console.log(x, y, loc);
+            //console.log(pos);
             //console.log(pixel);
 
-            this.blocked.x = this.blocked.y = false;
-            this.blocker.x = this.blocker.y = null;
-
-            if(!pixel.b) {
+            if(!pixel.blue) {
                 //console.log('NO BLUE!', x, texX, texXd, pixel);
                 return;
             }
@@ -247,46 +211,132 @@ define([
             if(texYd < 0.5) shift = shift[1]; //shift for top (second element)
             else shift = shift[0]; //shift for bottom (first element)
 
-            var value = ((pixel.b >> shift) & flag);
+            var value = ((pixel.blue >> shift) & flag);
 
-            //TODO: Make everything empty, since everything is blocking right now
-            //value = ~value;
+            return [{
+                blockType: value,
+                pixel: pixel,
+                tilemapLoc: pos
+            }];
+        },
+        //the map collision checks if we were to move by X, Y units, would we collide with
+        //a map element. This check is neccessary since most elements on the map are not
+        //entities (walls, hills, jump downs, fences, trees, etc.) so normal entity collisions
+        //won't detect these hits. Entities are only created for interactive elements of the map.
+        checkMapCollision: function(x, y) {
+            if(!x && !y) return;
 
-            //if this is a blocking subtile
-            if(value == types.SUBTILE.BLOCK) {
-                //if we are moving in X, block X
-                if(x) {
-                    console.log(x, loc, pixel);
+            //if we moved by x,y would we collide with a wall or other map element?
+            //if yes, set "this.blocked[axis] = true" and set the "this.blocker[axis] = tile";
+
+            //clone our mesh and simulate movement
+            var mesh = this._mesh.clone();
+
+            mesh.translateX(x);
+            mesh.translateY(y);
+
+            var tilemapSize = this.engine.map.tilemapSize.clone().divideScalar(2), //half tilemap size
+                pos = new THREE.Vector2(mesh.position.x, mesh.position.y), //mesh tiles offset from center
+                loc = new THREE.Vector2();
+
+            //position is really the "origin" of the entity, it is the center point.
+            //link has 4 "hot spots" that are used to detect collision:
+            // - if moving left: his leftmost foot position, and leftmost center are checked
+            // - if moving right: his rightmost foot position, and rightmost center are checked
+            // - if moving up: his leftmost center and his rightmost center positions are checked
+            // - if moving down: his leftmost foot position and his rightmost foot positions are checked
+
+            this.blocked.x = this.blocked.y = false;
+            this.blocker.x = this.blocker.y = null;
+
+            var tilesX = [],
+                tilesY = [],
+                space = 5,
+                temp,
+                leftFoot = pos.clone(),
+                rightFoot = pos.clone(),
+                leftCenter = pos.clone(),
+                rightCenter = pos.clone();
+
+                leftFoot.x -= (this.size.x / 2) - space;
+                leftFoot.y -= (this.size.y / 2) - space;
+
+                rightFoot.x += (this.size.x / 2) - space;
+                rightFoot.y -= (this.size.y / 2) - space;
+
+                leftCenter.x -= (this.size.x / 2) - space;
+                leftCenter.y -= space * 2;
+
+                rightCenter.x += (this.size.x / 2) - space;
+                rightCenter.y -= space * 2;
+
+            //moving left
+            if(x < 0) {
+                //check left foot and left center hotspots
+                Array.prototype.push.apply(tilesX, this._getMapBlock(leftFoot, tilemapSize));
+                Array.prototype.push.apply(tilesX, this._getMapBlock(leftCenter, tilemapSize));
+            }
+            //moving right
+            else if(x > 0) {
+                //check the right foot and right center hotspots
+                Array.prototype.push.apply(tilesX, this._getMapBlock(rightFoot, tilemapSize));
+                Array.prototype.push.apply(tilesX, this._getMapBlock(rightCenter, tilemapSize));
+            }
+
+            //moving down
+            if(y < 0) {
+                //check the left foot and right foot hotspots
+                Array.prototype.push.apply(tilesY, this._getMapBlock(leftFoot, tilemapSize));
+                Array.prototype.push.apply(tilesY, this._getMapBlock(rightFoot, tilemapSize));
+            }
+            //moving up
+            else if(y > 0) {
+                //check the left center and right center hotspots
+                Array.prototype.push.apply(tilesY, this._getMapBlock(leftCenter, tilemapSize));
+                Array.prototype.push.apply(tilesY, this._getMapBlock(rightCenter, tilemapSize));
+            }
+
+            //check X tiles
+            for(var z = 0, zl = tilesX.length; z < zl; ++z) {
+                if(tilesX[z].blockType == types.SUBTILE.BLOCK) {
                     this.blocked.x = true;
-                    this.blocker.x = {
-                        pixel: pixel,
-                        tilemapLoc: loc
-                    };
-                } //else console.log('NOT BLOCKING X!', x, loc, pixel);
+                    this.blocker.x = tilesX[z];
+                    break;
+                } else if(tilesX[z].blockType == types.SUBTILE.JUMPDOWN) {
+                    //do jumpdown
+                    //this.freeze = true;
+                    this.engine.ui.playSound(this.sounds.jumpdown);
+                    //this.setAnimation('jumpdown');
+                    this.moveEntity((x > 0 ? 100 : -100), 0);
 
-                //if we are moving in Y, block Y
-                if(y) {
-                    console.log(y, loc, pixel);
+                    /*this.once('animDone', function() {
+                        this.freeze = false;
+                        this.setAnimation('idle' + dir);
+                    });*/
+                }
+            }
+
+            //check Y tiles
+            for(var q = 0, ql = tilesY.length; q < ql; ++q) {
+                if(tilesY[q].blockType == types.SUBTILE.BLOCK) {
                     this.blocked.y = true;
-                    this.blocker.y = {
-                        pixel: pixel,
-                        tilemapLoc: loc
-                    };
-                } //else console.log('NOT BLOCKING Y!', y, loc, pixel);
-            }
-            //if this is a jumpdown tile
-            else if(value == types.SUBTILE.JUMPDOWN && this.movePlayer) {
-                //do jumpdown
-                //this.freeze = true;
-                this.engine.ui.playSound(this.sounds.jumpdown);
-                //this.setAnimation('jumpdown');
-                this.movePlayer(0, 200); //47 is the size of a cliff
+                    this.blocker.y = tilesY[q];
+                    break;
+                } else if(tilesY[q].blockType == types.SUBTILE.JUMPDOWN) {
+                    //do jumpdown
+                    //this.freeze = true;
+                    this.engine.ui.playSound(this.sounds.jumpdown);
+                    //this.setAnimation('jumpdown');
+                    this.moveEntity(0, (y > 0 ? 200 : -200));
 
-                /*this.once('animDone', function() {
-                    this.freeze = false;
-                    this.setAnimation('idle' + dir);
-                });*/
+                    /*this.once('animDone', function() {
+                        this.freeze = false;
+                        this.setAnimation('idle' + dir);
+                    });*/
+                }
             }
+
+            console.log(this.blocked);
         }
     });
 

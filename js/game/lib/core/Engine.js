@@ -37,7 +37,8 @@ define([
             this.viewport.setCamera(this.camera);
 
             //map setup
-            this.map = new TileMap(resources.maps.lightworld, this.viewport);
+            this.map = new TileMap(this);//resources.maps.lightworld, this.viewport);
+            this.map.addLayer(resources.maps.lightworld, 'world');
             this.map.addToScene(this.scene);
 
             //controls setup
