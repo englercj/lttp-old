@@ -81,6 +81,7 @@ define([
             if(this.moving.right) x += speed;
 
             this.checkMapCollision(x, y);
+            this.checkEntityCollision(x, y);
 
             if(x || y) this.moveEntity(x, y);
         },
@@ -135,7 +136,7 @@ define([
                 }
             }
         },
-        _doEntityCollisionCheck: function() {
+        checkEntityCollision: function() {
             var origin = this._mesh.position.clone();
 
             //loop through each vertex of the mesh's geometry
@@ -161,7 +162,7 @@ define([
                     //for now we only care about the first hit on this object
                     //that is only one per entity
                     if(hits.length) {
-                        console.log('HIT! DirectionV:', directionV);
+                        console.log('HIT! DirectionV:', entity, directionV);
                         hits[0].entity = entity;
                         hits[0].direction = 'left'; //this needs to be based on directionV
                         collisions.push(hits[0]);
@@ -184,52 +185,6 @@ define([
                     }
                 }
             }
-        },
-        _getMapBlock: function(pos, tilemapSize) {
-            //do some division to make position be in "tiles from center" instead of "pixels from center"
-            pos.divideScalar(this.engine.map.tileScale).divideScalar(this.engine.map.tileSize);
-
-            //inverse the Y since we are getting offset from top not bottom like the position does
-            pos.y = -pos.y;
-
-            //pos is now the offset from the center, to make it from the top left
-            //we subtract half the size of the tilemap
-            pos.addSelf(tilemapSize);
-
-            //need to get decimals off to test which part of the tile
-            //we are on
-            var texX = pos.x,
-                texY = pos.y,
-                texXd = texX - Math.floor(texX),
-                texYd = texY - Math.floor(texY);
-
-            var pixel = util.getImagePixel(this.engine.map.layers[0].imageData.tilemap, Math.floor(texX), Math.floor(texY)),
-                colliders = [];
-
-            if(!pixel.blue) return;
-
-            //texX decimal < 0.5 == left side of tile, > 0.5 == right side of tile
-            //texY decimal < 0.5 == top side of tile, > 0.5 == bottom side of tile
-            //
-            //subtiles are a 1 byte value where 2 bits are for each subtile in the
-            //order lefttop, righttop, leftbottom, rightbottom
-            //to get righttop: ((pixel.a >> 4) & 3)
-            var shift = 0,
-                flag = 3; //binary "11" to "and" off the 2 least significant bits
-
-            if(texXd < 0.5) shift = [2, 6]; //shift for lefts (leftbottom, lefttop)
-            else shift = [0, 4]; //shifts for rights (rightbottom, righttop)
-
-            if(texYd < 0.5) shift = shift[1]; //shift for top (second element)
-            else shift = shift[0]; //shift for bottom (first element)
-
-            var value = ((pixel.blue >> shift) & flag);
-
-            return [{
-                blockType: value,
-                pixel: pixel,
-                tilemapLoc: pos
-            }];
         },
         //the map collision checks if we were to move by X, Y units, would we collide with
         //a map element. This check is neccessary since most elements on the map are not
@@ -347,6 +302,52 @@ define([
                     });*/
                 }
             }
+        },
+        _getMapBlock: function(pos, tilemapSize) {
+            //do some division to make position be in "tiles from center" instead of "pixels from center"
+            pos.divideScalar(this.engine.map.tileScale).divideScalar(this.engine.map.tileSize);
+
+            //inverse the Y since we are getting offset from top not bottom like the position does
+            pos.y = -pos.y;
+
+            //pos is now the offset from the center, to make it from the top left
+            //we subtract half the size of the tilemap
+            pos.addSelf(tilemapSize);
+
+            //need to get decimals off to test which part of the tile
+            //we are on
+            var texX = pos.x,
+                texY = pos.y,
+                texXd = texX - Math.floor(texX),
+                texYd = texY - Math.floor(texY);
+
+            var pixel = util.getImagePixel(this.engine.map.layers[0].imageData.tilemap, Math.floor(texX), Math.floor(texY)),
+                colliders = [];
+
+            if(!pixel.blue) return;
+
+            //texX decimal < 0.5 == left side of tile, > 0.5 == right side of tile
+            //texY decimal < 0.5 == top side of tile, > 0.5 == bottom side of tile
+            //
+            //subtiles are a 1 byte value where 2 bits are for each subtile in the
+            //order lefttop, righttop, leftbottom, rightbottom
+            //to get righttop: ((pixel.a >> 4) & 3)
+            var shift = 0,
+                flag = 3; //binary "11" to "and" off the 2 least significant bits
+
+            if(texXd < 0.5) shift = [2, 6]; //shift for lefts (leftbottom, lefttop)
+            else shift = [0, 4]; //shifts for rights (rightbottom, righttop)
+
+            if(texYd < 0.5) shift = shift[1]; //shift for top (second element)
+            else shift = shift[0]; //shift for bottom (first element)
+
+            var value = ((pixel.blue >> shift) & flag);
+
+            return [{
+                blockType: value,
+                pixel: pixel,
+                tilemapLoc: pos
+            }];
         }
     });
 
