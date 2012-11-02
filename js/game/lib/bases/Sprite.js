@@ -31,8 +31,8 @@ define([
                 }
             }
         */
-        init: function(opts) {
-            this._super();
+        init: function(opts, engine) {
+            this._super(engine);
 
             //sprite info
             this.texture = opts.texture;

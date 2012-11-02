@@ -2,11 +2,14 @@ define([
     'game/lib/bases/Emitter'
 ], function(Emitter) {
     var SceneObject = Emitter.extend({
-        init: function() {
+        init: function(engine) {
             //setup the emitter
             this._super({ wildcard: true, delimiter: '::', maxListeners: 10 });
+
+            this.engine = engine;
         },
         addToScene: function(scene) {
+            this.scene = scene;
             scene.add(this._mesh);
         },
         setPosition: function(x, y, z) {
