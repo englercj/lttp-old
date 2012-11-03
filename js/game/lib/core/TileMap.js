@@ -55,7 +55,9 @@ define([
 
             this.tileScale = opts.tileScale || 4.0;
             this.tileSize = opts.tileSize || 16;
-            this.tilemapSize = new THREE.Vector2();
+            this.zones = opts.zones || [];
+            this.zone = opts.zone || 0;
+            this.tilemapSize = new THREE.Vector2(opts.mapSize[0], opts.mapSize[1]);
         },
         addLayer: function(resource, opts) {
             if(typeof opts == 'string') {
@@ -72,7 +74,7 @@ define([
             this.layers.push(layer);
 
             //TODO: right now this only tracks the latest layer, should it be the biggest layer?
-            this.tilemapSize.set(layer.tilemap.image.width, layer.tilemap.image.height);
+            //this.tilemapSize.set(layer.tilemap.image.width, layer.tilemap.image.height);
 
             //incase they add the map to the scene first, then add layers
             if(this.scene)
