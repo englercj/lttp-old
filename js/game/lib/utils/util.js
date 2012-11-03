@@ -5,6 +5,22 @@ var util = {
         else
             return obj;
     },
+    pointInPoly: function(vertices, point) {
+        var x = 0, y = 1, c = false, len = vertices.length;
+
+        if(point instanceof THREE.Vector2)
+            point = [point.x, point.y];
+
+        for(var i = 0, j = len - 1; i < len; j = i++) {
+            if( ((vertices[i][y] > point[y]) != (vertices[j][y] > point[y])) &&
+                (point[x] < (vertices[j][x] - vertices[i][x]) * (point[y] - vertices[i][y]) / (vertices[j][y] - vertices[i][y]) + vertices[i][x]) )
+            {
+                c = !c;
+            }
+        }
+
+        return c;
+    },
     _isLittleEndian: null,
     isLittleEndian: function(imageData) {
         if(util._isLittleEndian !== null) return util._isLittleEndian;
