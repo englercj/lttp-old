@@ -29,14 +29,16 @@
         <script src="js/vendor/jquery.ajax-progress.js"></script>
 
         <!-- main js modules -->
-        <script src="js/mapeditor.js"></script>
         <script src="js/ui.js"></script>
+        <script src="js/mapeditor.js"></script>
+        <script src="js/tilereplacer.js"></script>
     </head>
     <body>
         <section id="tabs">
             <ul>
                 <li><a href="#generator">Map Generator</a></li>
                 <li><a href="#editor">Collision Editor</a></li>
+                <li><a href="#replacer">Tile Replacer</a></li>
             </ul>
             <div id="generator">
                 <form id="makemap" enctype="multipart/form-data">
@@ -68,7 +70,7 @@
                 <br class="clear"/>
             </div>
             <div id="editor">
-                <div id="tools">
+                <div>
                     <span class="tool empty" data-toolid="0">Empty</span>
                     <span class="tool jumpdown" data-toolid="1">Jumpdown</span>
                     <span class="tool reserved" data-toolid="2">Reserved</span>
@@ -80,9 +82,25 @@
                 <canvas id="map"></canvas>
                 <br class="clear"/>
             </div>
+            <div id="replacer">
+                <div>
+                    <button id="btnUploadReplace">Upload Tilemap and Tileset</button>
+
+                    <label for="chkOverride">Override Collision Guess</label>
+                    <input type="checkbox" id="chkOverride" />
+                    <span class="tool empty" data-toolid="0">Empty</span>
+                    <span class="tool jumpdown" data-toolid="1">Jumpdown</span>
+                    <span class="tool reserved" data-toolid="2">Reserved</span>
+                    <span class="tool block" data-toolid="3">Block</span>
+
+                    <button id="btnEditRepl">Edit Collision Data</button>
+                </div>
+                <canvas id="rplTilemap"></canvas>
+                <canvas id="rplTileset"></canvas>
+            </div>
         </section>
         <div id="dlgUpload" title="Upload Tilemap and Tileset">
-            <form id="uploadedit" enctype="multipart/form-data">
+            <form id="upload" enctype="multipart/form-data">
                 <label for="upTilesize">Tile Size:</label><br/>
                 <input type="number" name="upTilesize" id="upTilesize" value="16" />
                 <br/><br/>

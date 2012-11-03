@@ -6,6 +6,13 @@
         var socket = io.connect(),
             lastId = null;
 
+        window.$dlgUpload = $('#dlgUpload').dialog({
+            modal: true, autoOpen: false,
+            width: 400, height: 450
+        });
+
+        window.activeTool = null;
+
         $('#btnMapify').on('click', function() {
             var $form = $('#makemap'),
                 tilesize = $('#tilesize').val(),
@@ -44,6 +51,11 @@
             $('#btnEdit').attr('disabled', false);
             $('#imgTileset').attr('src', '/temp/e1cd040b583b65dbd88eb9122bdfa086-tileset.png');
             $('#imgTilemap').attr('src', '/temp/e1cd040b583b65dbd88eb9122bdfa086-tilemap.png');
+        });
+
+        $('.tool').on('click', function(e) {
+            $('.tool').removeClass('selected');
+            activeTool = $(this).addClass('selected').data('toolid');
         });
 
         socket.on('id', function(id) { socket.id = id; });
