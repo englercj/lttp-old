@@ -274,7 +274,7 @@ define([
                     //this.freeze = true;
                     this.engine.ui.playSound(this.sounds.jumpdown);
                     //this.setAnimation('jumpdown');
-                    this.moveEntity((x > 0 ? 100 : -100), 0);
+                    this.moveEntity((x > 0 ? 75 : -75), 0);
 
                     /*this.once('animDone', function() {
                         this.freeze = false;
@@ -294,7 +294,7 @@ define([
                     //this.freeze = true;
                     this.engine.ui.playSound(this.sounds.jumpdown);
                     //this.setAnimation('jumpdown_' + this.lastDirection);
-                    this.moveEntity(0, (y > 0 ? 200 : -200));
+                    this.moveEntity(0, (y > 0 ? 100 : -100));
 
                     /*this.once('animDone', function() {
                         this.freeze = false;
