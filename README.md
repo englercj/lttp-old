@@ -51,6 +51,24 @@ and misc details of the game:
 * [Zelda Elements](http://www.zeldaelements.net/games/c/a_link_to_the_past/) - Another good wiki-like source
 * [nes-snes-sprites.com](http://www.nes-snes-sprites.com/LegendofZeldaTheALinktothePast.html) - used for most character sprites
 
+### Roadmap
+
+Below is the current TODO list for the project:
+
+* ~~Map Rendering~~ ([tearing bug](https://github.com/englercj/lttp-webgl/issues/1))
+* ~~Entity Rendering~~
+* ~~Sprite Animation~~ (may be revisited)
+* ~~Map Collisions~~ ([clipping bug](https://github.com/englercj/lttp-webgl/issues/2))
+* Zone Confinement
+* Item Management
+* Zone entities
+* Entity Collisions
+* Entity Interaction (lifting, pushing, cutting, opening chests, etc)
+* Combat
+* Dialog
+* Cutscenes
+* First Dungeon (palace)
+
 ### License and Legal
 
 This code-base is released under the [Mozilla Public License 2.0](http://www.mozilla.org/MPL/2.0/).
