@@ -50,10 +50,11 @@ define([
             //set moving animations
             self.engine.controls.on('move::*', function(dir, startMoving) {
                 if(!self.engine.controls.isMoving) {
-                    self.setAnimation('idle_' + this.lastDirection);
+                    self.setAnimation('idle_' + self.lastDirection);
+                    self.setAnimation();
                 }
                 else {
-                    this.lastDirection = dir;
+                    self.lastDirection = dir;
                     self.setAnimation('move_' + dir);
                 }
             });
