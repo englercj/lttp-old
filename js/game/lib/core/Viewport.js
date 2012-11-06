@@ -3,9 +3,10 @@ define([
     'game/lib/bases/Emitter'
 ], function(util, Emitter) {
     var Viewport = Emitter.extend({
-        init: function(container, renderer) {
+        init: function(container, engine) {
             this.isDocument = false;
-            this.renderer = renderer;
+            this.engine = engine;
+            this.renderer = engine.renderer;
             this._$doc = $(document);
             this._$win = $(window);
             
@@ -25,12 +26,13 @@ define([
             
             this._$container.on('resize', $.proxy(this.onResize, this));
             this._$win.on('resize', $.proxy(this.onResize, this));
+            this._$win.on('blur', $.proxy(this.onWindowBlur, this));
             
             this.width = this._$container.width();
             this.height = this._$container.height();
 
-            renderer.setSize(this.width, this.height);
-            this.append(renderer.domElement);
+            this.renderer.setSize(this.width, this.height);
+            this.append(this.renderer.domElement);
 
             //this.requestFullScreen();
         },
@@ -105,6 +107,9 @@ define([
         },
         onPointerLockError: function(e) {
             console.warn('Unable to capture pointer lock!', e);
+        },
+        onWindowBlur: function(e) {
+            this.engine.pause();
         }
     });
     

@@ -10,6 +10,7 @@ define([
 ], function(Viewport, Controls, TileMap, Player, UI) {
     var Engine = Class.extend({
         init: function(elements, resources) {
+            var self = this;
             this.debug = true;
 
             if(this.debug) window.engine = this;
@@ -18,9 +19,11 @@ define([
             this.entities = [];
             this.ui = new UI(elements, this);
             this.scene = new THREE.Scene();
-            this.clock = new THREE.Clock();
+            this.clock = new THREE.Clock(false);
             this.renderer = new THREE.WebGLRenderer();
-            this.viewport = new Viewport(elements.container, this.renderer);
+            this.viewport = new Viewport(elements.container, this);
+
+            this.paused = false;
 
             //show mudora text
             /*this.ui.showDialog([
@@ -45,6 +48,10 @@ define([
             this.controls = new Controls(this.viewport, this.camera, this.map);//new THREE.FirstPersonControls(this.camera);
             this.controls.lockCamera.x = this.controls.lockCamera.y = true;
 
+            this.controls.on('pause', function() {
+                self.togglePause();
+            });
+
             //setup player
             this.player = new Player(resources.entities.link, this);
             this.player.addToScene(this.scene);
@@ -62,7 +69,20 @@ define([
             $('body').append(this.stats.domElement);
         },
         start: function() {
+            this.paused = false;
+            this.clock.start();
             this._tick();
+        },
+        pause: function() {
+            //TODO: Show paused message.
+            this.paused = true;
+            this.clock.stop();
+        },
+        togglePause: function() {
+            if(this.paused)
+                this.start();
+            else
+                this.pause();
         },
         destroyMesh: function(mesh) {
             this.scene.remove(mesh);
@@ -89,7 +109,7 @@ define([
         //don't need to be called every tick
         _tick: function() {
             //proxy the call so we retain the context
-            requestAnimationFrame($.proxy(this._tick, this));
+            if(!this.paused) requestAnimationFrame($.proxy(this._tick, this));
 
             //useful for throttling framerate for testing
             //0 = show all frames, 1 = half frames, 2 = 1/3 frames, 3 = 1/4 frames, etc...
