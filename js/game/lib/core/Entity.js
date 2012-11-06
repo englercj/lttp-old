@@ -50,10 +50,11 @@ define([
             //set moving animations
             self.engine.controls.on('move::*', function(dir, startMoving) {
                 if(!self.engine.controls.isMoving) {
-                    self.setAnimation('idle_' + this.lastDirection);
+                    self.setAnimation('idle_' + self.lastDirection);
+                    self.setAnimation();
                 }
                 else {
-                    this.lastDirection = dir;
+                    self.lastDirection = dir;
                     self.setAnimation('move_' + dir);
                 }
             });
@@ -274,7 +275,7 @@ define([
                     //this.freeze = true;
                     this.engine.ui.playSound(this.sounds.jumpdown);
                     //this.setAnimation('jumpdown');
-                    this.moveEntity((x > 0 ? 100 : -100), 0);
+                    this.moveEntity((x > 0 ? 75 : -75), 0);
 
                     /*this.once('animDone', function() {
                         this.freeze = false;
@@ -294,7 +295,7 @@ define([
                     //this.freeze = true;
                     this.engine.ui.playSound(this.sounds.jumpdown);
                     //this.setAnimation('jumpdown_' + this.lastDirection);
-                    this.moveEntity(0, (y > 0 ? 200 : -200));
+                    this.moveEntity(0, (y > 0 ? 100 : -100));
 
                     /*this.once('animDone', function() {
                         this.freeze = false;
