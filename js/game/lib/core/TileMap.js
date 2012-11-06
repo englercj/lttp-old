@@ -1,15 +1,6 @@
 /*
     This tilemap class operates by rendering a plane that is textured by the tilemap.
     A plane is rendered for each layer
-
-    TODO:
-    vertices offsets in the map meta.json are in pixels from the topleft
-    they should be converted to location vertexes with the following formula
-
-        x = (x - (tilemap.width / 2)) * tileSize * tileScale
-        y = (y - (tilemap.height / 2)) * tileSize * tileScale
-
-    To be used as the camera constrain vertices
 */
 define([
     'game/lib/bases/SceneObject',
@@ -125,6 +116,20 @@ define([
             this.eachLayer(function(layer) {
                 layer.pan.apply(layer, arguments);
             });
+        },
+        loadZone: function(zone) {
+            //Convert the vertices from pixels to offsets if necessary
+            var newZone = this.zones[zone];
+            if(newZone.vertexUnits != 'offsets') {
+                for (var i = 0, il = newZone.vertices.length; i < il; ++i) {
+                    newZone.vertices[i][0] = (newZone.vertices[i][0] - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
+                    newZone.vertices[i][1] = (newZone.vertices[i][1] - (this.tilemapSize.y / 2)) * this.tileSize * this.tileScale;
+                };
+            }
+            newZone.vertexUnits = 'offsets';
+
+            //set the new zone
+            this.zone = zone;
         },
         eachLayer: function(fn) {
             for(var i = 0, il = this.layers.length; i < il; ++i) {
