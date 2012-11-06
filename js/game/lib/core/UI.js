@@ -7,6 +7,7 @@ define([
             this._$win = $(window);
             this._$doc = $(document);
             this._$hud = util.jquerify(elements.hud);
+            this._$paused = util.jquerify(elements.paused);
             this._$dialog = util.jquerify(elements.dialog);
             this._$cutscenes = util.jquerify(elements.cutscenes);
 
@@ -19,7 +20,17 @@ define([
             this._$life = this._$hud.find('.life');
             this._$hearts = this._$hud.find('.life > .hearts');
 
+            this.bindEvents();
+
             this.engine = engine;
+        },
+        bindEvents: function() {
+            var self = this;
+
+            $('#btnUnpause').on('click', function(e) {
+                e.preventDefault();
+                self.engine.start();
+            });
         },
         playCutscene: function(name) {
             
@@ -42,6 +53,8 @@ define([
         hideDialog: function() { this._$dialog.hide(); },
         showHUD: function() { this._$hud.show(); },
         hideHUD: function() { this._$hud.hide(); },
+        showPaused: function() { this._$paused.show(); },
+        hidePaused: function() { this._$paused.hide(); },
         update: function(delta) {
             var magic = this.engine.player.magic,
                 maxMagic = this.engine.player.maxMagic,

@@ -24,6 +24,7 @@ define([
             this.viewport = new Viewport(elements.container, this);
 
             this.paused = false;
+            this.started = false;
 
             //show mudora text
             /*this.ui.showDialog([
@@ -69,12 +70,18 @@ define([
             $('body').append(this.stats.domElement);
         },
         start: function() {
+            if(this.started && !this.paused) return;
+
+            this.ui.hidePaused();
             this.paused = false;
+            this.started = true;
             this.clock.start();
             this._tick();
         },
         pause: function() {
-            //TODO: Show paused message.
+            if(this.paused) return;
+
+            this.ui.showPaused();
             this.paused = true;
             this.clock.stop();
         },

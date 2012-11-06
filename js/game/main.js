@@ -50,6 +50,7 @@ require([
                 engine = new Engine({
                     container: '#game',
                     hud: '#hud',
+                    paused: '#paused',
                     dialog: '#dialog',
                     cutscenes: '#cutscenes'
                 }, resources);
