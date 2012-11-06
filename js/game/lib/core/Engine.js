@@ -104,10 +104,21 @@ define([
             if(ent.texture)
                 this.destroyTexture(ent.texture);
         },
-        loadZone: function(zone) { //loads and places all the entities in a zone
+        //loads and places all the entities in a zone
+        loadZone: function(zone) {
+            var newZone = this.zones[zone];
 
+            this.map.loadZone(zone);
+
+            //spawn entities
+            //for (var i = 0m il = newZone.entities.length; i < il; ++i) {
+                //newZone.entities[i]
+            //};
+
+            //TODO: animation of zoning hero (probably in Player by freezing the hero, and moving the camera)
         },
-        unloadZone: function(zone) { //cleans up all the entities in a zone
+        //cleans up all the entities in a zone
+        unloadZone: function(zone) {
             for(var i = 0, il = this.entities.length; i < il; ++i) {
                 this.destryEntity(this.entities[i]);
             }

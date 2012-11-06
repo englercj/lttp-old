@@ -12,6 +12,7 @@
                 [8192, 8192],
                 [8192, -8192]
             ],
+            "vertexUnits": "offsets",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -24,6 +25,7 @@
                 [63, 64],
                 [63, 0]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -38,6 +40,7 @@
                 [63, 64],
                 [0, 64]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -52,6 +55,7 @@
                 [63, 126],
                 [63, 97]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -64,6 +68,7 @@
                 [63, 192],
                 [63, 162]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -76,6 +81,7 @@
                 [63, 255],
                 [63, 192]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -94,6 +100,7 @@
                 [159, 189],
                 [159, 64]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -110,6 +117,7 @@
                 [95, 162],
                 [63, 162]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -124,6 +132,7 @@
                 [223, 159],
                 [159, 159]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -138,6 +147,7 @@
                 [223, 191],
                 [255, 191]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -154,6 +164,7 @@
                 [223, 64],
                 [159, 64]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -168,6 +179,7 @@
                 [159, 19],
                 [159, 0]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
@@ -182,6 +194,7 @@
                 [255, 31],
                 [255, 0]
             ],
+            "vertexUnits": "pixels",
             "entities": [],
             "exits": [],
             "overlay": null
