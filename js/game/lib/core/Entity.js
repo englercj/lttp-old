@@ -200,11 +200,10 @@ define([
             //clone our mesh and simulate movement
             var mesh = this._mesh.clone();
 
-            mesh.translateX(x);
-            mesh.translateY(y);
-
             var tilemapSize = this.engine.map.tilemapSize.clone().divideScalar(2), //half tilemap size
-                pos = new THREE.Vector2(mesh.position.x, mesh.position.y), //mesh tiles offset from center
+                pos = new THREE.Vector2(mesh.position.x, mesh.position.y), //position before simulation
+                posX = new THREE.Vector2(mesh.position.x + x, mesh.position.y), //simulated movement for X
+                posY = new THREE.Vector2(mesh.position.x, mesh.position.y + y), //simulated movement for Y
                 loc = new THREE.Vector2();
 
             //position is really the "origin" of the entity, it is the center point.
@@ -219,49 +218,74 @@ define([
 
             var tilesX = [],
                 tilesY = [],
-                space = 5,
-                temp,
-                leftFoot = pos.clone(),
-                rightFoot = pos.clone(),
-                leftCenter = pos.clone(),
-                rightCenter = pos.clone();
+                space = 5;
 
-                leftFoot.x -= (this.size.x / 2) - space;
-                leftFoot.y -= (this.size.y / 2) - space;
+            //if moving along X, check that blockage
+            if(x) {
+                //moving left
+                if(x < 0) {
+                    var leftFoot = posX.clone(),
+                        leftCenter = posX.clone();
 
-                rightFoot.x += (this.size.x / 2) - space;
-                rightFoot.y -= (this.size.y / 2) - space;
+                    leftFoot.x -= (this.size.x / 2) - space;
+                    leftFoot.y -= (this.size.y / 2) - space;
 
-                leftCenter.x -= (this.size.x / 2) - space;
-                leftCenter.y -= space * 2;
+                    leftCenter.x -= (this.size.x / 2) - space;
+                    leftCenter.y -= space * 2;
 
-                rightCenter.x += (this.size.x / 2) - space;
-                rightCenter.y -= space * 2;
+                    //get the tiles for the left foot and left center hotspots
+                    Array.prototype.push.apply(tilesX, this._getMapBlock(leftFoot, tilemapSize));
+                    Array.prototype.push.apply(tilesX, this._getMapBlock(leftCenter, tilemapSize));
+                }
+                //moving right
+                else {
+                    var rightFoot = posX.clone(),
+                        rightCenter = posX.clone();
 
-            //moving left
-            if(x < 0) {
-                //check left foot and left center hotspots
-                Array.prototype.push.apply(tilesX, this._getMapBlock(leftFoot, tilemapSize));
-                Array.prototype.push.apply(tilesX, this._getMapBlock(leftCenter, tilemapSize));
+                    rightFoot.x += (this.size.x / 2) - space;
+                    rightFoot.y -= (this.size.y / 2) - space;
+
+                    rightCenter.x += (this.size.x / 2) - space;
+                    rightCenter.y -= space * 2;
+
+                    //get the tiles for the right foot and right center hotspots
+                    Array.prototype.push.apply(tilesX, this._getMapBlock(rightFoot, tilemapSize));
+                    Array.prototype.push.apply(tilesX, this._getMapBlock(rightCenter, tilemapSize));
+                }
             }
-            //moving right
-            else if(x > 0) {
-                //check the right foot and right center hotspots
-                Array.prototype.push.apply(tilesX, this._getMapBlock(rightFoot, tilemapSize));
-                Array.prototype.push.apply(tilesX, this._getMapBlock(rightCenter, tilemapSize));
-            }
 
-            //moving down
-            if(y < 0) {
-                //check the left foot and right foot hotspots
-                Array.prototype.push.apply(tilesY, this._getMapBlock(leftFoot, tilemapSize));
-                Array.prototype.push.apply(tilesY, this._getMapBlock(rightFoot, tilemapSize));
-            }
-            //moving up
-            else if(y > 0) {
-                //check the left center and right center hotspots
-                Array.prototype.push.apply(tilesY, this._getMapBlock(leftCenter, tilemapSize));
-                Array.prototype.push.apply(tilesY, this._getMapBlock(rightCenter, tilemapSize));
+            //if moving along Y, check that blockage
+            if(y) {
+                //moving down
+                if(y < 0) {
+                    var leftFoot = posY.clone(),
+                        rightFoot = posY.clone()
+
+                    leftFoot.x -= (this.size.x / 2) - space;
+                    leftFoot.y -= (this.size.y / 2) - space;
+
+                    rightFoot.x += (this.size.x / 2) - space;
+                    rightFoot.y -= (this.size.y / 2) - space;
+
+                    //get the tiles for the left foot and right foot hotspots
+                    Array.prototype.push.apply(tilesY, this._getMapBlock(leftFoot, tilemapSize));
+                    Array.prototype.push.apply(tilesY, this._getMapBlock(rightFoot, tilemapSize));
+                }
+                //moving up
+                else {
+                    var leftCenter = posY.clone(),
+                        rightCenter = posY.clone();
+
+                    leftCenter.x -= (this.size.x / 2) - space;
+                    leftCenter.y -= space * 2;
+
+                    rightCenter.x += (this.size.x / 2) - space;
+                    rightCenter.y -= space * 2;
+
+                    //get the tiles for the left center and right center hotspots
+                    Array.prototype.push.apply(tilesY, this._getMapBlock(leftCenter, tilemapSize));
+                    Array.prototype.push.apply(tilesY, this._getMapBlock(rightCenter, tilemapSize));
+                }
             }
 
             //check X tiles

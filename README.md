@@ -58,7 +58,7 @@ Below is the current TODO list for the project:
 * ~~Map Rendering~~ ([tearing bug](https://github.com/englercj/lttp-webgl/issues/1))
 * ~~Entity Rendering~~
 * ~~Sprite Animation~~ (may be revisited)
-* ~~Map Collisions~~ ([clipping bug](https://github.com/englercj/lttp-webgl/issues/2))
+* ~~Map Collisions~~
 * Zone Confinement
 * Item Management
 * Zone entities
