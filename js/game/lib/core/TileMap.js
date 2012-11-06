@@ -1,6 +1,15 @@
 /*
     This tilemap class operates by rendering a plane that is textured by the tilemap.
     A plane is rendered for each layer
+
+    TODO:
+    vertices offsets in the map meta.json are in pixels from the topleft
+    they should be converted to location vertexes with the following formula
+
+        x = (x - (tilemap.width / 2)) * tileSize * tileScale
+        y = (y - (tilemap.height / 2)) * tileSize * tileScale
+
+    To be used as the camera constrain vertices
 */
 define([
     'game/lib/bases/SceneObject',
