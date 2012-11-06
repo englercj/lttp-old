@@ -14,18 +14,9 @@
             viewSize = { x: 96, y: 48 },
             stripes = new Image(),
             tileSize = 16,
-            activeTool = null,
             lastSlice = null,
             dragMap = false,
-            init = false,
-            $dlgUplEdit = $('#dlgUpload').dialog({
-                modal: true, autoOpen: false,
-                width: 400, height: 450,
-                buttons: {
-                    Upload: doUploadToEditor,
-                    Cancel: function() { $(this). dialog('close'); }
-                }
-            });
+            init = false;
 
         window.initEditor = function initEditor(tilesz, tm, ts) {
             maps = {
@@ -37,9 +28,6 @@
                 tileSize = parseInt(tilesz, 10);
             else
                 tileSize = tilesz;
-
-            window.drawMinimap = drawMinimap;
-            window.drawMap = drawMap;
 
             tilecanvas.width = tileSize;
             tilecanvas.height = tileSize;
@@ -122,11 +110,6 @@
             drawMap();
         });
 
-        $('.tool').on('click', function(e) {
-            $('.tool').removeClass('selected');
-            activeTool = $(this).addClass('selected').data('toolid');
-        });
-
         $('#btnDlTm').on('click', function(e) {
             ctxMinimap.putImageData(tilemapData, 0, 0);
             window.open($minimap[0].toDataURL());
@@ -134,7 +117,11 @@
         });
 
         $('#btnUploadEdit').on('click', function() {
-            $dlgUplEdit.dialog('open');
+            $dlgUpload.dialog('option', 'buttons', {
+                Upload: doUploadToEditor,
+                Cancel: function() { $(this). dialog('close'); }
+            });
+            $dlgUpload.dialog('open');
         });
 
         $map.on('mousedown', function(e) {
@@ -303,7 +290,7 @@
         }
 
         function doUploadToEditor() {
-            var $form = $('#uploadedit'),
+            var $form = $('#upload'),
                 formData = new FormData($form[0]);
 
             $.ajax({
@@ -321,7 +308,7 @@
                     imgTilemap.addEventListener('load', function() {
                         imgTileset.addEventListener('load', function() {
                             initEditor(tsz, imgTilemap, imgTileset);
-                            $dlgUplEdit.dialog('close');
+                            $dlgUpload.dialog('close');
                         }, false);
                         imgTileset.src = data.tileset;
                     }, false);
