@@ -131,6 +131,29 @@ define([
             //set the new zone
             this.zone = zone;
         },
+        findZone: function(z) {
+            var check;
+
+            //if z is a vector, make it an array
+            if(z instanceof THREE.Vector2) z = [z.x, z.y];
+
+            //if z is an Array we use it as a point to find which zone that point is in
+            if(z instanceof Array) {
+                check = function(zone) { return util.pointInPoly(zone.vertices, z); };
+            }
+            //if z is a string, find the zone that has that name
+            else if(typeof z == 'string') {
+                check = function(zone) { return zone.name == z; };
+            }
+
+            for(var i = 0, il = this.zones.length; i < il && !!check; ++i) {
+                if(check(this.zones[i])) {
+                    return i;
+                }
+            }
+
+            return null;
+        },
         eachLayer: function(fn) {
             for(var i = 0, il = this.layers.length; i < il; ++i) {
                 if(fn.call(this, this.layers[i], i, this.layers) === false)
