@@ -47,15 +47,15 @@ define([
             if(!this.blocked.x && !this.cameraLock.x) this.engine.camera.translateX(x);
             if(!this.blocked.y && !this.cameraLock.y) this.engine.camera.translateY(y);
 
+            //check if the character has gotten back on center, and unlock the camera if necessary
             this.checkOnCenter();
+
+            //check is it is time to zone based on exit points
+            this.checkZoneOut();
         },
         checkCameraLock: function(x, y) {
-            //Currently this check will simulate the camera movement, then calculate the 4 corners of the
-            //viewport and check to ensure each is within the zone.
-            //
-            //Really, this should simulate movement to X and Y seperately and run the checks for each so
-            //that we can lock one or the other and not only both, but this should be fine unless it causes
-            //issues later on.
+            //This will simulate movement to X and Y seperately and test that each corner of the viewport is
+            //within the current zone's vertices
             var pos = new THREE.Vector2(this.engine.camera.position.x, this.engine.camera.position.y),
                 vpSize = [this.engine.viewport.width / 2, this.engine.viewport.height / 2],
                 vertsX = [
@@ -103,6 +103,9 @@ define([
                 this.cameraLock.y = false;
             }
             else this.cameraLock.y = true;
+        },
+        checkZoneOut: function() {
+            //check that the player
         }
     });
 

@@ -56,7 +56,7 @@ define([
             this.tileScale = opts.tileScale || 4.0;
             this.tileSize = opts.tileSize || 16;
             this.zones = opts.zones || [];
-            this.zone = opts.zone || 0;
+            this.zone = this.findZoneIndex(opts.zone) || 0;
             this.tilemapSize = new THREE.Vector2(opts.mapSize[0], opts.mapSize[1]);
         },
         addLayer: function(resource, opts) {
@@ -118,8 +118,11 @@ define([
             });
         },
         loadZone: function(zone) {
+            //set the new zone
+            this.zone = this.findZoneIndex(zone);
+
             //Convert the vertices from pixels to offsets if necessary
-            var newZone = this.zones[zone];
+            var newZone = this.zones[this.zone];
             if(newZone.vertexUnits != 'offsets') {
                 for (var i = 0, il = newZone.vertices.length; i < il; ++i) {
                     newZone.vertices[i][0] = (newZone.vertices[i][0] - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
@@ -127,11 +130,9 @@ define([
                 };
             }
             newZone.vertexUnits = 'offsets';
-
-            //set the new zone
-            this.zone = zone;
         },
-        findZone: function(z) {
+        findZoneIndex: function(z) {
+            if(typeof z == 'number') return z;
             var check;
 
             //if z is a vector, make it an array

@@ -63,6 +63,9 @@ define([
             //add ambient light
             this.scene.add(new THREE.AmbientLight(0xFFFFFF));
 
+            //load initial zone
+            this.loadZone(resources.maps.lightworld.meta.zone);
+
             this.stats = new Stats();
             this.stats.domElement.style.position = 'absolute';
             this.stats.domElement.style.top = '0px';
@@ -106,7 +109,7 @@ define([
         },
         //loads and places all the entities in a zone
         loadZone: function(zone) {
-            var newZone = this.zones[zone];
+            var newZone = this.map.zones[this.map.findZoneIndex(zone)];
 
             this.map.loadZone(zone);
 
