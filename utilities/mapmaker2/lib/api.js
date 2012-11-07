@@ -19,6 +19,7 @@ Api.prototype.start = function() {
     if(!this.server) {
         this.server = this.app.listen(this.config.server.port, this.config.server.host);
         this.io = sio.listen(this.server);
+        console.log('Listening on', this.config.server.host + ':' + this.config.server.port)
 
         this._configure();
         this._setupRoutes();
