@@ -169,6 +169,8 @@ p, .rog, #dialog, #hud {
     background-color: #000;
     opacity: 0.5;
     z-index: 40001;
+    top: 0;
+    left: 0;
 }
 
 .modal .vert-center {
