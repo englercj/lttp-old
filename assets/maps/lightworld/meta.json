@@ -5,19 +5,6 @@
     "zone": "Hyrule Field",
     "zones": [
         {
-            "name": "everywhere",
-            "vertices": [
-                [-8192, -8192],
-                [-8192, 8192],
-                [8192, 8192],
-                [8192, -8192]
-            ],
-            "vertexUnits": "offsets",
-            "entities": [],
-            "exits": [],
-            "overlay": null
-        },
-        {
             "name": "Lost Woods",
             "vertices": [
                 [0, 0],

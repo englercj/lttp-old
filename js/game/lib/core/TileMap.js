@@ -58,6 +58,10 @@ define([
             this.zones = opts.zones || [];
             this.zone = this.findZoneIndex(opts.zone) || 0;
             this.tilemapSize = new THREE.Vector2(opts.mapSize[0], opts.mapSize[1]);
+
+            this.eachZone(function(zone) {
+                this.upgradeVertexUnits(zone);
+            });
         },
         addLayer: function(resource, opts) {
             if(typeof opts == 'string') {
@@ -120,20 +124,10 @@ define([
         loadZone: function(zone) {
             //set the new zone
             this.zone = this.findZoneIndex(zone);
-
-            //Convert the vertices from pixels to offsets if necessary
-            var newZone = this.zones[this.zone];
-            if(newZone.vertexUnits != 'offsets') {
-                for (var i = 0, il = newZone.vertices.length; i < il; ++i) {
-                    newZone.vertices[i][0] = (newZone.vertices[i][0] - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
-                    newZone.vertices[i][1] = (newZone.vertices[i][1] - (this.tilemapSize.y / 2)) * this.tileSize * this.tileScale;
-                };
-            }
-            newZone.vertexUnits = 'offsets';
         },
         findZoneIndex: function(z) {
             if(typeof z == 'number') return z;
-            var check;
+            var check, index = null;
 
             //if z is a vector, make it an array
             if(z instanceof THREE.Vector2) z = [z.x, z.y];
@@ -147,17 +141,36 @@ define([
                 check = function(zone) { return zone.name == z; };
             }
 
-            for(var i = 0, il = this.zones.length; i < il && !!check; ++i) {
-                if(check(this.zones[i])) {
-                    return i;
-                }
+            if(check) {
+                this.eachZone(function(zone, i) {
+                    if(check(zone)) {
+                        index = i;
+                        return false;
+                    }
+                })
             }
 
-            return null;
+            return index;
+        },
+        upgradeVertexUnits: function(zone) {
+            if(zone.vertexUnits == 'offsets') return;
+
+            //Convert the vertices from pixels to offsets if necessary
+            for (var i = 0, il = zone.vertices.length; i < il; ++i) {
+                zone.vertices[i][0] = (zone.vertices[i][0] - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
+                zone.vertices[i][1] = (zone.vertices[i][1] - (this.tilemapSize.y / 2)) * this.tileSize * this.tileScale;
+            };
+            zone.vertexUnits = 'offsets';
         },
         eachLayer: function(fn) {
             for(var i = 0, il = this.layers.length; i < il; ++i) {
                 if(fn.call(this, this.layers[i], i, this.layers) === false)
+                    break;
+            }
+        },
+        eachZone: function(fn) {
+            for(var i = 0, il = this.zones.length; i < il; ++i) {
+                if(fn.call(this, this.zones[i], i, this.zones) === false)
                     break;
             }
         }
