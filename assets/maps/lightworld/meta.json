@@ -2,7 +2,7 @@
     "tileScale": 4.0,
     "tileSize": 16.0,
     "mapSize": [256, 256],
-    "zone": 0,
+    "zone": "Hyrule Field",
     "zones": [
         {
             "name": "everywhere",
