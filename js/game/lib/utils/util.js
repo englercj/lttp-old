@@ -1,10 +1,13 @@
 var util = {
+    //utility to ensure an object is wrapped by jQuery
     jquerify: function(obj) {
         if(!obj.jquery)
             return $(obj);
         else
             return obj;
     },
+    //Simple Point in Polygon test, casts a ray and counts the hits to determine if
+    //a point is within a polygon specified by the vertices
     pointInPoly: function(vertices, point) {
         var x = 0, y = 1, c = false, len = vertices.length;
 
@@ -20,6 +23,32 @@ var util = {
         }
 
         return c;
+    },
+    //walks down an object using a dot-notation string and sets the value at that point
+    //if parts of the dot-notation string are missing, it creates them.
+    setObjectProperty: function(obj, prop, value) {
+        var props = prop.split('.'),
+            o = obj;
+
+        for(var p = 0, pl = props.length - 1; p < pl; ++p) {
+            if(o[props[p]] == undefined)
+                o[props[p]] = {};
+
+            o = o[props[p]];
+        }
+
+        return o[props[props.length - 1]] = value;
+    },
+    //walks down an object using a dot-notation string and returns the value at that property
+    getObjectProperty: function(obj, prop) {
+        var props = prop.split('.'),
+            o = obj;
+
+        for(var p = 0, pl = props.length; p < pl; ++p) {
+            o = o[props[p]];
+        }
+
+        return o;
     },
     _isLittleEndian: null,
     isLittleEndian: function(imageData) {

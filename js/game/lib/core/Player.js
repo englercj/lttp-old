@@ -50,8 +50,34 @@ define([
             //check if the character has gotten back on center, and unlock the camera if necessary
             this.checkOnCenter();
 
-            //check is it is time to zone based on exit points
-            this.checkZoneOut();
+            //check is it is time to zone based on if the mesh reaches the viewport edge
+            var data = this.checkZoneOut();
+            if(data && data.zone !== null) {
+                this.freeze = true;
+
+                //unload current zone
+                this.engine.unloadZone(this.engine.map.zone);
+
+                //load the new zone
+                this.engine.loadZone(data.zone);
+
+                //animate the camera
+                var props = {}, self = this;
+
+                if(data.axis == 'x')
+                    props['position.x'] = '+=' + ((this.engine.viewport.width - this.size.x) * (x < 0 ? -1 : 1));
+                else
+                    props['position.y'] = '+=' + ((this.engine.viewport.height - this.size.y) * (y < 0 ? -1 : 1));
+
+                this.animate(this.engine.camera, {
+                    duration: 1000,
+                    props: props,
+                    complete: function() {
+                        self.freeze = false;
+                        self.cameraLock[data.axis] = true;
+                    }
+                });
+            }
         },
         checkCameraLock: function(x, y) {
             //This will simulate movement to X and Y seperately and test that each corner of the viewport is
@@ -106,6 +132,28 @@ define([
         },
         checkZoneOut: function() {
             //check that the player
+            var diffX = Math.abs(this.engine.camera.position.x - this._mesh.position.x) + (this.size.x / 2),
+                biasX = (this._mesh.position.x < 0 ? -1 : 1) * this.size.x,
+
+                diffY = Math.abs(this.engine.camera.position.y - this._mesh.position.y) + (this.size.y / 2),
+                biasY = (this._mesh.position.y < 0 ? -1 : 1) * this.size.y;
+
+            if(diffX >= (this.engine.viewport.width / 2)) { //zone X
+                //to find what zone they are moving into we add a bit to their X position
+                //and see what zone that puts us in, if any
+                return {
+                    axis: 'x',
+                    zone: this.engine.map.findZoneIndex([this._mesh.position.x + biasX, this._mesh.position.y])
+                };
+            }
+            else if(diffY >= (this.engine.viewport.height / 2)) { //zone Y
+                //to find what zone they are moving into we add a bit to their Y position
+                //and see what zone that puts us in, if any
+                return {
+                    axis: 'y',
+                    zone: this.engine.map.findZoneIndex([this._mesh.position.x, this._mesh.position.y + biasY])
+                };
+            }
         }
     });
 

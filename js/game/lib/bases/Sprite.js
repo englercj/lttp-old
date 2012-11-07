@@ -165,7 +165,9 @@ define([
 
             return this.currentAnim;
         },
-        animate: function(delta) {
+        update: function(delta) {
+            this._super(delta);
+
             if(this.currentAnim) {
                 if(this.currentAnim._done) return;
 

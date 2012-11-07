@@ -60,8 +60,7 @@ define([
             });
         },
         update: function(delta) {
-            //animation updates
-            this.animate(delta);
+            this._super(delta);
 
             if(this.freeze) return;
 
