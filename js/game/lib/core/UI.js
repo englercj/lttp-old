@@ -20,6 +20,8 @@ define([
             this._$life = this._$hud.find('.life');
             this._$hearts = this._$hud.find('.life > .hearts');
 
+            this._meterValMaxHeight = parseInt(this._$metervalue.css('max-height').replace('px', ''), 10);
+
             this.bindEvents();
 
             this.engine = engine;
@@ -56,15 +58,14 @@ define([
         showPaused: function() { this._$paused.show(); },
         hidePaused: function() { this._$paused.hide(); },
         update: function(delta) {
-            var magic = this.engine.player.magic,
-                maxMagic = this.engine.player.maxMagic,
+            var pctMagic = this.engine.player.magic / this.engine.player.maxMagic,
                 inventory = this.engine.player.inventory,
                 maxHp = this.engine.player.maxHealth,
                 hp = this.engine.player.health;
 
             this._$metervalue.css({
-                height: magic,
-                marginTop: maxMagic - magic + 6
+                height: this._meterValMaxHeight * pctMagic,
+                marginTop: this._meterValMaxHeight - (this._meterValMaxHeight * pctMagic) + 6
             });
             //this._$item.css('background-image', 'assets/items/' + );
             this._$rupees.text(inventory.rupees);
