@@ -144,7 +144,6 @@ define([
             if(check) {
                 this.eachZone(function(zone, i) {
                     if(check(zone)) {
-                        console.log(zone, i, z);
                         index = i;
                         return false;
                     }
