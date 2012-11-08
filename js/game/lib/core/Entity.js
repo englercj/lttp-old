@@ -54,8 +54,11 @@ define([
                     self.setAnimation();
                 }
                 else {
-                    self.lastDirection = dir;
-                    self.setAnimation('move_' + dir);
+                    this.moving[dir] = startMoving;
+                    if(this.moving.up) self.setAnimation('move_up');
+                    else if(this.moving.down) self.setAnimation('move_down');
+                    else if(this.moving.left) self.setAnimation('move_left');
+                    else if(this.moving.right) self.setAnimation('move_right');
                 }
             });
         },
