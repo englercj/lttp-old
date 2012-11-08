@@ -8,8 +8,8 @@
     "weapon": "",
     "health": 1.5,
     "maxHealth": 3,
-    "magic": 35,
-    "maxMagic": 70,
+    "magic": 50,
+    "maxMagic": 100,
     "inventory": {
         "rupees": 0,
         "bombs": 0,

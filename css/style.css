@@ -94,6 +94,7 @@ p, .rog, #dialog, #hud {
     background: center bottom url(../assets/ui/magic_meter_value.png) no-repeat;
     width: 20px;
     height: 70px;
+    max-height: 70px;
     margin: 6px 0  0 6px;
 }
 
