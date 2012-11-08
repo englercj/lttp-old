@@ -53,6 +53,7 @@ define([
             //check is it is time to zone based on if the mesh reaches the viewport edge
             var data = this.checkZoneOut();
             if(data && data.zone !== null) {
+                console.log(data);
                 this.freeze = true;
 
                 //unload current zone
@@ -68,7 +69,7 @@ define([
                     self = this;
 
                 camProps[data.axis] = '+=' + (this.engine.viewport[(data.axis == 'x' ? 'width' : 'height')] * (vals[data.axis] < 0 ? -1 : 1));
-                meshProps[data.axis] = '+=' + (this.size[data.axis] * 1.25 * (vals[data.axis] < 0 ? -1 : 1))
+                meshProps[data.axis] = '+=' + ((this.size[data.axis] * 1.25)  * (vals[data.axis] < 0 ? -1 : 1))
 
                 this.animate(this.engine.camera.position, {
                     duration: 1000,
@@ -141,11 +142,13 @@ define([
         },
         checkZoneOut: function() {
             //check that the player
-            var diffX = Math.abs(this.engine.camera.position.x - this._mesh.position.x) + (this.size.x / 2),
-                biasX = (this._mesh.position.x < 0 ? -1 : 1) * this.size.x,
+            var diffX = Math.abs(this._mesh.position.x - this.engine.camera.position.x) + (this.size.x / 2),
+                diffXSign = (this._mesh.position.x - this.engine.camera.position.x) < 0 ? -1 : 1,
+                biasX = diffXSign * this.size.x,
 
-                diffY = Math.abs(this.engine.camera.position.y - this._mesh.position.y) + (this.size.y / 2),
-                biasY = (this._mesh.position.y < 0 ? -1 : 1) * this.size.y;
+                diffY = Math.abs(this._mesh.position.y - this.engine.camera.position.y) + (this.size.y / 2),
+                diffYSign = (this._mesh.position.y - this.engine.camera.position.y) < 0 ? -1 : 1,
+                biasY = diffYSign * this.size.y;
 
             if(diffX >= (this.engine.viewport.width / 2)) { //zone X
                 //to find what zone they are moving into we add a bit to their X position
@@ -160,7 +163,9 @@ define([
                 //and see what zone that puts us in, if any
                 return {
                     axis: 'y',
-                    zone: this.engine.map.findZoneIndex([this._mesh.position.x, this._mesh.position.y + biasY])
+                    zone: this.engine.map.findZoneIndex([this._mesh.position.x, this._mesh.position.y + biasY]),
+                    pos: this._mesh.position.y,
+                    bis: this._mesh.position.y + biasY
                 };
             }
         }
