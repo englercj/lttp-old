@@ -144,10 +144,11 @@ define([
             if(check) {
                 this.eachZone(function(zone, i) {
                     if(check(zone)) {
+                        console.log(zone, i, z);
                         index = i;
                         return false;
                     }
-                })
+                });
             }
 
             return index;
@@ -156,9 +157,10 @@ define([
             if(zone.vertexUnits == 'offsets') return;
 
             //Convert the vertices from pixels to offsets if necessary
+            //pixel offsets are from the topleft of the tilemap, but offset units are from the center of the screen
             for (var i = 0, il = zone.vertices.length; i < il; ++i) {
                 zone.vertices[i][0] = (zone.vertices[i][0] - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
-                zone.vertices[i][1] = (zone.vertices[i][1] - (this.tilemapSize.y / 2)) * this.tileSize * this.tileScale;
+                zone.vertices[i][1] = ((this.tilemapSize.y / 2) - zone.vertices[i][1]) * this.tileSize * this.tileScale;
             };
             zone.vertexUnits = 'offsets';
         },
