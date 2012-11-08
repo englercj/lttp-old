@@ -62,19 +62,28 @@ define([
                 this.engine.loadZone(data.zone);
 
                 //animate the camera
-                var props = {}, self = this;
+                var camProps = {},
+                    meshProps = {},
+                    vals = { x: x, y: y },
+                    self = this;
 
-                if(data.axis == 'x')
-                    props['position.x'] = '+=' + ((this.engine.viewport.width - this.size.x) * (x < 0 ? -1 : 1));
-                else
-                    props['position.y'] = '+=' + ((this.engine.viewport.height - this.size.y) * (y < 0 ? -1 : 1));
+                camProps[data.axis] = '+=' + (this.engine.viewport[(data.axis == 'x' ? 'width' : 'height')] * (vals[data.axis] < 0 ? -1 : 1));
+                meshProps[data.axis] = '+=' + (this.size[data.axis] * 1.25 * (vals[data.axis] < 0 ? -1 : 1))
 
-                this.animate(this.engine.camera, {
+                this.animate(this.engine.camera.position, {
                     duration: 1000,
-                    props: props,
+                    props: camProps,
+                    complete: function() {
+                        self.cameraLock.x = self.cameraLock.y = false;
+                        self.freeze = false;
+                    }
+                });
+
+                this.animate(this._mesh.position, {
+                    duration: 1000,
+                    props: meshProps,
                     complete: function() {
                         self.freeze = false;
-                        self.cameraLock[data.axis] = true;
                     }
                 });
             }
