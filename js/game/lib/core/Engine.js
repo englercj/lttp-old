@@ -57,6 +57,9 @@ define([
             this.player = new Player(resources.entities.link, this);
             this.player.addToScene(this.scene);
 
+            //setup UI
+            this.ui.setControls(this.controls);
+
             //create entities (enemies, items, bushes, etc)
             //this.entities.push(link);
 

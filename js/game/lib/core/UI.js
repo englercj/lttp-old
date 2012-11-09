@@ -22,10 +22,10 @@ define([
 
             this._meterValMaxHeight = parseInt(this._$metervalue.css('max-height').replace('px', ''), 10);
 
-            this.bindEvents();
-
             this.engine = engine;
             this.cutscenes = {};
+
+            this.bindEvents();
         },
         bindEvents: function() {
             var self = this;
@@ -34,10 +34,13 @@ define([
                 e.preventDefault();
                 self.engine.start();
             });
+        },
+        setControls: function(ctrls) {
+            this.controls = ctrls;
 
-            this.engine.controls.on('inventory', $.proxy(this.toggleInventory, this));
-            this.engine.controls.on('map', $.proxy(this.toggleMap, this));
-            this.engine.controls.on('menu', $.proxy(this.toggleMenu, this));
+            this.controls.on('inventory', $.proxy(this.toggleInventory, this));
+            this.controls.on('map', $.proxy(this.toggleMap, this));
+            this.controls.on('menu', $.proxy(this.toggleMenu, this));
         },
         playCutscene: function(name) {
             
