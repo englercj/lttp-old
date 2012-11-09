@@ -25,6 +25,7 @@ require([
     }*/
     
     $('.progressbar').progressbar();
+    $('button, .button').button();
 
     require(['game/main']);
 });

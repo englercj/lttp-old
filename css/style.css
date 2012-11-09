@@ -5,7 +5,7 @@
 }
 
 body {
-    background-color: #EBEBEB;
+    background:left top url(../assets/ui/bg.jpg) repeat #EBEBEB;
     color: black;
     font-family: Verdana,sans-serif;
     margin: 0;
@@ -15,14 +15,11 @@ h1 {
     font-size: 1.4em;
 }
 
-button {
-    height: 24px;
-    padding: 0 8px;
-}
-
 p, .rog, #dialog, #hud {
     font-family: ReturnOfGanon,Consolas,'Lucida Console','DejaVu Sans Mono',monospace;
 }
+
+#btnStart { display:none; }
 
 /* Dialog text */
 #dialog {
@@ -71,12 +68,11 @@ p, .rog, #dialog, #hud {
     margin-left: -350px;
     position: absolute;
 
+    display:none;
     z-index: 100;
 }
 
-#hud > div {
-    position: absolute;
-}
+#hud > div { position: absolute; }
 
 #hud .meter {
     background: left top url(../assets/ui/magic_meter.png) no-repeat;
@@ -190,51 +186,7 @@ p, .rog, #dialog, #hud {
     border: solid 1px #000;
 }
 
-/* CSS below this point is garbage... */
-#game canvas {
-    background-color: #CCC;
-    display: block;
-}
-
-#stats {
-    z-index: 2;
-}
-
-#game-container:-moz-full-screen, #game-container:-moz-full-screen #game-canvas {
-    height: 600px;
-    margin: 0;
-    padding: 0;
-    width: 800px;
-}
-
-#game-container:-moz-full-screen #stats {
-    bottom: 5px;
-    left: 5px;
-    position: absolute;
-}
-
-#game-container:-moz-full-screen #fullscreen {
-}
-
-#gl-error {
-    margin: 0.5em;
-}
-
-#game canvas {
-    height: 600px;
-    left: 0;
-    margin: 0;
-    position: absolute;
-    top: 0;
-    width: 800px;
-}
-
-#stats {
-    bottom: 5px;
-    left: 5px;
-    position: absolute;
-}
-
+/* Main game area */
 #game-container {
     display: block;
     position: absolute;
@@ -253,10 +205,21 @@ p, .rog, #dialog, #hud {
     margin-left: -400px;
     position: absolute;
     top: -300px;
-    visibility: visible;
+    width: 800px;
+    display: none;
+}
+
+#game canvas {
+    display: block;
+    height: 600px;
+    left: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
     width: 800px;
 }
 
+/* Progress bars */
 #progTotal {
     width:700px;
     height:35px;
@@ -283,4 +246,22 @@ p, .rog, #dialog, #hud {
 #progTotal .ui-progressbar-text { font-size:0.8em; font-weight:bold; line-height:35px; }
 #progPart .ui-progressbar-text { font-size:0.6em; line-height:20px; }
 
-#btnStart { display:none; }
+/* Fullscreen styles?
+
+#game-container:-moz-full-screen, #game-container:-moz-full-screen #game-canvas {
+    height: 600px;
+    margin: 0;
+    padding: 0;
+    width: 800px;
+}
+
+#game-container:-moz-full-screen #stats {
+    bottom: 5px;
+    left: 5px;
+    position: absolute;
+}
+
+#game-container:-moz-full-screen #fullscreen {
+}*/
+
+#gl-error { margin: 0.5em; }

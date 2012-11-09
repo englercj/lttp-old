@@ -14,7 +14,7 @@ define([
                 this._$container = $(document);
                 this.isDocument = true;
             } else {
-                this._$container = util.jquerify(container);
+                this._$container = util.jquerify(container).show();
             }
             
             this._$container.attr('tabindex', -1);
