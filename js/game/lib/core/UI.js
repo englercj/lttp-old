@@ -25,6 +25,7 @@ define([
             this.bindEvents();
 
             this.engine = engine;
+            this.cutscenes = {};
         },
         bindEvents: function() {
             var self = this;
@@ -33,6 +34,10 @@ define([
                 e.preventDefault();
                 self.engine.start();
             });
+
+            this.engine.controls.on('inventory', $.proxy(this.toggleInventory, this));
+            this.engine.controls.on('map', $.proxy(this.toggleMap, this));
+            this.engine.controls.on('menu', $.proxy(this.toggleMenu, this));
         },
         playCutscene: function(name) {
             
@@ -44,6 +49,15 @@ define([
                 return null;
         },
         playSound: function(file) {
+
+        },
+        toggleInventory: function() {
+
+        },
+        toggleMap: function() {
+
+        },
+        toggleMenu: function() {
 
         },
         showDialog: function(lines) {
