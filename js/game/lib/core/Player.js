@@ -53,7 +53,6 @@ define([
             //check is it is time to zone based on if the mesh reaches the viewport edge
             var data = this.checkZoneOut();
             if(data && data.zone !== null) {
-                console.log(data);
                 this.freeze = true;
 
                 //unload current zone
@@ -66,10 +65,17 @@ define([
                 var camProps = {},
                     meshProps = {},
                     vals = { x: x, y: y },
-                    self = this;
+                    self = this,
+                    ax = data.axis,
+                    nax = (ax == 'x' ? 'y' : 'x');
 
-                camProps[data.axis] = '+=' + (this.engine.viewport[(data.axis == 'x' ? 'width' : 'height')] * (vals[data.axis] < 0 ? -1 : 1));
-                meshProps[data.axis] = '+=' + ((this.size[data.axis] * 1.25)  * (vals[data.axis] < 0 ? -1 : 1))
+                //animate the camera in the direction of the zone
+                camProps[ax] = '+=' + (this.engine.viewport[(ax == 'x' ? 'width' : 'height')] * (vals[ax] < 0 ? -1 : 1));
+                //center the other axis on the player
+                camProps[nax] = this._mesh.position[nax];
+
+                //move the player a small bit so they are off the zone line
+                meshProps[ax] = '+=' + ((this.size[ax] * 1.25)  * (vals[ax] < 0 ? -1 : 1));
 
                 this.animate(this.engine.camera.position, {
                     duration: 1000,
@@ -84,7 +90,6 @@ define([
                     duration: 1000,
                     props: meshProps,
                     complete: function() {
-                        self.freeze = false;
                     }
                 });
             }
@@ -95,16 +100,16 @@ define([
             var pos = new THREE.Vector2(this.engine.camera.position.x, this.engine.camera.position.y),
                 vpSize = [this.engine.viewport.width / 2, this.engine.viewport.height / 2],
                 vertsX = [
-                    [pos.x + x - vpSize[0], pos.y - vpSize[1]],
-                    [pos.x + x - vpSize[0], pos.y + vpSize[1]],
-                    [pos.x + x + vpSize[0], pos.y + vpSize[1]],
-                    [pos.x + x + vpSize[0], pos.y - vpSize[1]]
+                    [pos.x + x - vpSize[0], pos.y - vpSize[1]], //bottom left
+                    [pos.x + x - vpSize[0], pos.y + vpSize[1]], //top left
+                    [pos.x + x + vpSize[0], pos.y + vpSize[1]], //top right
+                    [pos.x + x + vpSize[0], pos.y - vpSize[1]] //bottom right
                 ],
                 vertsY = [
-                    [pos.x - vpSize[0], pos.y + y - vpSize[1]],
-                    [pos.x - vpSize[0], pos.y + y + vpSize[1]],
-                    [pos.x + vpSize[0], pos.y + y + vpSize[1]],
-                    [pos.x + vpSize[0], pos.y + y - vpSize[1]]
+                    [pos.x - vpSize[0], pos.y + y - vpSize[1]], //bottom left
+                    [pos.x - vpSize[0], pos.y + y + vpSize[1]], //top left
+                    [pos.x + vpSize[0], pos.y + y + vpSize[1]], //top right
+                    [pos.x + vpSize[0], pos.y + y - vpSize[1]] //bottom right
                 ];
 
             //this.cameraLock.x = this.cameraLock.y = false;
