@@ -12,7 +12,13 @@
 
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
+        <!-- HTML5 Boilerplate normalize -->
         <link rel="stylesheet" href="css/normalize.css">
+
+        <!-- jQuery UI Theme -->
+        <link rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css">
+
+        <!-- main application styles -->
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/style.css">
 
@@ -24,11 +30,6 @@
         <![endif]-->
 
         <!-- Main Content Section -->
-        <div id="progTotal" class="progressbar"><span class="ui-progressbar-text"></span></div>
-        <div id="progPart" class="progressbar"><span class="ui-progressbar-text"></span></div>
-        <button id="btnDownload">Download Resources</button>
-        <button id="btnStart">Launch Game</button>
-
         <section id="game-container">
             <div id="hud">
                 <div class="meter"><div class="meter-value"></div></div>
@@ -58,6 +59,12 @@
                         <span class="heart empty"></span>
                     </div>
                 </div>
+            </div>
+            <div id="startup">
+                <div id="progTotal" class="progressbar"><span class="ui-progressbar-text"></span></div>
+                <div id="progPart" class="progressbar"><span class="ui-progressbar-text"></span></div>
+                <button id="btnDownload" class="ui-button-primary">Download Resources</button>
+                <button id="btnStart" class="ui-button-success">Launch Game</button>
             </div>
             <div id="game"></div>
             <div id="dialog"></div>

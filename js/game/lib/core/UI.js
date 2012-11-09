@@ -6,7 +6,7 @@ define([
         init: function(elements, engine) {
             this._$win = $(window);
             this._$doc = $(document);
-            this._$hud = util.jquerify(elements.hud);
+            this._$hud = util.jquerify(elements.hud).show();
             this._$paused = util.jquerify(elements.paused);
             this._$dialog = util.jquerify(elements.dialog);
             this._$cutscenes = util.jquerify(elements.cutscenes);
