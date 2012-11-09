@@ -38,22 +38,28 @@ define([
 
                 //do property animation
                 for(var p in item.properties) {
-                    var op = item.properties[p].match(/^(.=)[ ]*(\-?[\d]+)$/),
-                        val = util.getObjectProperty(item.object, p);
+                    var op, val = util.getObjectProperty(item.object, p);
 
-                    if(op === null && !item.notified) {
-                        item.notified = true;
-                        console.error('Unable to determine operation for animation of property', p, item.properties);
-                    } else {
-                        switch(op[1]) {
-                            case '+=': val += item.part * parseInt(op[2], 10); break;
-                            case '-=': val -= item.part * parseInt(op[2], 10); break;
-                            case '*=': val *= item.part * parseInt(op[2], 10); break;
-                            case '/=': val /= item.part * parseInt(op[2], 10); break;
+                    if(!item.interpol[p]) {
+                        op = item.properties[p].toString().match(/^(.=)[ ]*(\-?[\d]+)$/);
+
+                        if(op === null) {
+                            item.op = '+=';
+                            item.interpol[p] = parseInt(item.properties[p], 10) - val;
+                        } else {
+                            item.op = op[1];
+                            item.interpol[p] = parseInt(op[2], 10);
                         }
-
-                        util.setObjectProperty(item.object, p, val);
                     }
+
+                    switch(item.op) {
+                        case '+=': val += item.part * item.interpol[p]; break;
+                        case '-=': val -= item.part * item.interpol[p]; break;
+                        case '*=': val *= item.part * item.interpol[p]; break;
+                        case '/=': val /= item.part * item.interpol[p]; break;
+                    }
+
+                    util.setObjectProperty(item.object, p, val);
                 }
 
                 //complete the animation
@@ -74,7 +80,8 @@ define([
                 duration: opts.duration,
                 step: opts.step,
                 complete: opts.complete,
-                ms: 0
+                ms: 0,
+                interpol: {}
             });
         }
     });
