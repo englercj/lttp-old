@@ -59,7 +59,7 @@ Below is the current TODO list for the project:
 * ~~Entity Rendering~~
 * ~~Sprite Animation~~ (may be revisited)
 * ~~Map Collisions~~
-* Zone Confinement
+* ~~Zone Confinement~~
 * Item Management
 * Zone entities
 * Entity Collisions
