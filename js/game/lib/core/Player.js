@@ -6,8 +6,8 @@ define([
             //initialize entity
             this._super(resource, engine);
 
-            this.maxMagic = resource.data.maxMagic || 70;
-            this.magic = resource.data.magic || 70;
+            this.maxMagic = resource.data.maxMagic || 100;
+            this.magic = resource.data.magic || 100;
             this.inventory = resource.data.inventory || {
                 rupees: 0,
                 bombs: 0,
