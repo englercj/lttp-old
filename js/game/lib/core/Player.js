@@ -72,7 +72,7 @@ define([
                 //animate the camera in the direction of the zone
                 camProps[ax] = '+=' + (this.engine.viewport[(ax == 'x' ? 'width' : 'height')] * (vals[ax] < 0 ? -1 : 1));
                 //center the other axis on the player
-                camProps[nax] = this._mesh.position[nax];
+                camProps[nax] = this.getConstrainedCenter()[nax];
 
                 //move the player a small bit so they are off the zone line
                 meshProps[ax] = '+=' + ((this.size[ax] * 1.25)  * (vals[ax] < 0 ? -1 : 1));
@@ -94,25 +94,73 @@ define([
                 });
             }
         },
+        getConstrainedCenter: function(ax) {
+            var pos = this._mesh.position.clone(),
+                out = true,
+                verts;
+
+            while(out)
+            {
+                verts = this.getViewportVerts(pos);
+
+                //check if top left, and if it is out we need to move either down or right
+                if(!util.pointInPoly(this.engine.map.zones[this.engine.map.zone].vertices, verts.topLeft)) {
+                    //check bottom left, and if it is out we need to move right
+                    if(!util.pointInPoly(this.engine.map.zones[this.engine.map.zone].vertices, verts.bottomLeft)) {
+                        pos.x++; //positive X is right
+                    }
+                    //if it is in, we need to move down
+                    else {
+                        pos.y--; //negative Y is down
+                    }
+                }
+                //check bottom right, and if it is out we need to move either up or left
+                else if(!util.pointInPoly(this.engine.map.zones[this.engine.map.zone].vertices, verts.bottomRight)) {
+                    //check top right, and if it is out we need to move left
+                    if(!util.pointInPoly(this.engine.map.zones[this.engine.map.zone].vertices, verts.topRight)) {
+                        pos.x--; //negative X is left
+                    }
+                    //if it is in, we need to move down
+                    else {
+                        pos.y++; //positive Y is up
+                    }
+                }
+                //both are in, so lets get out of here
+                else out = false;
+            }
+
+            return pos;
+        },
+        getViewportVerts: function(pos, offX, offY, array) {
+            var vpSize = [this.engine.viewport.width / 2, this.engine.viewport.height / 2],
+                verts;
+
+            //vertices array
+            if(array) {
+                verts = [
+                    [pos.x + offX - vpSize[0], pos.y + offY - vpSize[1]], //bottom left
+                    [pos.x + offX - vpSize[0], pos.y + offY + vpSize[1]], //top left
+                    [pos.x + offX + vpSize[0], pos.y + offY + vpSize[1]], //top right
+                    [pos.x + offX + vpSize[0], pos.y + offY - vpSize[1]] //bottom right
+                ];
+            }
+            //easy-to-use readable object
+            else {
+                verts = {
+                    bottomLeft:  [pos.x + offX - vpSize[0], pos.y + offY - vpSize[1]], //bottom left
+                    topLeft:     [pos.x + offX - vpSize[0], pos.y + offY + vpSize[1]], //top left
+                    topRight:    [pos.x + offX + vpSize[0], pos.y + offY + vpSize[1]], //top right
+                    bottomRight: [pos.x + offX + vpSize[0], pos.y + offY - vpSize[1]] //bottom right
+                };
+            }
+
+            return verts;
+        },
         checkCameraLock: function(x, y) {
             //This will simulate movement to X and Y seperately and test that each corner of the viewport is
             //within the current zone's vertices
-            var pos = new THREE.Vector2(this.engine.camera.position.x, this.engine.camera.position.y),
-                vpSize = [this.engine.viewport.width / 2, this.engine.viewport.height / 2],
-                vertsX = [
-                    [pos.x + x - vpSize[0], pos.y - vpSize[1]], //bottom left
-                    [pos.x + x - vpSize[0], pos.y + vpSize[1]], //top left
-                    [pos.x + x + vpSize[0], pos.y + vpSize[1]], //top right
-                    [pos.x + x + vpSize[0], pos.y - vpSize[1]] //bottom right
-                ],
-                vertsY = [
-                    [pos.x - vpSize[0], pos.y + y - vpSize[1]], //bottom left
-                    [pos.x - vpSize[0], pos.y + y + vpSize[1]], //top left
-                    [pos.x + vpSize[0], pos.y + y + vpSize[1]], //top right
-                    [pos.x + vpSize[0], pos.y + y - vpSize[1]] //bottom right
-                ];
-
-            //this.cameraLock.x = this.cameraLock.y = false;
+            var vertsX = this.getViewportVerts(this.engine.camera.position, x, 0, true),
+                vertsY = this.getViewportVerts(this.engine.camera.position, 0, y, true);
 
             //check vertices
             for(var i = 0, il = vertsX.length; i < il; ++i) {
