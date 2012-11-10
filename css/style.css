@@ -200,23 +200,23 @@ p, .rog, #dialog, #hud {
 }
 
 #game {
-    height: 600px;
+    height: 768px;
     left: 50%;
-    margin-left: -400px;
+    margin-left: -512px;
     position: absolute;
-    top: -300px;
-    width: 800px;
+    top: -384px;
+    width: 1024px;
     display: none;
 }
 
 #game canvas {
     display: block;
-    height: 600px;
+    height: 768px;
     left: 0;
     margin: 0;
     position: absolute;
     top: 0;
-    width: 800px;
+    width: 1024px;
 }
 
 /* Progress bars */
