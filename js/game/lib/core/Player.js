@@ -53,7 +53,7 @@ define([
             //check is it is time to zone based on if the mesh reaches the viewport edge
             var data = this.checkZoneOut();
             if(data && data.zone !== null) {
-                this.doZoneOut(data);
+                this.doZoneOut(data, x, y);
             }
         },
         animateMoveEntity: function(x, y, speed, cb) {
@@ -76,14 +76,14 @@ define([
                     //check is it is time to zone based on if the mesh reaches the viewport edge
                     var data = self.checkZoneOut();
                     if(data && data.zone !== null) {
-                        self.doZoneOut(data);
+                        self.doZoneOut(data, x, y);
                     }
 
                     if(cb) cb();
                 }
             });
         },
-        doZoneOut: function(data) {
+        doZoneOut: function(data, x, y) {
             this.freeze = true;
 
             //unload current zone
