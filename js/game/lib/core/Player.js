@@ -53,46 +53,76 @@ define([
             //check is it is time to zone based on if the mesh reaches the viewport edge
             var data = this.checkZoneOut();
             if(data && data.zone !== null) {
-                this.freeze = true;
-
-                //unload current zone
-                this.engine.unloadZone(this.engine.map.zone);
-
-                //load the new zone
-                this.engine.loadZone(data.zone);
-
-                //animate the camera
-                var camProps = {},
-                    meshProps = {},
-                    vals = { x: x, y: y },
-                    self = this,
-                    ax = data.axis,
-                    nax = (ax == 'x' ? 'y' : 'x');
-
-                //animate the camera in the direction of the zone
-                camProps[ax] = '+=' + (this.engine.viewport[(ax == 'x' ? 'width' : 'height')] * (vals[ax] < 0 ? -1 : 1));
-                //center the other axis on the player
-                camProps[nax] = this.getConstrainedCenter()[nax];
-
-                //move the player a small bit so they are off the zone line
-                meshProps[ax] = '+=' + ((this.size[ax] * 1.25)  * (vals[ax] < 0 ? -1 : 1));
-
-                this.animate(this.engine.camera.position, {
-                    duration: 1000,
-                    props: camProps,
-                    complete: function() {
-                        self.cameraLock.x = self.cameraLock.y = false;
-                        self.freeze = false;
-                    }
-                });
-
-                this.animate(this._mesh.position, {
-                    duration: 1000,
-                    props: meshProps,
-                    complete: function() {
-                    }
-                });
+                this.doZoneOut(data);
             }
+        },
+        animateMoveEntity: function(x, y, speed, cb) {
+            this._super(x, y, speed);
+
+            //constrain the camera to this zone
+            this.checkCameraLock(x, y);
+
+            var props = {}, self = this;
+            if(!this.blocked.x && !this.cameraLock.x) props.x = '+=' + x;
+            if(!this.blocked.y && !this.cameraLock.y) props.y = '+=' + y;
+
+            this.animate(this.engine.camera.position, {
+                duration: speed,
+                props: props,
+                complete: function() {
+                    //check if the character has gotten back on center, and unlock the camera if necessary
+                    self.checkOnCenter();
+
+                    //check is it is time to zone based on if the mesh reaches the viewport edge
+                    var data = self.checkZoneOut();
+                    if(data && data.zone !== null) {
+                        self.doZoneOut(data);
+                    }
+
+                    if(cb) cb();
+                }
+            });
+        },
+        doZoneOut: function(data) {
+            this.freeze = true;
+
+            //unload current zone
+            this.engine.unloadZone(this.engine.map.zone);
+
+            //load the new zone
+            this.engine.loadZone(data.zone);
+
+            //animate the camera
+            var camProps = {},
+                meshProps = {},
+                vals = { x: x, y: y },
+                self = this,
+                ax = data.axis,
+                nax = (ax == 'x' ? 'y' : 'x');
+
+            //animate the camera in the direction of the zone
+            camProps[ax] = '+=' + (this.engine.viewport[(ax == 'x' ? 'width' : 'height')] * (vals[ax] < 0 ? -1 : 1));
+            //center the other axis on the player
+            camProps[nax] = this.getConstrainedCenter()[nax];
+
+            //move the player a small bit so they are off the zone line
+            meshProps[ax] = '+=' + ((this.size[ax] * 1.25)  * (vals[ax] < 0 ? -1 : 1));
+
+            this.animate(this.engine.camera.position, {
+                duration: 1000,
+                props: camProps,
+                complete: function() {
+                    self.cameraLock.x = self.cameraLock.y = false;
+                    self.freeze = false;
+                }
+            });
+
+            this.animate(this._mesh.position, {
+                duration: 1000,
+                props: meshProps,
+                complete: function() {
+                }
+            });
         },
         getConstrainedCenter: function(ax) {
             var pos = this._mesh.position.clone(),
