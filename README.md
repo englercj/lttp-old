@@ -60,10 +60,10 @@ Below is the current TODO list for the project:
 * ~~Sprite Animation~~ (may be revisited)
 * ~~Map Collisions~~
 * ~~Zone Confinement~~
-* Item Management
 * Zone entities
-* Entity Collisions
 * Entity Interaction (lifting, pushing, cutting, opening chests, etc)
+* Entity Collisions
+* Item Management
 * Combat
 * Dialog
 * Cutscenes
