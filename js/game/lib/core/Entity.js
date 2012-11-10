@@ -92,6 +92,18 @@ define([
             if(!this.blocked.x) this._mesh.translateX(x);
             if(!this.blocked.y) this._mesh.translateY(y);
         },
+        animateMoveEntity: function(x, y, speed, cb) {
+            var props = {};
+
+            if(!this.blocked.x) props.x = '+=' + x;
+            if(!this.blocked.y) props.y = '+=' + y;
+
+            this.animate(this._mesh.position, {
+                duration: speed,
+                props: props,
+                complete: cb
+            });
+        },
         die: function() {
             console.log('ENTITY DIED!', this);
             var self = this;
@@ -200,7 +212,7 @@ define([
             //if yes, set "this.blocked[axis] = true" and set the "this.blocker[axis] = tile";
 
             //clone our mesh and simulate movement
-            var mesh = this._mesh.clone();
+            var mesh = this._mesh.clone(), self = this;
 
             var tilemapSize = this.engine.map.tilemapSize.clone().divideScalar(2), //half tilemap size
                 pos = new THREE.Vector2(mesh.position.x, mesh.position.y), //position before simulation
@@ -220,7 +232,10 @@ define([
 
             var tilesX = [],
                 tilesY = [],
-                space = 10;
+                space = 10,
+                rollMax = 0.5,
+                rollMin = 0.5,
+                rollAmt = this.engine.map.tileScale * this.engine.map.tileSize;
 
             //if moving along X, check that blockage
             if(x) {
@@ -236,8 +251,12 @@ define([
                     leftCenter.y -= space * 2;
 
                     //get the tiles for the left foot and left center hotspots
-                    Array.prototype.push.apply(tilesX, this._getMapBlock(leftFoot, tilemapSize));
-                    Array.prototype.push.apply(tilesX, this._getMapBlock(leftCenter, tilemapSize));
+                    lfBlock = this._getMapBlock(leftFoot, tilemapSize);
+                    lcBlock = this._getMapBlock(leftCenter, tilemapSize);
+
+                    //store the blocks if they exist
+                    Array.prototype.push.apply(tilesX, lfBlock);
+                    Array.prototype.push.apply(tilesX, lcBlock);
                 }
                 //moving right
                 else {
@@ -251,8 +270,12 @@ define([
                     rightCenter.y -= space * 2;
 
                     //get the tiles for the right foot and right center hotspots
-                    Array.prototype.push.apply(tilesX, this._getMapBlock(rightFoot, tilemapSize));
-                    Array.prototype.push.apply(tilesX, this._getMapBlock(rightCenter, tilemapSize));
+                    rfBlock = this._getMapBlock(rightFoot, tilemapSize);
+                    rcBlock = this._getMapBlock(rightCenter, tilemapSize);
+
+                    //get the tiles for the right foot and right center hotspots
+                    Array.prototype.push.apply(tilesX, rfBlock);
+                    Array.prototype.push.apply(tilesX, rcBlock);
                 }
             }
 
@@ -261,7 +284,7 @@ define([
                 //moving down
                 if(y < 0) {
                     var leftFoot = posY.clone(),
-                        rightFoot = posY.clone()
+                        rightFoot = posY.clone();
 
                     leftFoot.x -= (this.size.x / 2) - space;
                     leftFoot.y -= (this.size.y / 2) - space;
@@ -269,9 +292,13 @@ define([
                     rightFoot.x += (this.size.x / 2) - space;
                     rightFoot.y -= (this.size.y / 2) - space;
 
+                    //get the tiles for the right foot and right center hotspots
+                    lfBlock = this._getMapBlock(leftFoot, tilemapSize);
+                    rfBlock = this._getMapBlock(rightFoot, tilemapSize);
+
                     //get the tiles for the left foot and right foot hotspots
-                    Array.prototype.push.apply(tilesY, this._getMapBlock(leftFoot, tilemapSize));
-                    Array.prototype.push.apply(tilesY, this._getMapBlock(rightFoot, tilemapSize));
+                    Array.prototype.push.apply(tilesY, lfBlock);
+                    Array.prototype.push.apply(tilesY, rfBlock);
                 }
                 //moving up
                 else {
@@ -284,9 +311,13 @@ define([
                     rightCenter.x += (this.size.x / 2) - space;
                     rightCenter.y -= space * 2;
 
+                    //get the tiles for the right foot and right center hotspots
+                    lcBlock = this._getMapBlock(leftCenter, tilemapSize);
+                    rcBlock = this._getMapBlock(rightCenter, tilemapSize);
+
                     //get the tiles for the left center and right center hotspots
-                    Array.prototype.push.apply(tilesY, this._getMapBlock(leftCenter, tilemapSize));
-                    Array.prototype.push.apply(tilesY, this._getMapBlock(rightCenter, tilemapSize));
+                    Array.prototype.push.apply(tilesY, lcBlock);
+                    Array.prototype.push.apply(tilesY, rcBlock);
                 }
             }
 
@@ -295,7 +326,6 @@ define([
                 if(tilesX[z].blockType == types.SUBTILE.BLOCK) {
                     this.blocked.x = true;
                     this.blocker.x = tilesX[z];
-                    break;
                 } else if(tilesX[z].blockType == types.SUBTILE.JUMPDOWN) {
                     //do jumpdown
                     //this.freeze = true;
@@ -315,7 +345,6 @@ define([
                 if(tilesY[q].blockType == types.SUBTILE.BLOCK) {
                     this.blocked.y = true;
                     this.blocker.y = tilesY[q];
-                    break;
                 } else if(tilesY[q].blockType == types.SUBTILE.JUMPDOWN) {
                     //do jumpdown
                     //this.freeze = true;
@@ -373,7 +402,9 @@ define([
             return [{
                 blockType: value,
                 pixel: pixel,
-                tilemapLoc: pos
+                tilemapLoc: pos,
+                texXd: texXd,
+                texYd: texYd
             }];
         }
     });

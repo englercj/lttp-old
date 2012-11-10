@@ -41,7 +41,7 @@ define([
                     var op, val = util.getObjectProperty(item.object, p);
 
                     if(!item.interpol[p]) {
-                        op = item.properties[p].toString().match(/^(.=)[ ]*(\-?[\d]+)$/);
+                        op = item.properties[p].toString().match(/^(.=)[ ]*(\-?[\d]+\.?[\d]*)$/);
 
                         if(op === null) {
                             item.op = '+=';
