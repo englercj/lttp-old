@@ -220,7 +220,7 @@ define([
 
             var tilesX = [],
                 tilesY = [],
-                space = 5;
+                space = 10;
 
             //if moving along X, check that blockage
             if(x) {
