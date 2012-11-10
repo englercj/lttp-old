@@ -60,6 +60,7 @@ Below is the current TODO list for the project:
 * ~~Sprite Animation~~ (may be revisited)
 * ~~Map Collisions~~
 * ~~Zone Confinement~~
+* Collision Edge Rolling (make edges of collision tiles roll)
 * Zone entities
 * Entity Interaction (lifting, pushing, cutting, opening chests, etc)
 * Entity Collisions
