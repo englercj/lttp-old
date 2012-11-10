@@ -17,7 +17,7 @@
         "heart_pieces": 0
     },
     "sprite": {
-        "size": [64, 88],
+        "size": [72, 92],
         "offset": [0, 0],
         "area": [8, 3],
         "segments": [5, 8],
