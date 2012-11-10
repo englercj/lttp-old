@@ -25,17 +25,17 @@
         "animations": {
             "move_down": {
                 "numFrames": 8,
-                "duration": 600
+                "duration": 500
             },
             "move_up": {
                 "offset": [0, 2],
                 "numFrames": 8,
-                "duration": 600
+                "duration": 500
             },
             "move_left": {
                 "offset": [0, 1],
                 "numFrames": 8,
-                "duration": 600
+                "duration": 500
             },
             "move_right": {
                 "inverseX": "move_left"
