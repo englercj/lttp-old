@@ -165,6 +165,9 @@ define([
             var vpSize = [this.engine.viewport.width / 2, this.engine.viewport.height / 2],
                 verts;
 
+            offX = offX || 0;
+            offY = offY || 0;
+
             //vertices array
             if(array) {
                 verts = [
