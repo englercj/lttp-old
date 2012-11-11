@@ -255,12 +255,12 @@ define([
                     lcBlock = this._getMapBlock(leftCenter, tilemapSize);
 
                     //at upper edge, move up
-                    if((lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].types != types.SUBTILE.BLOCK)) {
-                        this._mesh.position.y += rollAmt;
+                    if((lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                        this.moveEntity(0, rollAmt);
                     }
                     //lower edge, move down
-                    else if((lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].types != types.SUBTILE.BLOCK)) {
-                        this._mesh.position.y -= rollAmt;
+                    else if((lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                        this.moveEntity(0, -rollAmt);
                     }
 
                     //store the blocks if they exist
@@ -283,12 +283,12 @@ define([
                     rcBlock = this._getMapBlock(rightCenter, tilemapSize);
 
                     //at upper edge, move up
-                    if((rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].types != types.SUBTILE.BLOCK)) {
-                        this._mesh.position.y += rollAmt;
+                    if((rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                        this.moveEntity(0, rollAmt);
                     }
                     //lower edge, move down
-                    else if((rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].types != types.SUBTILE.BLOCK)) {
-                        this._mesh.position.y -= rollAmt;
+                    else if((rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                        this.moveEntity(0, -rollAmt);
                     }
 
                     //get the tiles for the right foot and right center hotspots
@@ -315,12 +315,12 @@ define([
                     rfBlock = this._getMapBlock(rightFoot, tilemapSize);
 
                     //at right edge, move right
-                    if((lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].types != types.SUBTILE.BLOCK)) {
-                        this._mesh.position.x += rollAmt;
+                    if((lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                        this.moveEntity(rollAmt, 0);
                     }
                     //left edge, move left
-                    else if((rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].types != types.SUBTILE.BLOCK)) {
-                        this._mesh.position.x -= rollAmt;
+                    else if((rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                        this.moveEntity(-rollAmt, 0);
                     }
 
                     //get the tiles for the left foot and right foot hotspots
@@ -343,12 +343,12 @@ define([
                     rcBlock = this._getMapBlock(rightCenter, tilemapSize);
 
                     //at right edge, move right
-                    if((lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].types != types.SUBTILE.BLOCK)) {
-                        this._mesh.position.x += rollAmt;
+                    if((lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                        this.moveEntity(rollAmt, 0);
                     }
                     //left edge, move left
-                    else if((rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].types != types.SUBTILE.BLOCK)) {
-                        this._mesh.position.x -= rollAmt;
+                    else if((rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                        this.moveEntity(-rollAmt, 0);
                     }
 
                     //get the tiles for the left center and right center hotspots
