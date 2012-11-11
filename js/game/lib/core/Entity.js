@@ -233,7 +233,7 @@ define([
             var tilesX = [],
                 tilesY = [],
                 space = 10,
-                rollMax = 0.5,
+                rollMax = 0.575
                 rollMin = 0.5,
                 rollAmt = this.engine.map.tileScale * this.engine.map.tileSize;
 
@@ -272,6 +272,8 @@ define([
                     //get the tiles for the right foot and right center hotspots
                     rfBlock = this._getMapBlock(rightFoot, tilemapSize);
                     rcBlock = this._getMapBlock(rightCenter, tilemapSize);
+
+
 
                     //get the tiles for the right foot and right center hotspots
                     Array.prototype.push.apply(tilesX, rfBlock);
@@ -359,26 +361,24 @@ define([
                 }
             }
         },
-        _getMapBlock: function(pos, tilemapSize) {
-            //do some division to make position be in "tiles from center" instead of "pixels from center"
-            pos.divideScalar(this.engine.map.tileScale).divideScalar(this.engine.map.tileSize);
+        _getMapBlock: function(pos, tilemapSize, realCoords) {
+            //if not realCoords, they are world coords; and must be converted
+            if(!realCoords) {
+                //do some division to make position be in "tiles from center" instead of "pixels from center"
+                pos.divideScalar(this.engine.map.tileScale).divideScalar(this.engine.map.tileSize);
 
-            //inverse the Y since we are getting offset from top not bottom like the position does
-            pos.y = -pos.y;
+                //inverse the Y since we are getting offset from top not bottom like the position does
+                pos.y = -pos.y;
 
-            //pos is now the offset from the center, to make it from the top left
-            //we subtract half the size of the tilemap
-            pos.addSelf(tilemapSize);
+                //pos is now the offset from the center, to make it from the top left
+                //we subtract half the size of the tilemap
+                pos.addSelf(tilemapSize);
+            }
 
             //need to get decimals off to test which part of the tile
             //we are on
-            var texX = pos.x,
-                texY = pos.y,
-                texXd = texX - Math.floor(texX),
-                texYd = texY - Math.floor(texY);
-
-            var pixel = util.getImagePixel(this.engine.map.layers[0].imageData.tilemap, Math.floor(texX), Math.floor(texY)),
-                colliders = [];
+            var posd = new THREE.Vector2(pos.x - Math.floor(pos.x), pos.y - Math.floor(pos.y)),
+                pixel = util.getImagePixel(this.engine.map.layers[0].imageData.tilemap, Math.floor(pos.x), Math.floor(pos.y));
 
             if(!pixel.blue) return;
 
@@ -391,20 +391,19 @@ define([
             var shift = 0,
                 flag = 3; //binary "11" to "and" off the 2 least significant bits
 
-            if(texXd < 0.5) shift = [2, 6]; //shift for lefts (leftbottom, lefttop)
+            if(posd.x < 0.5) shift = [2, 6]; //shift for lefts (leftbottom, lefttop)
             else shift = [0, 4]; //shifts for rights (rightbottom, righttop)
 
-            if(texYd < 0.5) shift = shift[1]; //shift for top (second element)
+            if(posd.y < 0.5) shift = shift[1]; //shift for top (second element)
             else shift = shift[0]; //shift for bottom (first element)
 
-            var value = ((pixel.blue >> shift) & flag);
-
             return [{
-                blockType: value,
+                blockType: ((pixel.blue >> shift) & flag),
                 pixel: pixel,
                 tilemapLoc: pos,
-                texXd: texXd,
-                texYd: texYd
+                pos: pos,
+                posd: posd,
+                shift: shift
             }];
         }
     });
