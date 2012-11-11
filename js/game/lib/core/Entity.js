@@ -400,7 +400,6 @@ define([
             return [{
                 blockType: ((pixel.blue >> shift) & flag),
                 pixel: pixel,
-                tilemapLoc: pos,
                 pos: pos,
                 posd: posd,
                 shift: shift
