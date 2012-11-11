@@ -235,7 +235,7 @@ define([
                 space = 10,
                 rollMax = 0.575
                 rollMin = 0.5,
-                rollAmt = this.engine.map.tileScale * this.engine.map.tileSize;
+                rollAmt = 0.05 * this.engine.map.tileScale * this.engine.map.tileSize;
 
             //if moving along X, check that blockage
             if(x) {
@@ -253,6 +253,15 @@ define([
                     //get the tiles for the left foot and left center hotspots
                     lfBlock = this._getMapBlock(leftFoot, tilemapSize);
                     lcBlock = this._getMapBlock(leftCenter, tilemapSize);
+
+                    //at upper edge, move up
+                    if((lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].types != types.SUBTILE.BLOCK)) {
+                        this._mesh.position.y += rollAmt;
+                    }
+                    //lower edge, move down
+                    else if((lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].types != types.SUBTILE.BLOCK)) {
+                        this._mesh.position.y -= rollAmt;
+                    }
 
                     //store the blocks if they exist
                     Array.prototype.push.apply(tilesX, lfBlock);
@@ -273,7 +282,14 @@ define([
                     rfBlock = this._getMapBlock(rightFoot, tilemapSize);
                     rcBlock = this._getMapBlock(rightCenter, tilemapSize);
 
-
+                    //at upper edge, move up
+                    if((rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].types != types.SUBTILE.BLOCK)) {
+                        this._mesh.position.y += rollAmt;
+                    }
+                    //lower edge, move down
+                    else if((rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].types != types.SUBTILE.BLOCK)) {
+                        this._mesh.position.y -= rollAmt;
+                    }
 
                     //get the tiles for the right foot and right center hotspots
                     Array.prototype.push.apply(tilesX, rfBlock);
@@ -298,6 +314,15 @@ define([
                     lfBlock = this._getMapBlock(leftFoot, tilemapSize);
                     rfBlock = this._getMapBlock(rightFoot, tilemapSize);
 
+                    //at right edge, move right
+                    if((lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].types != types.SUBTILE.BLOCK)) {
+                        this._mesh.position.x += rollAmt;
+                    }
+                    //left edge, move left
+                    else if((rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].types != types.SUBTILE.BLOCK)) {
+                        this._mesh.position.x -= rollAmt;
+                    }
+
                     //get the tiles for the left foot and right foot hotspots
                     Array.prototype.push.apply(tilesY, lfBlock);
                     Array.prototype.push.apply(tilesY, rfBlock);
@@ -316,6 +341,15 @@ define([
                     //get the tiles for the right foot and right center hotspots
                     lcBlock = this._getMapBlock(leftCenter, tilemapSize);
                     rcBlock = this._getMapBlock(rightCenter, tilemapSize);
+
+                    //at right edge, move right
+                    if((lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].types != types.SUBTILE.BLOCK)) {
+                        this._mesh.position.x += rollAmt;
+                    }
+                    //left edge, move left
+                    else if((rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].types != types.SUBTILE.BLOCK)) {
+                        this._mesh.position.x -= rollAmt;
+                    }
 
                     //get the tiles for the left center and right center hotspots
                     Array.prototype.push.apply(tilesY, lcBlock);
