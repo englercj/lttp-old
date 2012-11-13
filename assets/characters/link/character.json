@@ -6,7 +6,6 @@
     "health": 3,
     "location": [0, 0],
     "weapon": "",
-    "health": 1.5,
     "maxHealth": 3,
     "magic": 50,
     "maxMagic": 100,

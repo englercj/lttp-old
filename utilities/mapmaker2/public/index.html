@@ -32,6 +32,7 @@
         <script src="js/ui.js"></script>
         <script src="js/mapeditor.js"></script>
         <script src="js/tilereplacer.js"></script>
+        <script src="js/tilelocator.js"></script>
     </head>
     <body>
         <section id="tabs">
@@ -39,6 +40,7 @@
                 <li><a href="#generator">Map Generator</a></li>
                 <li><a href="#editor">Collision Editor</a></li>
                 <li><a href="#replacer">Tile Replacer</a></li>
+                <li><a href="#locator">Tile Locator</a></li>
             </ul>
             <div id="generator">
                 <form id="makemap" enctype="multipart/form-data">
@@ -84,8 +86,6 @@
             </div>
             <div id="replacer">
                 <div>
-                    <button id="btnUploadReplace">Upload Tilemap and Tileset</button>
-
                     <label for="chkOverride">Override Collision Guess</label>
                     <input type="checkbox" id="chkOverride" />
                     <span class="tool empty" data-toolid="0">Empty</span>
@@ -94,9 +94,67 @@
                     <span class="tool block" data-toolid="3">Block</span>
 
                     <button id="btnEditRepl">Edit Collision Data</button>
+                    <button id="btnUploadReplace">Upload Tilemap and Tileset</button>
                 </div>
                 <canvas id="rplTilemap"></canvas>
                 <canvas id="rplTileset"></canvas>
+            </div>
+            <div id="locator">
+                <button id="btnUploadLocate">Upload Tilemap and Tileset</button>
+                <br/>
+                <form id="locEntity">
+                    <label for="ent_type">Entity Type:</label>
+                    <select id="ent_type">
+                        <option value="ENTITY.BORING">ENTITY.BORING</option>
+                        <option value="ENTITY.PLAYER">ENTITY.PLAYER</option>
+                        <option value="ENTITY.ENEMY">ENTITY.ENEMY</option>
+                        <option value="ENTITY.FRIENDLY">ENTITY.FRIENDLY</option>
+                        <option value="ENTITY.NEUTRAL">ENTITY.NEUTRAL</option>
+                        <option value="ENTITY.ITEM">ENTITY.ITEM</option>
+                        <option value="ENTITY.TILE">ENTITY.TILE</option>
+                    </select>
+                    <br/>
+
+                    <label for="ent_subtype">Entity Subtype:</label>
+                    <select id="ent_subtype">
+                        <option value="TILE.EMPTY">ENTITY.EMPTY</option>
+                        <option value="TILE.CUTABLE">ENTITY.CUTABLE</option>
+                        <option value="TILE.SMASHABLE">ENTITY.SMASHABLE</option>
+                        <option value="TILE.TELEPORTING">ENTITY.TELEPORTING</option>
+                        <option value="TILE.LIFTABLE">ENTITY.LIFTABLE</option>
+                        <option value="TILE.LIFTABLE_2">ENTITY.LIFTABLE_2</option>
+                        <option value="TILE.LIFTABLE_3">ENTITY.LIFTABLE_3</option>
+                        <option value="TILE.LIFTABLE_4">ENTITY.LIFTABLE_4</option>
+                        <option value="TILE.LIFTABLE_5">ENTITY.LIFTABLE_5</option>
+                        <option value="TILE.DESTRUCTABLE">ENTITY.DESTRUCTABLE</option>
+                        <option value="TILE.DESTRUCTABLE_2">ENTITY.DESTRUCTABLE_2</option>
+                        <option value="TILE.LIFTABLE_CUTABLE">ENTITY.LIFTABLE_CUTABLE</option>
+                        <option value="TILE.MOVABLE">ENTITY.MOVABLE</option>
+                        <option value="TILE.MOVABLE_2">ENTITY.MOVABLE_2</option>
+                        <option value="TILE.MOVABLE_3">ENTITY.MOVABLE_3</option>
+                    </select>
+                    <br/>
+
+                    <label for="ent_name">Entity Name:</label>
+                    <input id="ent_name" type="text" value="" />
+                    <br/>
+
+                    <label for="ent_moveSpeed">Entity Movement Speed:</label>
+                    <input id="ent_moveSpeed" type="number" value="250" />
+                    <br/>
+
+                    <label for="ent_health">health:</label>
+                    <input id="ent_health" type="number" value="0.1" />
+                    <br/>
+
+                    <label for="ent_sprite">Entity Sprite:</label>
+                    <textarea id="ent_sprite"></textarea>
+                    <br/>
+                </form>
+                <canvas id="locTilemap"></canvas>
+                <canvas id="locTileset"></canvas>
+                <br class="clear"/>
+                <pre id="locJson"></pre>
             </div>
         </section>
         <div id="dlgUpload" title="Upload Tilemap and Tileset">

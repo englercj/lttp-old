@@ -18,7 +18,7 @@
             dragMap = false,
             init = false;
 
-        window.initEditor = function initEditor(tilesz, tm, ts) {
+        window.initEditor = function(tilesz, tm, ts) {
             maps = {
                 tilemap: tm,
                 tileset: ts

@@ -13,7 +13,7 @@
             override = false,
             init = false;
 
-        window.initReplacer = function initEditor(tilesz, tm, ts) {
+        window.initReplacer = function(tilesz, tm, ts) {
             maps = {
                 tilemap: tm,
                 tileset: ts
