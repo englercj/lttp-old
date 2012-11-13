@@ -248,7 +248,7 @@ define([
                     leftFoot.y -= (this.size.y / 2) - space;
 
                     leftCenter.x -= (this.size.x / 2) - space;
-                    leftCenter.y -= space * 2;
+                    //leftCenter.y -= space * 2;
 
                     //get the tiles for the left foot and left center hotspots
                     lfBlock = this._getMapBlock(leftFoot, tilemapSize);
@@ -276,7 +276,7 @@ define([
                     rightFoot.y -= (this.size.y / 2) - space;
 
                     rightCenter.x += (this.size.x / 2) - space;
-                    rightCenter.y -= space * 2;
+                    //rightCenter.y -= space * 2;
 
                     //get the tiles for the right foot and right center hotspots
                     rfBlock = this._getMapBlock(rightFoot, tilemapSize);
@@ -333,10 +333,10 @@ define([
                         rightCenter = posY.clone();
 
                     leftCenter.x -= (this.size.x / 2) - space;
-                    leftCenter.y -= space * 2;
+                    //leftCenter.y -= space * 2;
 
                     rightCenter.x += (this.size.x / 2) - space;
-                    rightCenter.y -= space * 2;
+                    //rightCenter.y -= space * 2;
 
                     //get the tiles for the right foot and right center hotspots
                     lcBlock = this._getMapBlock(leftCenter, tilemapSize);
