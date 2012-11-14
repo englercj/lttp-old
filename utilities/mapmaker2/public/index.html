@@ -30,6 +30,7 @@
 
         <!-- main js modules -->
         <script src="js/ui.js"></script>
+        <script src="js/eyes.js"></script>
         <script src="js/mapeditor.js"></script>
         <script src="js/tilereplacer.js"></script>
         <script src="js/tilelocator.js"></script>
@@ -157,7 +158,21 @@
                 <canvas id="locTilemap"></canvas>
                 <canvas id="locTileset"></canvas>
                 <br class="clear"/>
-                <pre id="locJson" class="meta"></pre>
+                <button id="btnLocInsert">Insert Entities into Zones</button>
+                <br class="clear"/>
+                <div class="col3">
+                    <h3>Entities</h2>
+                    <pre id="entJson" class="meta"></pre>
+                </div>
+                <div class="col3">
+                    <h3>Zones</h3>
+                    <textarea id="zoneJson" class="meta"></textarea>
+                </div>
+                <div class="col3">
+                    <h3>Entities in Zones</h3>
+                    <pre id="compJson" class="meta"></pre>
+                </div>
+                <br class="clear"/>
             </div>
         </section>
         <div id="dlgUpload" title="Upload Tilemap and Tileset">

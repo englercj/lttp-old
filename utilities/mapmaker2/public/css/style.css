@@ -4,6 +4,7 @@
 }
 
 .clear { clear: both; }
+.col3 { float:left; width:30%; }
 
 canvas { vertical-align:top; }
 
@@ -38,17 +39,20 @@ canvas { vertical-align:top; }
 .tool.block { background:rgba(200, 0, 0, 1); }
 
 /* Code Containers */
-pre.meta {
-    outline:solid 1px #CCC;
+textarea.meta { width:95%; }
+pre.meta, textarea.meta {
+    border:solid 1px #CCC;
     padding:5px;
-    margin:5px;
+    margin:0 5px;
     font-weight:bold;
     overflow:auto;
     font-size:0.6em;
+    color:#FFF;
+    background:#111;
     /*white-space:pre-wrap;*/
 }
 pre.meta .string { color: green; }
 pre.meta .number { color: firebrick; }
-pre.meta .boolean { color: blue; }
+pre.meta .bool { color: blue; }
 pre.meta .null { color: magenta; }
 pre.meta .key { color: #444; }

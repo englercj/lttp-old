@@ -112,7 +112,7 @@
 
             ctxMap.putImageData(tilemapData, 0, 0);
             console.log('Success! Generated', locs.length, 'entities!');
-            $('#locJson').html(pretify(locs));
+            $('#entJson').html(pretify(locs));
         }
 
         function getTilemapPixel(x, y) {
@@ -127,7 +127,7 @@
             return rgba;
         }
 
-        function pretify(obj) {
+        /*function pretify(obj) {
             var json = stringify(obj);
             json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
@@ -148,8 +148,9 @@
             });
         }
 
-        //this stringify formats it in a certain way, and makes some
-        //assumptions about the kind of data in there
+        //this stringify formats it in a more intelligent way than normal
+        //JSON.stringify(). Namely arrays like [6] are on one line, not 3
+        //to save some space.
         function stringify(obj) {
             var str = '[\n';
 
@@ -180,7 +181,7 @@
                                 for(var y = 0, yl = obj[i][p].length; y < yl; ++y) {
                                     str += obj[i][p][y] + ', ';
                                 }
-                                str = str.slice(0, str.length - 2);
+                                str = str.slice(0, -2); //remove ", " of array item
                                 str += '],\n';
                             }
                             break;
@@ -188,13 +189,31 @@
                             break;
                     }
                 }
-                str = str.slice(0, str.length - 2);
+                str = str.slice(0, -2); //remove ", " of obj item
                 str += '\n    },\n';
             }
 
+            str = str.slice(0, -2); //remove ",\n" of array item
             str += ']';
 
             return str;
+        }*/
+
+        function pointInPoly(vertices, point) {
+            var x = 0, y = 1, c = false, len = vertices.length;
+
+            if(point instanceof THREE.Vector2)
+                point = [point.x, point.y];
+
+            for(var i = 0, j = len - 1; i < len; j = i++) {
+                if( ((vertices[i][y] > point[y]) != (vertices[j][y] > point[y])) &&
+                    (point[x] < (vertices[j][x] - vertices[i][x]) * (point[y] - vertices[i][y]) / (vertices[j][y] - vertices[i][y]) + vertices[i][x]) )
+                {
+                    c = !c;
+                }
+            }
+
+            return c;
         }
 
         function doUploadToLocator() {
