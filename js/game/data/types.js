@@ -106,5 +106,16 @@ define({
         NEUTRAL: 4,
         ITEM: 5,
         TILE: 6
+    },
+
+    /////////////////////////////////////////////////////////
+    // Unit Types
+    ///////////////////
+    //There is a lot of scaling an sizing in the app, so I need
+    //to track units a lot of times
+    /////////////////////////////////////////////////////////
+    UNIT: {
+        PIXELS: 0, //value in pixels (from top-left)
+        OFFSETS: 1, //value in offsets (world coords, from center)
     }
 });

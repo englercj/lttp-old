@@ -4,8 +4,9 @@
 */
 define([
     'game/lib/bases/SceneObject',
+    'game/lib/utils/AssetLoader',
     'game/lib/utils/util'
-], function(SceneObject, util) {
+], function(SceneObject, AssetLoader, util) {
     // Shader
     var tilemapVS = [
         "varying vec2 pixelCoord;",
@@ -47,7 +48,7 @@ define([
     ].join("\n");
 
     var TileMap = Class.extend({
-        init: function(engine, opts) {
+        init: function(opts, engine) {
             this._super(engine);
 
             this.layers = [];
@@ -59,11 +60,20 @@ define([
             this.zone = this.findZoneIndex(opts.zone) || 0;
             this.tilemapSize = new THREE.Vector2(opts.mapSize[0], opts.mapSize[1]);
 
+            this.loader = new AssetLoader();
+
             this.eachZone(function(zone) {
                 this.upgradeVertexUnits(zone);
             });
+
+            if(opts.layers && opts.layers.length) {
+                for(var i = 0, il = opts.layers.length; i < il; ++i) {
+                    //load resources necessary
+                    this.loadLayer(opts.layers[i]);
+                }
+            }
         },
-        addLayer: function(resource, opts) {
+        addLayer: function(resources, opts) {
             if(typeof opts == 'string') {
                 var temp = opts;
                 opts = { name: temp };
@@ -74,15 +84,27 @@ define([
             opts.tileSize = this.tileSize;
             opts.zIndex = (opts.zIndex !== undefined) ? opts.zIndex : this.layers.length;
 
-            var layer = new TileMapLayer(this.engine, resource, opts, this);
+            var layer = new TileMapLayer(this.engine, resources, opts, this);
             this.layers.push(layer);
 
-            //TODO: right now this only tracks the latest layer, should it be the biggest layer?
-            //this.tilemapSize.set(layer.tilemap.image.width, layer.tilemap.image.height);
-
             //incase they add the map to the scene first, then add layers
+            console.log('adding layer to:', this.scene);
             if(this.scene)
                 layer.addToScene(this.scene);
+        },
+        loadLayer: function(lyr) {
+            var self = this;
+
+            this.loader.loadResources(
+                [
+                    { name: 'tilemap', type: 'texture', src: lyr.tilemapSrc },
+                    { name: 'tileset', type: 'texture', src: lyr.tilesetSrc }
+                ],
+                function(rsrcs) {
+                    console.log('layer loaded', rsrcs);
+                    self.addLayer(rsrcs, lyr);
+                }
+            );
         },
         //removes the first layer matching the index, or name passed
         //returns the layer removed, or undefined if not found.
@@ -108,7 +130,8 @@ define([
             return lyr;
         },
         addToScene: function(scene) {
-            this.scene = this;
+            console.log('setting scene', scene);
+            this.scene = scene;
 
             //incase they add layers first, then add the map to the scene
             this.eachLayer(function(layer) {
@@ -193,7 +216,6 @@ define([
             //set maps
             this.tilemap = resource.tilemap;
             this.tileset = resource.tileset;
-            this.meta = resource.meta;
 
             //cache image data
             this.imageData = {

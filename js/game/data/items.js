@@ -5,6 +5,7 @@ define([
         /////////////////////////////////////////////////////////
         // Weapons!
         ///////////////////
+        //Having these in your hand and being in an attack state will do stuffs
         /////////////////////////////////////////////////////////
         FIGHTER_SWORD: {
             type: types.WEAPON.DAMAGING,

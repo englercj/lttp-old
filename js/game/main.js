@@ -24,21 +24,19 @@ require([
             
             var loader = new AssetLoader();
 
-            loader.loadResources(
+            /*loader.loadResources(
                 [
                     { name: 'maps.lightworld.tilemap', type: 'texture', src: 'assets/maps/lightworld/tilemap.png' },
                     { name: 'maps.lightworld.tileset', type: 'texture', src: 'assets/maps/lightworld/tileset.png' },
-                    { name: 'maps.lightworld.meta', type: 'json', src: 'assets/maps/lightworld/meta.json' },
-                    { name: 'entities.link.texture', type: 'texture', src: 'assets/characters/link/sprite.png' },
-                    { name: 'entities.link.data', type: 'json', src: 'assets/characters/link/character.json' }
+                    { name: 'entities.link.texture', type: 'texture', src: 'assets/characters/link/sprite.png' }
                 ],
                 function(rsrcs) {
-                    resources = rsrcs;
+                    resources = rsrcs;*/
                     
                     $('#btnDownload').hide();
                     $('#btnStart').show();
-                }
-            );
+                /*}
+            );*/
         });
 
         //Initialize engine when startup button is clicked

@@ -2,13 +2,13 @@ define([
     'game/lib/core/Entity'
 ], function(Entity) {
     var Player = Entity.extend({
-        init: function(resource, engine) {
+        init: function(data, engine) {
             //initialize entity
-            this._super(resource, engine);
+            this._super(data, engine);
 
-            this.maxMagic = resource.data.maxMagic || 100;
-            this.magic = resource.data.magic || 100;
-            this.inventory = resource.data.inventory || {
+            this.maxMagic = data.maxMagic || 100;
+            this.magic = data.magic || 100;
+            this.inventory = data.inventory || {
                 rupees: 0,
                 bombs: 0,
                 arrows: 0,
