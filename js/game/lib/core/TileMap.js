@@ -5,8 +5,9 @@
 define([
     'game/lib/bases/SceneObject',
     'game/lib/utils/AssetLoader',
-    'game/lib/utils/util'
-], function(SceneObject, AssetLoader, util) {
+    'game/lib/utils/util',
+    'game/data/types'
+], function(SceneObject, AssetLoader, util, types) {
     // Shader
     var tilemapVS = [
         "varying vec2 pixelCoord;",
@@ -88,7 +89,6 @@ define([
             this.layers.push(layer);
 
             //incase they add the map to the scene first, then add layers
-            console.log('adding layer to:', this.scene);
             if(this.scene)
                 layer.addToScene(this.scene);
         },
@@ -101,7 +101,6 @@ define([
                     { name: 'tileset', type: 'texture', src: lyr.tilesetSrc }
                 ],
                 function(rsrcs) {
-                    console.log('layer loaded', rsrcs);
                     self.addLayer(rsrcs, lyr);
                 }
             );
@@ -130,7 +129,6 @@ define([
             return lyr;
         },
         addToScene: function(scene) {
-            console.log('setting scene', scene);
             this.scene = scene;
 
             //incase they add layers first, then add the map to the scene
@@ -176,7 +174,7 @@ define([
             return index;
         },
         upgradeVertexUnits: function(zone) {
-            if(zone.vertexUnits == 'offsets') return;
+            if(zone.vertexUnits === types.UNIT.OFFSETS) return;
 
             //Convert the vertices from pixels to offsets if necessary
             //pixel offsets are from the topleft of the tilemap, but offset units are from the center of the screen
@@ -184,7 +182,7 @@ define([
                 zone.vertices[i][0] = (zone.vertices[i][0] - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
                 zone.vertices[i][1] = ((this.tilemapSize.y / 2) - zone.vertices[i][1]) * this.tileSize * this.tileScale;
             };
-            zone.vertexUnits = 'offsets';
+            zone.vertexUnits = types.UNIT.OFFSETS;
         },
         eachLayer: function(fn) {
             for(var i = 0, il = this.layers.length; i < il; ++i) {

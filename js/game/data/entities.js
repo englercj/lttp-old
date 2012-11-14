@@ -11,13 +11,12 @@ define([
 
     //adds it twice, as an array elm and as a property
     function addEnt(name, ent) {
-        var len = ents.push(ent);
-
+        ents.push(ent);
         ents[name] = ent;
     }
 
     /////////////////////////////////////////////////////////
-    // Main Player Entity
+    // 0 - Main Player Entity
     /////////////////////////////////////////////////////////
     addEnt('PLAYER', {
         type: types.ENTITY.PLAYER,
@@ -40,7 +39,7 @@ define([
     });
 
     /////////////////////////////////////////////////////////
-    // Green Grass Entity
+    // 1 - Green Grass Entity
     /////////////////////////////////////////////////////////
     addEnt('GREEN_GRASS', {
         type: types.ENTITY.TILE,
@@ -51,14 +50,14 @@ define([
     });
 
     /////////////////////////////////////////////////////////
-    // Desert Grass Entity
+    // 2 - Desert Grass Entity
     /////////////////////////////////////////////////////////
     addEnt('DESERT_GRASS', {
         type: types.ENTITY.TILE,
         subtype: types.TILE.LIFTABLE_CUTABLE,
-        name: 'Green Grass',
+        name: 'Desert Grass',
         health: 0.1,
-        sprite: sprites.TILE.GREEN_GRASS
+        sprite: sprites.TILE.DESERT_GRASS
     });
 
     return ents;
