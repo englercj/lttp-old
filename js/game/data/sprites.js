@@ -11,7 +11,7 @@ define([
                 "offset": [0, 0],
                 "area": [8, 3],
                 "segments": [5, 8],
-                "zindex": 2,
+                "zindex": 5,
                 "animations": {
                     "move_down": {
                         "numFrames": 8,
@@ -43,7 +43,32 @@ define([
         // Tile and Map Interaction Sprites
         /////////////////////////////////////////////////////////
         TILE: {
-            GRASS: {}
+            GREEN_GRASS: {
+                "size": [57, 57],
+                "offset": [0, 0],
+                "area": [0, 0],
+                "segments": [1, 1],
+                "zindex": 2,
+                "animations": {
+                    "idle": {
+                        "numFrames": 1,
+                        "duration": 1000
+                    }
+                }
+            },
+            DESERT_GRASS: {
+                "size": [57, 57],
+                "offset": [0, 1],
+                "area": [0, 0],
+                "segments": [1, 1],
+                "zindex": 2,
+                "animations": {
+                    "idle": {
+                        "numFrames": 1,
+                        "duration": 1000
+                    }
+                }
+            }
         }
     };
 });
