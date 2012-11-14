@@ -8,6 +8,7 @@
             tilemapData = null,
             maps = null,
             props = {},
+            ents = [],
             init = false;
 
         window.initLocator = function(tilesz, tm, ts) {
@@ -59,6 +60,10 @@
             $dlgUpload.dialog('open');
         });
 
+        $('#btnLocInsert').on('click', function() {
+            insertEntsIntoZones();
+        });
+
         $tileset.on('mousemove', function(e) {
             if(!init) return;
 
@@ -92,7 +97,7 @@
         });
 
         function findTile(tile) {
-            var locs = [];
+            ents = [];
 
             //iterate through each pizel of the tilemap and store the ones that match this tile
             for(var x = 0; x < maps.tilemap.width; ++x) {
@@ -105,14 +110,34 @@
 
                         obj.location = [x, y];
                         obj.locationUnits = 'pixels';
-                        locs.push(obj);
+                        ents.push(obj);
                     }
                 }
             }
 
             ctxMap.putImageData(tilemapData, 0, 0);
-            console.log('Success! Generated', locs.length, 'entities!');
-            $('#entJson').html(pretify(locs));
+            console.log('Success! Generated', ents.length, 'entities!');
+            $('#entJson').html(pretify(ents));
+        }
+
+        function insertEntsIntoZones() {
+            var zones = JSON.parse($('#zoneJson').val());
+
+            for(var i = 0, il = ents.length; i < il; ++i) {
+                var ent = ents[i];
+
+                for(var z = 0, zl = zones.length; z < zl; ++z) {
+                    var zone = zones[z];
+
+                    if(pointInPoly(zone.vertices, ent.location)) {
+                        zone.entities.push(ent);
+                        break;
+                    }
+                }
+            }
+
+            console.log('Success! Inserted', ents.length, 'entities into', zones.length, 'zones!');
+            $('#compJson').html(pretify(zones));
         }
 
         function getTilemapPixel(x, y) {
@@ -201,9 +226,6 @@
 
         function pointInPoly(vertices, point) {
             var x = 0, y = 1, c = false, len = vertices.length;
-
-            if(point instanceof THREE.Vector2)
-                point = [point.x, point.y];
 
             for(var i = 0, j = len - 1; i < len; j = i++) {
                 if( ((vertices[i][y] > point[y]) != (vertices[j][y] > point[y])) &&
