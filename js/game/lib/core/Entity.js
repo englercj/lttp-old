@@ -1,24 +1,25 @@
 define([
     'game/lib/bases/Sprite',
+    'game/lib/utils/AssetLoader',
     'game/data/types',
     'game/lib/utils/util'
-], function(Sprite, types, util) {
+], function(Sprite, AssetLoader, types, util) {
     var Entity = Sprite.extend({
-        init: function(resource, engine) {
+        init: function(data, engine) {
             //this.controls = controls;
             //this.map = map;
             //this.viewport = viewport;
 
-            this.type = resource.data.type;
-            this.name = resource.data.name;
-            this.moveSpeed = resource.data.moveSpeed || 200;
-            this.maxHealth = resource.data.maxHealth || 3;
-            this.health = resource.data.health || 3;
+            this.type = data.type;
+            this.name = data.name;
+            this.moveSpeed = data.moveSpeed || 200;
+            this.maxHealth = data.maxHealth || 3;
+            this.health = data.health || 3;
 
-            this.items = resource.data.items || [];
-            this.loot = resource.data.loot || [];
+            this.items = data.items || [];
+            this.loot = data.loot || [];
 
-            this.sounds = resource.data.sounds || {};
+            this.sounds = data.sounds || {};
 
             this.lastDirection = null;
 
@@ -32,15 +33,23 @@ define([
 
             this.ray = new THREE.Ray();
 
-            resource.data.sprite = resource.data.sprite || { size: [0, 0], area: [1, 1] };
+            data.sprite = data.sprite || { size: [0, 0], area: [1, 1] };
 
-            resource.data.sprite.texture = resource.texture || new THREE.Texture();
+            if(!data.sprite.texture) {
+                var loader = new AssetLoader(), self = this;
+
+                loader.loadResource({ type: 'texture', src: data.sprite.textureSrc }, function(err, texture) {
+                    if(err) console.error('BAD TEXTURE LOAD!', err);
+
+                    self.setTexture(texture);
+                });
+            }
 
             //initialize visual sprite
-            this._super(resource.data.sprite, engine);
+            this._super(data.sprite, engine);
 
-            //this.setAnimation('idle');
-            this.setPosition(resource.data.location[0], resource.data.location[1]);
+            this.setAnimation('idle');
+            this.setPosition(data.location[0], data.location[1]);
 
             this.bindEvents();
         },
@@ -152,6 +161,8 @@ define([
             }
         },
         checkEntityCollision: function() {
+            if(!this._mesh) return;
+
             var origin = this._mesh.position.clone();
 
             //loop through each vertex of the mesh's geometry
@@ -206,6 +217,8 @@ define([
         //entities (walls, hills, jump downs, fences, trees, etc.) so normal entity collisions
         //won't detect these hits. Entities are only created for interactive elements of the map.
         checkMapCollision: function(x, y) {
+            if(!this._mesh) return;
+
             if(!x && !y) return;
 
             //if we moved by x,y would we collide with a wall or other map element?

@@ -4,12 +4,14 @@ define([
     'game/lib/core/Controls',
     'game/lib/core/TileMap',
     'game/lib/core/Player',
-    'game/lib/core/UI'
+    'game/lib/core/UI',
+    //data
+    'game/data/data'
     //Scritps that modify global
     //'game/lib/core/three_fpcontrols'
-], function(Viewport, Controls, TileMap, Player, UI) {
+], function(Viewport, Controls, TileMap, Player, UI, data) {
     var Engine = Class.extend({
-        init: function(elements, resources) {
+        init: function(elements) {
             var self = this;
             this.debug = true;
 
@@ -41,8 +43,7 @@ define([
             this.viewport.setCamera(this.camera);
 
             //map setup
-            this.map = new TileMap(this, resources.maps.lightworld.meta);//resources.maps.lightworld, this.viewport);
-            this.map.addLayer(resources.maps.lightworld, 'world');
+            this.map = new TileMap(data.maps.LIGHTWORLD, this);//resources.maps.lightworld, this.viewport);
             this.map.addToScene(this.scene);
 
             //controls setup
@@ -54,7 +55,7 @@ define([
             });
 
             //setup player
-            this.player = new Player(resources.entities.link, this);
+            this.player = new Player(data.entities.PLAYER, this);
             this.player.addToScene(this.scene);
 
             //setup UI
@@ -67,7 +68,7 @@ define([
             this.scene.add(new THREE.AmbientLight(0xFFFFFF));
 
             //load initial zone
-            this.loadZone(resources.maps.lightworld.meta.zone);
+            this.loadZone(data.maps.LIGHTWORLD.zone);
 
             this.stats = new Stats();
             this.stats.domElement.style.position = 'absolute';

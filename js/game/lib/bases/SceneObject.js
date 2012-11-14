@@ -11,9 +11,12 @@ define([
         },
         addToScene: function(scene) {
             this.scene = scene;
-            scene.add(this._mesh);
+
+            if(this._mesh) scene.add(this._mesh);
         },
         setPosition: function(x, y, z) {
+            if(!this._mesh) return;
+
             var zi = (z !== undefined ? z : (this.zindex ? this.zindex : 0));
 
             if(x instanceof THREE.Vector2)

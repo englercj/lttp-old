@@ -111,6 +111,18 @@ define([
             this.currentTile = 0;
             this.currentAnim = 0;
 
+            if(this.texture) this.setTexture(this.texture);
+        },
+        setTexture: function(tex) {
+            var pos = new THREE.Vector2(0, 0);
+            if(this._mesh) {
+                pos = this._mesh.position.clone();
+                this.engine.destroyMesh(this._mesh);
+                this.engine.destroyTexture(this.texture);
+            }
+
+            this.texture = tex;
+
             this.texture.wrapS = this.texture.wrapT = THREE.RepeatWrapping;
             this.texture.repeat.set(
                 1 / this.area.x,
@@ -132,7 +144,9 @@ define([
             this._plane = new THREE.PlaneGeometry(this.size.x, this.size.y, this.segments.x, this.segments.y);
             this._material = new THREE.MeshBasicMaterial({ map: this.texture, transparent: true });
             this._mesh = new THREE.Mesh(this._plane, this._material);
-            this._mesh.position.set(0, 0, this.zindex);
+            this._mesh.position.set(pos.x, pos.y, this.zindex);
+            
+            this.addToScene(this.scene);
         },
         setAnimation: function(name) {
             this.currentFrameTime = 0;
@@ -150,7 +164,7 @@ define([
                 this.texture.offset.x = (this.offset.x / this.area.x);
                 this.texture.offset.y = (this.offset.y / this.area.y);
             }
-            else if(this.animations[name]) {
+            else if(this.animations && this.animations[name]) {
                 this.currentAnim = this.animations[name];
                 this.currentAnim._done = false;
 
