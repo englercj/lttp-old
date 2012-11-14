@@ -36,3 +36,19 @@ canvas { vertical-align:top; }
 .tool.jumpdown { background:rgba(0, 200, 0, 1); }
 .tool.reserved { background:rgba(0, 0, 200, 1); }
 .tool.block { background:rgba(200, 0, 0, 1); }
+
+/* Code Containers */
+pre.meta {
+    outline:solid 1px #CCC;
+    padding:5px;
+    margin:5px;
+    font-weight:bold;
+    overflow:auto;
+    font-size:0.6em;
+    /*white-space:pre-wrap;*/
+}
+pre.meta .string { color: green; }
+pre.meta .number { color: firebrick; }
+pre.meta .boolean { color: blue; }
+pre.meta .null { color: magenta; }
+pre.meta .key { color: #444; }

@@ -40,6 +40,14 @@
             ctxSet.drawImage(maps.tileset, 0, 0);
             ctxSet.save();
 
+            $('#locEntity').children().each(function(i, child) {
+                if(child.id && child.id.match(/^ent_.+$/)) {
+                    var p = this.id.match(/^ent_(.+)$/)[1];
+
+                    props[p] = this.value;
+                }
+            });
+
             init = true;
         };
 
@@ -79,7 +87,6 @@
                     var p = this.id.match(/^ent_(.+)$/)[1];
 
                     props[p] = this.value;
-                    console.log(p, props[p], props);
                 });
             }
         });
@@ -105,7 +112,7 @@
 
             ctxMap.putImageData(tilemapData, 0, 0);
             console.log('Success! Generated', locs.length, 'entities!');
-            $('#locJson').text(JSON.stringify(locs));
+            $('#locJson').html(pretify(locs));
         }
 
         function getTilemapPixel(x, y) {
@@ -118,6 +125,76 @@
 
             //rgba.hex = this.rgbaToHex(rgba);
             return rgba;
+        }
+
+        function pretify(obj) {
+            var json = stringify(obj);
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        //this stringify formats it in a certain way, and makes some
+        //assumptions about the kind of data in there
+        function stringify(obj) {
+            var str = '[\n';
+
+            for(var i = 0, il = obj.length; i < il; ++i) {
+                str += '    {\n';
+
+                for(var p in obj[i]) {
+                    str += '        "' + p + '": ';
+
+                    var type = typeof obj[i][p],
+                        num;
+
+                    if(type !== 'object')
+                        num = parseInt(obj[i][p], 10) || false;
+
+                    if(num) obj[i][p] = num;
+
+                    switch(type) {
+                        case 'string':
+                            str += '"' + obj[i][p] + '",\n';
+                            break;
+                        case 'number':
+                            str += obj[i][p] + ',\n';
+                            break;
+                        case 'object':
+                            if(obj[i][p] instanceof Array) {
+                                str += '[';
+                                for(var y = 0, yl = obj[i][p].length; y < yl; ++y) {
+                                    str += obj[i][p][y] + ', ';
+                                }
+                                str = str.slice(0, str.length - 2);
+                                str += '],\n';
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                str = str.slice(0, str.length - 2);
+                str += '\n    },\n';
+            }
+
+            str += ']';
+
+            return str;
         }
 
         function doUploadToLocator() {

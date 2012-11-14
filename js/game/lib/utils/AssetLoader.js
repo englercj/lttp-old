@@ -1,8 +1,9 @@
 define([
     'game/lib/bases/Emitter',
     'game/data/types',
-    'game/data/items'
-], function(Emitter, types, items) {
+    'game/data/items',
+    'game/data/sprites'
+], function(Emitter, types, items, sprites) {
     var AssetLoader = Emitter.extend({
         init: function() {
         },
@@ -73,13 +74,24 @@ define([
                     success: function(data, textStatus, jqXHR) {
                         //parse this object to have correct types defined
                         if(typeof data == 'object') {
+                            //set type
                             if(data.type) {
                                 var type = data.type.split('.');
                                 data.type = types[type[0]][type[1]];
                             }
 
+                            //set subtype
                             if(data.type == types.ENTITY.ITEM && data.subtype) {
                                 data.subtype = items[data.subtype]
+                            } else if(data.subtype) {
+                                var type = data.subtype.split('.');
+                                data.subtype = types[type[0]][type[1]];
+                            }
+
+                            //set sprite if needed
+                            if(data.sprite && typeof data.sprite == 'string') {
+                                var spr = data.sprite.split('.');
+                                data.sprite  = sprites[spr[0]][spr[1]];
                             }
                         }
 
