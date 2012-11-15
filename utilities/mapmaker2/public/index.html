@@ -29,19 +29,18 @@
         <script src="js/vendor/jquery.ajax-progress.js"></script>
 
         <!-- main js modules -->
-        <script src="js/ui.js"></script>
         <script src="js/eyes.js"></script>
+        <script src="js/mapgenerator.js"></script>
         <script src="js/mapeditor.js"></script>
-        <script src="js/tilereplacer.js"></script>
-        <script src="js/entityeditor.js"></script>
+        <script src="js/editors/collisions.js"></script>
+        <script src="js/editors/replacer.js"></script>
+        <script src="js/editors/entity.js"></script>
     </head>
     <body>
         <section id="tabs">
             <ul>
                 <li><a href="#generator">Map Generator</a></li>
-                <li><a href="#editor">Collision Editor</a></li>
-                <li><a href="#replacer">Tile Replacer</a></li>
-                <li><a href="#entity">Entity Editor</a></li>
+                <li><a href="#editor">Map Editor</a></li>
             </ul>
             <div id="generator">
                 <form id="makemap" enctype="multipart/form-data">
@@ -55,12 +54,10 @@
                     <input type="file" name="map" id="fileMap" />
                     <br/>
                     <input type="button" value="Mapify" id="btnMapify" />
-                    <input type="button" value="Edit Collision Data" id="btnEdit" disabled />
-                    <input type="button" value="Test Images" id="btnTest" />
+                    <input type="button" value="Edit Map" id="btnEdit" disabled />
                 </form>
 
                 <br/>
-                <!--<div id="progUpload" class="progress"></div>-->
                 <div id="status"></div>
 
                 <br/>
@@ -73,46 +70,49 @@
                 <br class="clear"/>
             </div>
             <div id="editor">
-                <div>
-                    <span class="tool empty" data-toolid="0">Empty</span>
-                    <span class="tool jumpdown" data-toolid="1">Jumpdown</span>
-                    <span class="tool reserved" data-toolid="2">Reserved</span>
-                    <span class="tool block" data-toolid="3">Block</span>
-                    <button id="btnDlTm">Download Tilemap</button>
-                    <button id="btnUploadEdit">Upload Tilemap and Tileset</button>
+                <div class="left">
+                    <button id="btnUploadEdit">Upload Maps</button>
+                    <button id="btnDlTm">Download Maps</button>
+                    <div id="editors">
+                        <h4>Editors</h4>
+                        <button class="editor collision" data-editorid="collisions">Collision Editor</button>
+                        <button class="editor entity" data-editorid="entity">Entity Editor</button>
+                        <button class="editor replace" data-editorid="replacer">Tile Replacer</button>
+                    </div>
+                    <div id="tools">
+                        <div class="tools collisions replacer">
+                            <h4>Tools</h4>
+                            <span class="tool empty" data-toolid="0">Empty</span>
+                            <span class="tool jumpdown" data-toolid="1">Jumpdown</span>
+                            <span class="tool reserved" data-toolid="2">Reserved</span>
+                            <span class="tool block" data-toolid="3">Block</span>
+                        </div>
+                        <div class="tools entity">
+                            <h4>Tools</h4>
+                            <label for="ent_type">Entity:</label>
+                            <select id="ent_type">
+                                <option value="0">Player</option>
+                                <option value="1">Green Grass</option>
+                                <option value="2">Desert Grass</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <canvas id="minimap"></canvas>
-                <canvas id="map"></canvas>
-                <br class="clear"/>
-            </div>
-            <div id="replacer">
-                <div>
-                    <label for="chkOverride">Override Collision Guess</label>
-                    <input type="checkbox" id="chkOverride" />
-                    <span class="tool empty" data-toolid="0">Empty</span>
-                    <span class="tool jumpdown" data-toolid="1">Jumpdown</span>
-                    <span class="tool reserved" data-toolid="2">Reserved</span>
-                    <span class="tool block" data-toolid="3">Block</span>
-
-                    <button id="btnEditRepl">Edit Collision Data</button>
-                    <button id="btnUploadReplace">Upload Tilemap and Tileset</button>
+                <div class="right">
+                    <h2 id="activeEditor"></h3>
+                    <div class="col">
+                        <h5>Minimap</h5>
+                        <canvas id="minimap"></canvas>
+                    </div>
+                    <div class="col entlyr">
+                        <h5>Entity Layer</h5>
+                        <canvas id="entlyr"></canvas>
+                    </div>
+                    <div class="col">
+                        <h5 class="mapTitle">Map</h5>
+                        <canvas id="map"></canvas>
+                    </div>
                 </div>
-                <canvas id="rplTilemap"></canvas>
-                <canvas id="rplTileset"></canvas>
-            </div>
-            <div id="entity">
-                <button id="btnUploadLocate">Upload Tilemap and Tileset</button>
-                <br/>
-                <form id="locEntity">
-                    <label for="ent_type">Entity Type:</label>
-                    <select id="ent_type">
-                        <option value="0">Player</option>
-                        <option value="1">Green Grass</option>
-                        <option value="2">Desert Grass</option>
-                    </select>
-                </form>
-                <canvas id="locTilemap"></canvas>
-                <canvas id="locTileset"></canvas>
                 <br class="clear"/>
             </div>
         </section>

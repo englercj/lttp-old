@@ -1,13 +1,16 @@
-.col2 {
-    float: left;
-    width: 48%;
-}
+h2, h3, h4, h5 { text-decoration: underline; text-align: center; }
+h2, h3, h5 { margin:6px 10px;}
+h4 { margin:10px; }
 
 .clear { clear: both; }
-.col3 { float:left; width:30%; }
+.col { float:left; }
 .small { font-size: 0.8em !important; }
 
 canvas { vertical-align:top; }
+
+#editors, #btnDlTm, .entlyr, .tools { display:none; }
+.left { float:left; width:10%; text-align: center; }
+.right { float:left; width:90%; }
 
 .tool {
     height: 25px;

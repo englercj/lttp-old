@@ -1,323 +1,143 @@
 (function($, window, undefined) {
     $(function() {
-        //TODO: this is gross, need to organize it
-        var $map = $('#map'),
-            $minimap = $('#minimap'),
-            tilecanvas = document.createElement('canvas'),
-            ctxMap = $map[0].getContext('2d'),
-            ctxMinimap = $minimap[0].getContext('2d'),
-            ctxTile = tilecanvas.getContext('2d'),
-            tilemapData = null,
-            maps = null,
-            offset = { x: 0, y: 0 },
-            dragMinimap = null,
-            viewSize = { x: 96, y: 48 },
-            stripes = new Image(),
-            tileSize = 16,
-            lastSlice = null,
-            dragMap = false,
-            init = false;
-
-        window.initEditor = function(tilesz, tm, ts) {
-            maps = {
-                tilemap: tm,
-                tileset: ts
-            };
-
-            if(typeof tilesz == 'string')
-                tileSize = parseInt(tilesz, 10);
-            else
-                tileSize = tilesz;
-
-            tilecanvas.width = tileSize;
-            tilecanvas.height = tileSize;
-            ctxTile.translate(0, tileSize);
-            ctxTile.scale(1, -1);
-
-            //init minimap
-            $minimap.attr({
-                width: maps.tilemap.width,
-                height: maps.tilemap.height
-            });
-
-            ctxMinimap.drawImage(maps.tilemap, 0, 0);
-            tilemapData = ctxMinimap.getImageData(0, 0, maps.tilemap.width, maps.tilemap.height);
-
-            ctxMinimap.strokeStyle = 'rgba(255,255,255,1)';
-            drawMinimap();
-
-            //init regular map
-            stripes.addEventListener('load', function () {
-                $map.attr({
-                    width: viewSize.x * tileSize,
-                    height: viewSize.y * tileSize
-                });
-                drawMap();
-                init = true;
-            }, false);
-            stripes.src = '/img/stripes.png';
-        };
-
-        $minimap.on('mousedown', function(e) {
-            if(!init) return;
-
-            var pos = $minimap.position();
-            if(e.pageX > (pos.left + offset.x) && e.pageX < (pos.left + offset.x + viewSize.x) &&
-                e.pageY > (pos.top + offset.y) && e.pageY < (pos.top + offset.y + viewSize.y)) 
-            {
-                dragMinimap = { x: e.clientX, y: e.clientY };
+        EDITOR.$dlgUpload = $('#dlgUpload').dialog({
+            modal: true, autoOpen: false,
+            width: 400, height: 450,
+            buttons: {
+                Upload: EDITOR.utils.doImageUpload,
+                Cancel: function() { $(this). dialog('close'); }
             }
         });
 
-        $minimap.on('mousemove', function(e) {
-            if(!init) return;
-
-            if(dragMinimap) {
-                var diffX = e.clientX - dragMinimap.x,
-                    diffY = e.clientY - dragMinimap.y;
-
-                dragMinimap.x = e.clientX;
-                dragMinimap.y = e.clientY;
-
-                offset.x += diffX;
-                offset.y += diffY;
-
-                drawMinimap();
-            }
+        $('.tool').on('click', function(e) {
+            $('.tool').removeClass('selected');
+            EDITOR.tool = parseInt($(this).addClass('selected').data('toolid'), 10);
         });
 
-        $minimap.on('mouseup', function(e) {
-            if(!init) return;
-
-            if(dragMinimap) dragMinimap = null;
+        $('#editors .editor').on('click', function(e) {
+            EDITOR.selectEditor($(this).data('editorid'), $(this).text());
         });
 
-        $minimap.on('click', function(e) {
-            if(!init) return;
-
-            var pos = $minimap.position();
-
-            offset.x = Math.round(e.pageX - pos.left - (viewSize.x / 2));
-            offset.y = Math.round(e.pageY - pos.top - (viewSize.y / 2));
-
-            if(offset.x < 0) offset.x = 0;
-            if(offset.y < 0) offset.y = 0;
-
-            if(offset.x > (maps.tilemap.width - viewSize.x)) offset.x = (maps.tilemap.width - viewSize.x);
-            if(offset.y > (maps.tilemap.height - viewSize.y)) offset.y = (maps.tilemap.height - viewSize.y);
-
-            drawMinimap();
-            drawMap();
+        $('#btnUploadEdit').on('click', function(e) {
+            EDITOR.$dlgUpload.dialog('open');
         });
 
         $('#btnDlTm').on('click', function(e) {
-            ctxMinimap.putImageData(tilemapData, 0, 0);
-            window.open($minimap[0].toDataURL());
-            drawMinimap();
-        });
+            EDITOR.ctxMinimap.putImageData(EDITOR.minimapData, 0, 0);
+            window.open(EDITOR.$minimap[0].toDataURL());
 
-        $('#btnUploadEdit').on('click', function() {
-            $dlgUpload.dialog('option', 'buttons', {
-                Upload: doUploadToEditor,
-                Cancel: function() { $(this). dialog('close'); }
-            });
-            $dlgUpload.dialog('open');
-        });
-
-        $map.on('mousedown', function(e) {
-            if(!init) return;
-
-            dragMap = true;
-        });
-
-        $map.on('mouseup', function(e) {
-            if(!init) return;
-
-            if(dragMap) dragMap = false;
-        });
-
-        $map.on('mousemove', function(e) {
-            if(!init) return;
-
-            var pos = $map.position(),
-                sz = tileSize / 2,
-                x = Math.floor((e.pageX - pos.left) / sz),
-                y = Math.floor((e.pageY - pos.top) / sz);
-
-            //this is the first slice, setup the slice canvas
-            if(lastSlice) {
-                //we haven't moved to a new subtile, don't redraw it
-                if(x == lastSlice.x && y == lastSlice.y) return;
-
-                //if dragging then paint collisions
-                if(dragMap) updateMapCollisionPoint(x, y);
-
-                //we have moved to a new subtile, restore this full tile before drawing the tool
-                drawMapTile(Math.floor(lastSlice.x / 2), Math.floor(lastSlice.y / 2));
+            if(EDITOR._eid && EDITOR.editors[EDITOR._eid].drawMinimap) {
+                EDITOR.editors[EDITOR._eid].drawMinimap();
             }
-
-            //save this position so we can redraw this single tile later
-            lastSlice = { x: x, y: y };
-
-            //draw the subtile sized tool
-            ctxMap.fillStyle = getToolColor(activeTool);
-            ctxMap.fillRect(x * sz, y * sz, sz, sz);
-            ctxMap.drawImage(stripes, x * sz, y * sz);
         });
 
-        $map.on('click', function(e) {
-            if(!init) return;
-
-            var pos = $map.position(),
-                sz = tileSize / 2,
-                x = Math.floor((e.pageX - pos.left) / sz),
-                y = Math.floor((e.pageY - pos.top) / sz);
-
-            updateMapCollisionPoint(x, y);
-        });
-
-        function updateMapCollisionPoint(x, y) {
-            var tx = Math.floor(x / 2),
-                ty = Math.floor(y / 2),
-                pixel = getTilemapPixel(offset.x + tx, offset.y + ty),
-
-                xpos = (x / 2) - tx, //will be 0 (left) or 0.5 (right)
-                ypos = (y / 2) - ty, //will be 0 (top) or 0.5 (bottom)
-                shift = 0;
-
-            if(xpos < 0.5) shift = [2, 6]; //shift for lefts (leftbottom, lefttop)
-            else shift = [0, 4]; //shifts for rights (rightbottom, righttop)
-
-            if(ypos < 0.5) shift = shift[1]; //shift for top (second element)
-            else shift = shift[0]; //shift for bottom (first element)
-
-            var value = (activeTool << shift);
-
-            //clear these bits
-            pixel.b &= ~(3 << shift);
-
-            //set these bits
-            pixel.b |= (activeTool << shift);
-
-            setTilemapPixel(offset.x + tx, offset.y + ty, pixel);
-            drawMinimap();
-        }
-
-        function drawMinimap() {
-            //ctxMinimap.drawImage(maps.tilemap, 0, 0);
-            ctxMinimap.putImageData(tilemapData, 0, 0);
-            ctxMinimap.strokeRect(offset.x, offset.y, viewSize.x, viewSize.y);
-        }
-
-        function drawMap() {
-            for(var x = 0; x < viewSize.x; ++x) {
-                for(var y = 0; y < viewSize.y; ++y) {
-                    drawMapTile(x, y);
-                }
-            }
-        }
-
-        function drawMapTile(x, y) {
-            var pixel = getTilemapPixel(offset.x + x, offset.y + y);
-
-            //flip the tile image
-            ctxTile.drawImage(maps.tileset, pixel.r * tileSize, pixel.g * tileSize, tileSize, tileSize, 0, 0, tileSize, tileSize);
-
-            //draw tile to map
-            ctxMap.drawImage(tilecanvas, 0, 0, tileSize, tileSize, x * tileSize, y * tileSize, tileSize, tileSize);
-
-            //draw collision types
-            if(pixel.b) {
-                //left top, right top, left bottom, right bottom
-                var subtiles = [((pixel.b >> 6) & 3), ((pixel.b >> 4) & 3), ((pixel.b >> 2) & 3), (pixel.b & 3)],
-                    numTiles = Math.sqrt(subtiles.length);
-
-                for(var s = 0, sl = subtiles.length; s < sl; ++s) {
-                    if(!subtiles[s]) continue;
-
-                    var x2 = s % numTiles,
-                        y2 = Math.floor(s / numTiles);
-
-                    ctxMap.fillStyle = getToolColor(subtiles[s]);
-
-                    ctxMap.fillRect(
-                        (x * tileSize) + (x2 * (tileSize / numTiles)),
-                        (y * tileSize) + (y2 * (tileSize / numTiles)),
-                        tileSize / numTiles,
-                        tileSize / numTiles
-                    );
-
-                    ctxMap.drawImage(
-                        stripes,
-                        (x * tileSize) + (x2 * (tileSize / numTiles)),
-                        (y * tileSize) + (y2 * (tileSize / numTiles))
-                    );
-                }
-            }
-        }
-
-        function getTilemapPixel(x, y) {
-            var index = (y * tilemapData.width + x) * 4,
-                red = tilemapData.data[index],
-                green = tilemapData.data[index + 1],
-                blue = tilemapData.data[index + 2],
-                alpha = tilemapData.data[index + 3],
-                rgba = { r: red, g: green, b: blue, a: alpha };
-
-            //rgba.hex = this.rgbaToHex(rgba);
-            return rgba;
-        }
-
-        function setTilemapPixel(x, y, pixel) {
-            var index = (y * tilemapData.width + x) * 4;
-
-            tilemapData.data[index] = pixel.r;
-            tilemapData.data[index + 1] = pixel.g;
-            tilemapData.data[index + 2] = pixel.b;
-            tilemapData.data[index + 3] = pixel.a;
-        }
-
-        function getToolColor(id, opacity) {
-            opacity = opacity || 0.7;
-
-            switch(id) {
-                case 0: return 'rgba(255, 255, 255, ' + opacity + ')'; //white, empty
-                case 1: return 'rgba(0, 200, 0, ' + opacity + ')'; //green, jumpdown
-                case 2: return 'rgba(0, 0, 200, ' + opacity + ')'; //blue, reserved
-                case 3: return 'rgba(200, 0, 0, ' + opacity + ')'; //red, block
-                default: return 'rgba(255, 255, 255, ' + opacity + ')'; //purple
-            }
-        }
-
-        function doUploadToEditor() {
-            var $form = $('#upload'),
-                formData = new FormData($form[0]);
-
-            $.ajax({
-                url: '/uploadmaps',
-                type: 'POST',
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function(data, textStatus, jqXHR) {
-                    var imgTilemap = new Image(),
-                        imgTileset = new Image(),
-                        tsz = $('#upTilesize').val();
-
-                    imgTilemap.addEventListener('load', function() {
-                        imgTileset.addEventListener('load', function() {
-                            initEditor(tsz, imgTilemap, imgTileset);
-                            $dlgUpload.dialog('close');
-                        }, false);
-                        imgTileset.src = data.tileset;
-                    }, false);
-                    imgTilemap.src = data.tilemap;
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    alert('DERP!', errorThrown);
-                }
-            });
-        }
+        EDITOR.$activeEditor = $('#activeEditor');
+        EDITOR.$minimap = $('#minimap');
+        EDITOR.$map = $('#map');
+        EDITOR.ctxMinimap = EDITOR.$minimap[0].getContext('2d');
+        EDITOR.ctxMap = EDITOR.$map[0].getContext('2d');
     });
+
+    window.EDITOR = {
+        _init: function(tsz, tilemap, tileset) {
+            EDITOR.tileSize = parseInt(tsz, 10);
+            EDITOR.tilemap = tilemap;
+            EDITOR.tileset = tileset;
+
+            EDITOR.tool = 0;
+
+            EDITOR.$minimap.attr({
+                width: tilemap.width,
+                height: tilemap.height
+            });
+            EDITOR.ctxMinimap.drawImage(EDITOR.tilemap, 0, 0);
+            EDITOR.minimapData = EDITOR.ctxMinimap.getImageData(0, 0, EDITOR.tilemap.width, EDITOR.tilemap.height);
+
+            $('#editors, #btnDlTm').show();
+
+            EDITOR.selectEditor('collisions', 'Collision Editor');
+        },
+        selectEditor: function(id, title) {
+            console.log('Selecting Editor:', id, EDITOR.editors);
+            if(!EDITOR.editors[id]) return;
+
+            if(EDITOR._eid) {
+                EDITOR.editors[EDITOR._eid]._destroy();
+            }
+
+            EDITOR.ctxMinimap.putImageData(EDITOR.minimapData, 0, 0);
+            if(!$('.tool.selected').length) $('.tool.empty').addClass('selected');
+            EDITOR.tool = parseInt($('.tool.selected').data('toolid'), 10);
+
+            $('.tools').hide();
+            $('.tools.' + id).show();
+            EDITOR.$activeEditor.text(title);
+
+            EDITOR._eid = id;
+            EDITOR.editors[id]._init();
+        },
+        editors: {},
+        utils: {
+            getPixel: function(data, x, y) {
+                var index = (y * data.width + x) * 4,
+                    rgba = {
+                        red: data.data[index],
+                        green: data.data[index + 1],
+                        blue: data.data[index + 2],
+                        alpha: data.data[index + 3]
+                    };
+
+                return rgba;
+            },
+            setPixel: function(data, x, y, pixel) {
+                var index = (y * data.width + x) * 4;
+
+                data.data[index] = pixel.red;
+                data.data[index + 1] = pixel.green;
+                data.data[index + 2] = pixel.blue;
+                data.data[index + 3] = pixel.alpha;
+            },
+            getToolColor: function(id, opacity) {
+                opacity = opacity || 0.7;
+
+                switch(id) {
+                    case 0: return 'rgba(255, 255, 255, ' + opacity + ')'; //white, empty
+                    case 1: return 'rgba(0, 200, 0, ' + opacity + ')'; //green, jumpdown
+                    case 2: return 'rgba(0, 0, 200, ' + opacity + ')'; //blue, reserved
+                    case 3: return 'rgba(200, 0, 0, ' + opacity + ')'; //red, block
+                    default: return 'rgba(255, 255, 255, ' + opacity + ')'; //purple
+                }
+            },
+            doImageUpload: function(cb) {
+                var $form = $('#upload'),
+                    formData = new FormData($form[0]);
+
+                $.ajax({
+                    url: '/uploadmaps',
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(data, textStatus, jqXHR) {
+                        var imgTilemap = new Image(),
+                            imgTileset = new Image(),
+                            tsz = $('#upTilesize').val();
+
+                        imgTilemap.addEventListener('load', function() {
+                            imgTileset.addEventListener('load', function() {
+                                EDITOR._init(tsz, imgTilemap, imgTileset);
+                                EDITOR.$dlgUpload.dialog('close');
+                            }, false);
+                            imgTileset.src = data.tileset;
+                        }, false);
+                        imgTilemap.src = data.tilemap;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert('Couldn\'t upload images!', errorThrown);
+                    }
+                });
+            }
+        }
+    };
 })(jQuery, window);
