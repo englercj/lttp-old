@@ -33,7 +33,6 @@ define([
         "uniform sampler2D tiles;",
         "uniform sampler2D sprites;",
 
-        "uniform vec2 tileTextureSize;",
         "uniform vec2 inverseTileTextureSize;",
         "uniform vec2 inverseSpriteTextureSize;",
         "uniform float tileSize;",
@@ -42,7 +41,7 @@ define([
         "void main(void) {",
         "    vec4 tile = texture2D(tiles, texCoord);", //load this pixel of the tilemap
         "    if(tile.x == 1.0 && tile.y == 1.0) { discard; }", //discard if R is 255 and G is 255
-        "    vec2 spriteOffset = floor(tile.xy * tileTextureSize) * tileSize;", //generate the offset in the tileset this pixel represents
+        "    vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;", //generate the offset in the tileset this pixel represents
         "    vec2 spriteCoord = mod(pixelCoord, tileSize);",
         "    vec4 texture = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);",
         "    gl_FragColor = texture;",
@@ -253,7 +252,6 @@ define([
                 tiles: { type: 't', value: this.tilemap },
                 sprites: { type: 't', value: this.tileset },
 
-                tileTextureSize: { type: 'v2', value: new THREE.Vector2(this.tilemap.image.width, this.tilemap.image.height) },
                 inverseTileTextureSize: { type: 'v2', value: new THREE.Vector2(1/this.tilemap.image.width, 1/this.tilemap.image.height) },
                 repeatTiles: { type: 'i', value: this.repeat ? 1 : 0 }
             };
