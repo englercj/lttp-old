@@ -23,6 +23,9 @@ define([
 
             this.lastDirection = null;
 
+            this.jumpDownSpeed = 500;
+            this.jumpDownWait = 500;
+
             this.blocked = { x: false, y: false };
             this.blocker = { x: null, y: null };
 
@@ -376,11 +379,15 @@ define([
                     this.blocked.x = true;
                     this.blocker.x = tilesX[z];
                 } else if(tilesX[z].blockType == types.SUBTILE.JUMPDOWN) {
+                    var self = this;
                     //do jumpdown
                     //this.freeze = true;
                     this.engine.ui.playSound(this.sounds.jumpdown);
                     //this.setAnimation('jumpdown');
-                    this.moveEntity((x > 0 ? 75 : -75), 0);
+                    this.freeze = true;
+                    this.animateMoveEntity((x > 0 ? 75 : -75), 0, this.jumpDownSpeed, function() {
+                        self.freeze = false;
+                    });
 
                     /*this.once('animDone', function() {
                         this.freeze = false;
@@ -395,11 +402,15 @@ define([
                     this.blocked.y = true;
                     this.blocker.y = tilesY[q];
                 } else if(tilesY[q].blockType == types.SUBTILE.JUMPDOWN) {
+                    var self = this;
                     //do jumpdown
                     //this.freeze = true;
                     this.engine.ui.playSound(this.sounds.jumpdown);
                     //this.setAnimation('jumpdown_' + this.lastDirection);
-                    this.moveEntity(0, (y > 0 ? 100 : -100));
+                    this.freeze = true;
+                    this.animateMoveEntity(0, (y > 0 ? 100 : -100), this.jumpDownSpeed, function() {
+                        self.freeze = false;
+                    });
 
                     /*this.once('animDone', function() {
                         this.freeze = false;
