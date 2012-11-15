@@ -268,11 +268,11 @@ define([
                     lcBlock = this._getMapBlock(leftCenter, tilemapSize);
 
                     //at upper edge, move up
-                    if((lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                    if(!y && (lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].blockType != types.SUBTILE.BLOCK)) {
                         this.moveEntity(0, rollAmt);
                     }
                     //lower edge, move down
-                    else if((lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                    else if(!y && (lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].blockType != types.SUBTILE.BLOCK)) {
                         this.moveEntity(0, -rollAmt);
                     }
 
@@ -296,11 +296,11 @@ define([
                     rcBlock = this._getMapBlock(rightCenter, tilemapSize);
 
                     //at upper edge, move up
-                    if((rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                    if(!y && (rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].blockType != types.SUBTILE.BLOCK)) {
                         this.moveEntity(0, rollAmt);
                     }
                     //lower edge, move down
-                    else if((rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                    else if(!y && (rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].blockType != types.SUBTILE.BLOCK)) {
                         this.moveEntity(0, -rollAmt);
                     }
 
@@ -328,11 +328,11 @@ define([
                     rfBlock = this._getMapBlock(rightFoot, tilemapSize);
 
                     //at right edge, move right
-                    if((lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                    if(!x && (lfBlock && lfBlock[0].blockType == types.SUBTILE.BLOCK) && (!rfBlock || rfBlock[0].blockType != types.SUBTILE.BLOCK)) {
                         this.moveEntity(rollAmt, 0);
                     }
                     //left edge, move left
-                    else if((rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                    else if(!x && (rfBlock && rfBlock[0].blockType == types.SUBTILE.BLOCK) && (!lfBlock || lfBlock[0].blockType != types.SUBTILE.BLOCK)) {
                         this.moveEntity(-rollAmt, 0);
                     }
 
@@ -356,11 +356,11 @@ define([
                     rcBlock = this._getMapBlock(rightCenter, tilemapSize);
 
                     //at right edge, move right
-                    if((lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                    if(!x && (lcBlock && lcBlock[0].blockType == types.SUBTILE.BLOCK) && (!rcBlock || rcBlock[0].blockType != types.SUBTILE.BLOCK)) {
                         this.moveEntity(rollAmt, 0);
                     }
                     //left edge, move left
-                    else if((rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].blockType != types.SUBTILE.BLOCK)) {
+                    else if(!x && (rcBlock && rcBlock[0].blockType == types.SUBTILE.BLOCK) && (!lcBlock || lcBlock[0].blockType != types.SUBTILE.BLOCK)) {
                         this.moveEntity(-rollAmt, 0);
                     }
 
