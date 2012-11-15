@@ -71,7 +71,7 @@ Api.prototype.createMaps = function(file, tilesize, sheetsize, cb) {
                 fns.push(function(_cb) {
                     var p = path.join(self.temp, base + '-' + s + '.png'),
                         outStream = fs.createWriteStream(p),
-                        pngStream = canvases[s].pngStream();
+                        pngStream = canvases[s].createPNGStream();
 
                     pngStream.pipe(outStream);
                     pngStream.on('end', function() {

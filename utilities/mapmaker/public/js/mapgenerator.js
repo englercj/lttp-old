@@ -50,7 +50,7 @@
             //slight delay to ensure files are flushed
             setTimeout(function() {
                 $('#status').text('Done.');
-                $('#btnEdit').attr('disabled', false);
+                $('#btnEdit').show();
                 $('#imgTileset').attr('src', data.tileset);
                 $('#imgTilemap').attr('src', data.tilemap);
             }, 200);

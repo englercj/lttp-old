@@ -91,6 +91,9 @@ MapMaker.prototype.parseMap = function(src, tileSize, firstTileId, cb) {
     this.processImage(cb);
 };
 
+//TODO: Use cluster module to spawn multiple workers, split the image into chunks,
+//  and have each worker process a chunk. They can then send back their processed
+//  chunk and the master can piece them back together to form the full map
 MapMaker.prototype.processImage = function(cb) {
     var mapWidth = this.srcImage.width / this.tileSize;
     var mapHeight = this.srcImage.height / this.tileSize;
