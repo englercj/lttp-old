@@ -41,9 +41,11 @@ define([
         "void main(void) {",
         "    vec4 tile = texture2D(tiles, texCoord);", //load this pixel of the tilemap
         "    if(tile.x == 1.0 && tile.y == 1.0) { discard; }", //discard if R is 255 and G is 255
+        //"    tile.w = 1.0;",
         "    vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize;", //generate the offset in the tileset this pixel represents
         "    vec2 spriteCoord = mod(pixelCoord, tileSize);",
         "    vec4 texture = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);",
+        //"    texture.w = 1.0;",
         "    gl_FragColor = texture;",
         "}"
     ].join("\n");

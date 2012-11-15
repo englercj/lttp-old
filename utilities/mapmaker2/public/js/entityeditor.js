@@ -1,19 +1,16 @@
 (function($, window, undefined) {
     $(function() {
-        var $tilemap = $('#rplTilemap'),
-            $tileset = $('#rplTileset'),
+        var $tilemap = $('#locTilemap'),
+            $tileset = $('#locTileset'),
             ctxMap = $tilemap[0].getContext('2d'),
             ctxSet = $tileset[0].getContext('2d'),
             tileSize = 16,
             tilemapData = null,
-            lastSlice = null,
             maps = null,
-            firstTile = null,
-            secondTile = null,
-            override = false,
+            entity = null,
             init = false;
 
-        window.initReplacer = function(tilesz, tm, ts) {
+        window.initLocator = function(tilesz, tm, ts) {
             maps = {
                 tilemap: tm,
                 tileset: ts
@@ -39,18 +36,25 @@
                 height: maps.tileset.height
             });
 
+            ctxSet.strokeStyle = 'rgba(0, 255, 0, 1)';
             ctxSet.drawImage(maps.tileset, 0, 0);
             ctxSet.save();
+
+            entity = parseInt($('#ent_type').val(), 10);
 
             init = true;
         };
 
-        $('#btnUploadReplace').on('click', function() {
+        $('#btnUploadLocate').on('click', function() {
             $dlgUpload.dialog('option', 'buttons', {
-                Upload: doUploadToReplacer,
+                Upload: doUploadToLocator,
                 Cancel: function() { $(this). dialog('close'); }
             });
             $dlgUpload.dialog('open');
+        });
+
+        $('#btnLocInsert').on('click', function() {
+            insertEntsIntoZones();
         });
 
         $tileset.on('mousemove', function(e) {
@@ -60,51 +64,9 @@
                 x = Math.floor((e.pageX - pos.left) / tileSize) * tileSize,
                 y = Math.floor((e.pageY - pos.top) / tileSize) * tileSize;
 
-            //this is first 
-            /*if(!lastSlice)  {
-                lastSlice = {
-                    x: x, y: y,
-                    slice: document.createElement('canvas')
-                };
-
-                lastSlice.slice.width = tileSize + (indicatorWidth * 2);
-                lastSlice.slice.height = tileSize + (indicatorWidth * 2);
-                lastSlice.ctx = lastSlice.slice.getContext('2d');
-            }
-            //we have a slice, restore it
-            else {
-                //we haven't moved to a new subtile, don't redraw it
-                if(x == lastSlice.x && y == lastSlice.y) return;
-
-                //we have moved to a new subtile, restore this full tile before drawing the tool
-                ctxSet.drawImage(lastSlice.slice,
-                    0, 0, tileSize + (indicatorWidth * 2), tileSize + (indicatorWidth * 2),
-                    lastSlice.x - indicatorWidth, lastSlice.y - indicatorWidth, tileSize + indicatorWidth, tileSize + indicatorWidth);
-                //drawMapTile(Math.floor(lastSlice.x / 2), Math.floor(lastSlice.y / 2));
-
-                lastSlice.x = x;
-                lastSlice.y = y;
-            }
-
-            //save this square before it is overwritten
-            lastSlice.ctx.drawImage($tileset[0], x - indicatorWidth, y - indicatorWidth, tileSize + indicatorWidth, tileSize + indicatorWidth,
-                0, 0, tileSize + (indicatorWidth * 2), tileSize + (indicatorWidth * 2));*/
-
             //draw the tile sized tool
             ctxSet.drawImage(maps.tileset, 0, 0);
-            if(!firstTile) {
-                ctxSet.strokeStyle = 'rgba(0, 255, 0, 1)';
-                ctxSet.strokeRect(x, y, tileSize, tileSize);
-            }
-            else {
-                //draw green
-                ctxSet.strokeStyle = 'rgba(0, 255, 0, 1)';
-                ctxSet.strokeRect(firstTile.x * tileSize, firstTile.y * tileSize, tileSize, tileSize);
-
-                //draw red
-                ctxSet.strokeStyle = 'rgba(255, 0, 0, 1)';
-                ctxSet.strokeRect(x, y, tileSize, tileSize);
-            }
+            ctxSet.strokeRect(x, y, tileSize, tileSize);
         });
 
         $tileset.on('click', function(e) {
@@ -114,52 +76,25 @@
                 x = Math.floor((e.pageX - pos.left) / tileSize),
                 y = Math.floor((e.pageY - pos.top) / tileSize);
 
-            if(firstTile) {
-                secondTile = { x: x, y: y };
-                doReplaceTile();
-            }
-            else {
-                firstTile = { x: x, y: y };
-            }
+            placeEntity({ x: x, y: y });
         });
 
-        $tileset.on('contextmenu', function(e) {
-            e.preventDefault();
-
-            firstTile = secondTile = null;
-            ctxSet.drawImage(maps.tileset, 0, 0);
+        $('#ent_type').on('change', function() {
+            entity = parseInt($(this).val(), 10);
         });
 
-        $('#btnEditRepl').on('click', function() {
-            initEditor(tileSize, $tilemap[0], maps.tileset);
-            $('#tabs').tabs('option', 'active', 1);
-        });
+        function placeEntity(tile) {
+            var placed = 0;
 
-        $('#chkOverride').on('change', function() {
-            var $this = $(this);
-
-            override = !!$this.attr('checked');
-        });
-
-        function doReplaceTile() {
-            var replaced = 0;
-            //replace firstTile with secondTile using either our best-guess for the collision type
-            //or if overriden the activeTool
+            //iterate through each pizel of the tilemap and store the ones that match this tile
             for(var x = 0; x < maps.tilemap.width; ++x) {
                 for(var y = 0; y < maps.tilemap.height; ++y) {
                     var px = getTilemapPixel(x, y);
 
                     //tile to replace
-                    if(px.red == firstTile.x && px.green == firstTile.y) {
-                        replaced++;
-                        px.red = secondTile.x;
-                        px.green = secondTile.y;
-
-                        if(override) {
-                            px.blue = activeTool;
-                        } else {
-                            px.blue = 0;
-                        }
+                    if(px.red == tile.x && px.green == tile.y) {
+                        placed++;
+                        px.alpha = entity;
 
                         setTilemapPixel(x, y, px);
                     }
@@ -167,8 +102,8 @@
             }
 
             ctxMap.putImageData(tilemapData, 0, 0);
-            console.log('Success! Replaced', replaced, 'tiles!');
-            $tileset.trigger('contextmenu');
+            console.log('Success! Placed', placed, 'entities (entity id:', entity, ')!');
+            //$('#entJson').html(pretify(ents));
         }
 
         function getTilemapPixel(x, y) {
@@ -186,13 +121,14 @@
         function setTilemapPixel(x, y, pixel) {
             var index = (y * tilemapData.width + x) * 4;
 
+            console.log('Set pixel (', x, ',', y, '): ', pixel);
             tilemapData.data[index] = pixel.red;
             tilemapData.data[index + 1] = pixel.green;
             tilemapData.data[index + 2] = pixel.blue;
             tilemapData.data[index + 3] = pixel.alpha;
         }
 
-        function doUploadToReplacer() {
+        function doUploadToLocator() {
             var $form = $('#upload'),
                 formData = new FormData($form[0]);
 
@@ -210,7 +146,7 @@
 
                     imgTilemap.addEventListener('load', function() {
                         imgTileset.addEventListener('load', function() {
-                            initReplacer(tsz, imgTilemap, imgTileset);
+                            initLocator(tsz, imgTilemap, imgTileset);
                             $dlgUpload.dialog('close');
                         }, false);
                         imgTileset.src = data.tileset;
