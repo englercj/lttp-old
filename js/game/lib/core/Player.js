@@ -16,6 +16,7 @@ define([
             };
             this.equipted = null;
 
+            this.zoneTime = 650;
 
             //link the player moving to the controls
             this.moving = this.engine.controls.moving;
@@ -84,6 +85,8 @@ define([
             });
         },
         doZoneOut: function(data, x, y) {
+            //TODO: moving your char forward can put you in a cliff or mountain;
+            //  need to either block zoning if this would happen, not move the char, or recenter the char
             this.freeze = true;
 
             //unload current zone
@@ -109,7 +112,7 @@ define([
             meshProps[ax] = '+=' + ((this.size[ax] * 1.25)  * (vals[ax] < 0 ? -1 : 1));
 
             this.animate(this.engine.camera.position, {
-                duration: 1000,
+                duration: this.zoneTime,
                 props: camProps,
                 complete: function() {
                     self.cameraLock.x = self.cameraLock.y = false;
@@ -118,7 +121,7 @@ define([
             });
 
             this.animate(this._mesh.position, {
-                duration: 1000,
+                duration: this.zoneTime,
                 props: meshProps,
                 complete: function() {
                 }
