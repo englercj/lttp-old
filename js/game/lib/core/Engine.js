@@ -3,13 +3,14 @@ define([
     'game/lib/core/Viewport',
     'game/lib/core/Controls',
     'game/lib/core/TileMap',
+    'game/lib/core/Entity',
     'game/lib/core/Player',
     'game/lib/core/UI',
     //data
     'game/data/data'
     //Scritps that modify global
     //'game/lib/core/three_fpcontrols'
-], function(Viewport, Controls, TileMap, Player, UI, data) {
+], function(Viewport, Controls, TileMap, Entity, Player, UI, data) {
     var Engine = Class.extend({
         init: function(elements) {
             var self = this;
@@ -113,16 +114,46 @@ define([
         },
         //loads and places all the entities in a zone
         loadZone: function(zone) {
-            var newZone = this.map.zones[this.map.findZoneIndex(zone)];
-
             this.map.loadZone(zone);
 
             //spawn entities
-            //for (var i = 0m il = newZone.entities.length; i < il; ++i) {
-                //newZone.entities[i]
-            //};
+            /*var newZone = this.map.zones[this.map.zone],
+                verts = newZone.vertices,
+                checked = {};
 
-            //TODO: animation of zoning hero (probably in Player by freezing the hero, and moving the camera)
+            console.log(verts);
+            for(var v = 0, vl = verts.length - 4; v < vl; ++v) {
+                //grabbing the minimum X, Y and maximum X, Y to define a square to iterate in
+                var minX = Math.min(verts[v][0], verts[v + 1][0], verts[v + 2][0], verts[v + 3][0]),
+                    minY = Math.min(verts[v][1], verts[v + 1][1], verts[v + 2][1], verts[v + 3][1]),
+                    maxX = Math.max(verts[v][0], verts[v + 1][0], verts[v + 2][0], verts[v + 3][0]),
+                    maxY = Math.min(verts[v][1], verts[v + 1][1], verts[v + 2][1], verts[v + 3][1]);
+
+                for(var x = minX; x < maxX; ++x) {
+                    for(var y = minY; y < maxY; ++y) {
+                        if(!checked[x + '_' + y]) {
+                            checked[x + '_' + y] = true;
+
+                            var px = util.getImagePixel(this.map.layers[0].imageData.tilemap, x, y),
+                                entId = px.alpha & 127, //alpha & 01111111
+                                off = px.alpha & 128; //alpha & 10000000
+
+                            //for now entId of 127 is just a full alpha pixel without entity data
+                            if(entId && entId !== 127) {
+                                var entity = new Entity(data.entities[entId]);
+
+                                entity.addToScene(this.scene);
+                                entity.setPosition(
+                                    x * this.map.tileSize * this.map.tileScale,
+                                    y * this.map.tileSize * this.map.tileScale
+                                );
+
+                                this.entities.push(entity);
+                            }
+                        }
+                    }
+                }
+            }*/
         },
         //cleans up all the entities in a zone
         unloadZone: function(zone) {
