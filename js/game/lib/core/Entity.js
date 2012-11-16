@@ -95,7 +95,7 @@ define([
             if(this.moving.left) x -= speed;
             if(this.moving.right) x += speed;
 
-            this.checkMapCollision(x, y);
+            this.checkMapCollision(delta, x, y);
             this.checkEntityCollision(x, y);
 
             if(x || y) this.moveEntity(x, y);
@@ -219,7 +219,7 @@ define([
         //a map element. This check is neccessary since most elements on the map are not
         //entities (walls, hills, jump downs, fences, trees, etc.) so normal entity collisions
         //won't detect these hits. Entities are only created for interactive elements of the map.
-        checkMapCollision: function(x, y) {
+        checkMapCollision: function(delta, x, y) {
             if(!this._mesh) return;
 
             if(!x && !y) return;
@@ -249,9 +249,7 @@ define([
             var tilesX = [],
                 tilesY = [],
                 space = 10,
-                rollMax = 0.575
-                rollMin = 0.5,
-                rollAmt = 0.05 * this.engine.map.tileScale * this.engine.map.tileSize;
+                rollAmt = delta * this.moveSpeed;
 
             //if moving along X, check that blockage
             if(x) {
