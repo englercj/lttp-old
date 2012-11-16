@@ -1,45 +1,56 @@
-(function($, window, undefined) {
-    $(function() {
-        EDITOR.$dlgUpload = $('#dlgUpload').dialog({
-            modal: true, autoOpen: false,
-            width: 400, height: 450,
-            buttons: {
-                Upload: EDITOR.utils.doImageUpload,
-                Cancel: function() { $(this). dialog('close'); }
-            }
-        });
+define([
+], function() {
+    var EDITOR = {
+        _init: function() {
+            EDITOR.bindEvents();
 
-        $('.tool').on('click', function(e) {
-            $('.tool').removeClass('selected');
-            EDITOR.tool = parseInt($(this).addClass('selected').data('toolid'), 10);
-        });
+            EDITOR.$dlgUpload = $('#dlgUpload').dialog({
+                modal: true, autoOpen: false,
+                width: 400, height: 450,
+                buttons: {
+                    Upload: EDITOR.utils.doImageUpload,
+                    Cancel: function() { $(this). dialog('close'); }
+                }
+            });
+        },
+        _destroy: function() {
+            EDITOR.unbindEvents();
 
-        $('#editors .editor').on('click', function(e) {
-            EDITOR.selectEditor($(this).data('editorid'), $(this).text());
-        });
+            EDITOR.$dlgUpload.dialog('destroy');
+            EDITOR.$dlgUpload = null;
+        },
+        bindEvents: function() {
+            $('.tool').on('click', function(e) {
+                $('.tool').removeClass('selected');
+                EDITOR.tool = parseInt($(this).addClass('selected').data('toolid'), 10);
+            });
 
-        $('#btnUploadEdit').on('click', function(e) {
-            EDITOR.$dlgUpload.dialog('open');
-        });
+            $('#editors .editor').on('click', function(e) {
+                EDITOR.selectEditor($(this).data('editorid'), $(this).text());
+            });
 
-        $('#btnDlTm').on('click', function(e) {
-            EDITOR.ctxMinimap.putImageData(EDITOR.minimapData, 0, 0);
-            window.open(EDITOR.$minimap[0].toDataURL());
+            $('#btnDlTm').on('click', function(e) {
+                EDITOR.ctxMinimap.putImageData(EDITOR.minimapData, 0, 0);
+                window.open(EDITOR.$minimap[0].toDataURL());
 
-            if(EDITOR._eid && EDITOR.editors[EDITOR._eid].drawMinimap) {
-                EDITOR.editors[EDITOR._eid].drawMinimap();
-            }
-        });
+                if(EDITOR._eid && EDITOR.editors[EDITOR._eid].drawMinimap) {
+                    EDITOR.editors[EDITOR._eid].drawMinimap();
+                }
+            });
+        },
+        unbindEvents: function() {
+            $('.tool').off('click');
+            $('#editors .editor').off('click');
+            $('#btnDlTm').off('click');
+        },
+        newMaps: function(tsz, tilemap, tileset) {
+            EDITOR.$activeEditor = $('#activeEditor');
+            EDITOR.$minimap = $('#minimap');
+            EDITOR.$map = $('#map');
 
-        EDITOR.$activeEditor = $('#activeEditor');
-        EDITOR.$minimap = $('#minimap');
-        EDITOR.$map = $('#map');
-        EDITOR.ctxMinimap = EDITOR.$minimap[0].getContext('2d');
-        EDITOR.ctxMap = EDITOR.$map[0].getContext('2d');
-    });
+            EDITOR.ctxMinimap = EDITOR.$minimap[0].getContext('2d');
+            EDITOR.ctxMap = EDITOR.$map[0].getContext('2d');
 
-    window.EDITOR = {
-        _init: function(tsz, tilemap, tileset) {
             EDITOR.tileSize = parseInt(tsz, 10);
             EDITOR.tilemap = tilemap;
             EDITOR.tileset = tileset;
@@ -126,7 +137,7 @@
 
                         imgTilemap.addEventListener('load', function() {
                             imgTileset.addEventListener('load', function() {
-                                EDITOR._init(tsz, imgTilemap, imgTileset);
+                                EDITOR.newMaps(tsz, imgTilemap, imgTileset);
                                 EDITOR.$dlgUpload.dialog('close');
                             }, false);
                             imgTileset.src = data.tileset;
@@ -140,4 +151,6 @@
             }
         }
     };
-})(jQuery, window);
+
+    return EDITOR;
+});

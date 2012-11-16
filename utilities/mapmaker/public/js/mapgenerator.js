@@ -1,59 +1,73 @@
-(function($, window, undefined) {
-    $(function() {
-        $('#tabs').tabs();
-        $('.progress').progressbar();
+define([
+], function() {
+    var GEN = {
+        _init: function() {
+            GEN.socket = io.connect();
+            GEN.lastId = null;
 
-        var socket = io.connect(),
-            lastId = null;
+            GEN.bindEvents();
+        },
+        _destroy: function() {
+            GEN.unbindEvents();
 
-        $('#btnMapify').on('click', function() {
-            var $form = $('#makemap'),
-                tilesize = $('#tilesize').val(),
-                tilesheet = $('#tilesheet').val(),
-                formData = new FormData($form[0]);
-                
-            $('#status').text('Uploading...');
+            GEN.socket.disconnect();
+            GEN.socket = null;
+            GEN.lastId = null;
+        },
+        bindEvents: function() {
+            $('#btnMapify').on('click', function() {
+                var $form = $('#makemap'),
+                    tilesize = $('#tilesize').val(),
+                    tilesheet = $('#tilesheet').val(),
+                    formData = new FormData($form[0]);
+                    
+                $('#status').text('Uploading...');
 
-            $.ajax({
-                url: '/makemap/' + tilesize + '/' + tilesheet + '/' + socket.id,
-                type: 'POST',
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function(data, textStatus, jqXHR) {
-                    /*if(lastId) socket.emit('unsubscribe', lastId);
+                $.ajax({
+                    url: '/makemap/' + tilesize + '/' + tilesheet + '/' + GEN.socket.id,
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function(data, textStatus, jqXHR) {
+                        /*if(lastId) GEN.socket.emit('unsubscribe', lastId);
 
-                    socket.emit('subscribe', data);
-                    lastId = data;*/
-                    $('#status').text('Generating...');
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
+                        GEN.socket.emit('subscribe', data);
+                        lastId = data;*/
+                        $('#status').text('Generating...');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
 
-                }
+                    }
+                });
             });
-        });
 
-        $('#btnEdit').on('click', function() {
-            EDITOR._init($('#tilesize').val(), $('#imgTilemap')[0], $('#imgTileset')[0]);
-            $('#tabs').tabs('option', 'active', 1);
-        });
+            GEN.socket.on('id', function(id) { GEN.socket.id = id; });
 
-        socket.on('id', function(id) { socket.id = id; });
+            GEN.socket.on('progress', function(data) {
+                $('#progUpload').progressbar('option', 'value', data.complete / data.total);
+                console.log('progress', data);
+            });
 
-        socket.on('progress', function(data) {
-            $('#progUpload').progressbar('option', 'value', data.complete / data.total);
-            console.log('progress', data);
-        });
+            GEN.socket.on('complete', function(data) {
+                //slight delay to ensure files are flushed
+                setTimeout(function() {
+                    $('#status').text('Done.');
+                    $('#btnEdit').show();
+                    $('#imgTileset').attr('src', data.tileset);
+                    $('#imgTilemap').attr('src', data.tilemap);
+                }, 200);
+            });
+        },
+        unbindEvents: function() {
+            $('#btnMapify').off('click');
 
-        socket.on('complete', function(data) {
-            //slight delay to ensure files are flushed
-            setTimeout(function() {
-                $('#status').text('Done.');
-                $('#btnEdit').show();
-                $('#imgTileset').attr('src', data.tileset);
-                $('#imgTilemap').attr('src', data.tilemap);
-            }, 200);
-        });
-    });
-})(jQuery, window);
+            GEN.socket.off('id');
+            GEN.socket.off('progress');
+            GEN.socket.off('complete');
+        }
+    };
+
+    return GEN;
+});
