@@ -1,5 +1,7 @@
-(function($, window, undefined) {
-    var rEditor = EDITOR.editors.replacer = {
+define([
+    'mapeditor'
+], function(EDITOR) {
+    var rEditor = {
         _init: function() {
             EDITOR.$map.attr({
                 width: EDITOR.tileset.width,
@@ -13,11 +15,17 @@
             $('.mapTitle').text('Tileset');
 
             rEditor.bindEvents();
+
+            //show our workspace
+            EDITOR.$workspace.find('.minimap, .map').show();
         },
         _destroy: function() {
             $('.mapTitle').text('Map');
             rEditor.firstTile =  rEditor.secondTile = null;
             rEditor.unbindEvents();
+
+            //hide our workspace
+            EDITOR.$workspace.find('.minimap, .map').hide();
         },
         bindEvents: function() {
             EDITOR.$map.on('mousemove', function(e) {
@@ -94,4 +102,6 @@
             EDITOR.$map.trigger('contextmenu');
         }
     };
-})(jQuery, window);
+
+    return rEditor;
+});

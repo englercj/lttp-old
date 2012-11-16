@@ -6,11 +6,17 @@ h4 { margin:10px; }
 .col { float:left; }
 .small { font-size: 0.8em !important; }
 
+.w50 { width:50%; }
+
 canvas, .map { vertical-align:top; }
 
-#editors, #btnEdit, #btnDlTm, .entlyr, .tools { display:none; }
-.left { float:left; width:10%; text-align: center; }
-.right { float:left; width:90%; }
+#editor { padding:1em 0; }
+
+#editors, #btnEdit, #btnDlTm, .col, .tools { display:none; }
+.left { float:left; width:15%; text-align: center; }
+.right { float:left; width:85%; }
+
+.tools { font-size:0.8em !important; }
 
 .tool {
     height: 25px;
@@ -43,12 +49,13 @@ canvas, .map { vertical-align:top; }
 .tool.block { background:rgba(200, 0, 0, 1); }
 
 /* Code Containers */
-textarea.meta { width:95%; }
 pre.meta, textarea.meta {
+    width:95%;
+    height: 700px;
     border:solid 1px #CCC;
     padding:5px;
     margin:0 5px;
-    font-weight:bold;
+    /*font-weight:bold;*/
     overflow:auto;
     font-size:0.6em !important;
     font-family:'Courier New',Courier,'Nimbus Mono L',monospace !important;

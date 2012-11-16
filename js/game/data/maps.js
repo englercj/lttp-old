@@ -29,6 +29,7 @@ define([
                         [64, 0]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -42,6 +43,7 @@ define([
                         [0, 64]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -55,6 +57,7 @@ define([
                         [64, 97]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -66,6 +69,7 @@ define([
                         [64, 162]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -77,6 +81,7 @@ define([
                         [64, 192]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -94,6 +99,7 @@ define([
                         [159, 64]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -109,6 +115,7 @@ define([
                         [64, 162]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -122,6 +129,7 @@ define([
                         [159, 159]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -135,6 +143,7 @@ define([
                         [255, 191]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -150,6 +159,7 @@ define([
                         [159, 64]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -163,6 +173,7 @@ define([
                         [159, 0]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 },
                 {
@@ -176,6 +187,7 @@ define([
                         [255, 0]
                     ],
                     vertexUnits: types.UNIT.PIXELS,
+                    entities: [],
                     exits: []
                 }
             ]

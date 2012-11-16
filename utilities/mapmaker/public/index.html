@@ -64,45 +64,105 @@
             <div id="editor">
                 <div class="left">
                     <button id="btnUploadEdit">Upload Maps</button>
-                    <button id="btnDlTm">Download Maps</button>
+                    <br/>
+                    <button id="btnDlTm">Download Map</button>
                     <div id="editors">
                         <h4>Editors</h4>
                         <button class="editor collision" data-editorid="collisions">Collision Editor</button>
-                        <button class="editor entity" data-editorid="entity">Entity Editor</button>
+                        <br/>
                         <button class="editor replace" data-editorid="replacer">Tile Replacer</button>
+                        <br/>
+                        <button class="editor entity" data-editorid="entity">Entity Editor</button>
                     </div>
                     <div id="tools">
                         <div class="tools collisions replacer">
                             <h4>Tools</h4>
-                            <span class="tool empty" data-toolid="0">Empty</span>
-                            <span class="tool jumpdown" data-toolid="1">Jumpdown</span>
-                            <span class="tool reserved" data-toolid="2">Reserved</span>
-                            <span class="tool block" data-toolid="3">Block</span>
+                            <span class="tool empty" data-toolid="0">Empty</span><br/>
+                            <span class="tool jumpdown" data-toolid="1">Jumpdown</span><br/>
+                            <span class="tool reserved" data-toolid="2">Reserved</span><br/>
+                            <span class="tool block" data-toolid="3">Block</span><br/>
                         </div>
                         <div class="tools entity">
                             <h4>Tools</h4>
-                            <label for="ent_type">Entity:</label>
+                            <label for="ent_type">Entity Type:</label><br/>
                             <select id="ent_type">
-                                <option value="0">Player</option>
-                                <option value="1">Green Grass</option>
-                                <option value="2">Desert Grass</option>
+                                <option value="ENTITY.BORING">ENTITY.BORING</option>
+                                <option value="ENTITY.PLAYER">ENTITY.PLAYER</option>
+                                <option value="ENTITY.ENEMY">ENTITY.ENEMY</option>
+                                <option value="ENTITY.FRIENDLY">ENTITY.FRIENDLY</option>
+                                <option value="ENTITY.NEUTRAL">ENTITY.NEUTRAL</option>
+                                <option value="ENTITY.ITEM">ENTITY.ITEM</option>
+                                <option value="ENTITY.TILE" selected>ENTITY.TILE</option>
                             </select>
+                            <br/><br/>
+
+                            <label for="ent_subtype">Entity Subtype:</label><br/>
+                            <select id="ent_subtype">
+                                <option value="TILE.EMPTY">ENTITY.EMPTY</option>
+                                <option value="TILE.CUTABLE">ENTITY.CUTABLE</option>
+                                <option value="TILE.SMASHABLE">ENTITY.SMASHABLE</option>
+                                <option value="TILE.TELEPORTING">ENTITY.TELEPORTING</option>
+                                <option value="TILE.LIFTABLE">ENTITY.LIFTABLE</option>
+                                <option value="TILE.LIFTABLE_2">ENTITY.LIFTABLE_2</option>
+                                <option value="TILE.LIFTABLE_3">ENTITY.LIFTABLE_3</option>
+                                <option value="TILE.LIFTABLE_4">ENTITY.LIFTABLE_4</option>
+                                <option value="TILE.LIFTABLE_5">ENTITY.LIFTABLE_5</option>
+                                <option value="TILE.DESTRUCTABLE">ENTITY.DESTRUCTABLE</option>
+                                <option value="TILE.DESTRUCTABLE_2">ENTITY.DESTRUCTABLE_2</option>
+                                <option value="TILE.LIFTABLE_CUTABLE" selected>ENTITY.LIFTABLE_CUTABLE</option>
+                                <option value="TILE.MOVABLE">ENTITY.MOVABLE</option>
+                                <option value="TILE.MOVABLE_2">ENTITY.MOVABLE_2</option>
+                                <option value="TILE.MOVABLE_3">ENTITY.MOVABLE_3</option>
+                            </select>
+                            <br/><br/>
+
+                            <label for="ent_sprite">Entity Sprite:</label><br/>
+                            <select id="ent_sprite">
+                                <option value="TILE.GREEN_GRASS" selected>TILE.GREEN_GRASS</option>
+                                <option value="TILE.DESERT_GRASS">TILE.DESERT_GRASS</option>
+                            </select>
+                            <br/><br/>
+
+                            <label for="ent_name">Entity Name:</label><br/>
+                            <input id="ent_name" type="text" value="" placeholder="Entity Name" />
+                            <br/><br/>
+
+                            <label for="ent_moveSpeed">Entity Movespeed:</label><br/>
+                            <input id="ent_moveSpeed" type="number" value="0" placeholder="Movement Speed" />
+                            <br/><br/>
+
+                            <label for="ent_health">Entity Health:</label><br/>
+                            <input id="ent_health" type="number" value="0" placeholder="Health" />
+                            <br/><br/>
+
+                            <button id="btnEntGen">Generate Entity</button>
                         </div>
+                        <br class="clear"/>
+                        <p id="editorHelp"></p>
                     </div>
                 </div>
-                <div class="right">
+                <div id="workspace" class="right">
                     <h2 id="activeEditor"></h3>
-                    <div class="col">
+                    <div class="col minimap">
                         <h5>Minimap</h5>
                         <canvas id="minimap"></canvas>
                     </div>
-                    <div class="col entlyr">
+                    <div class="col minimap2">
                         <h5>Entity Layer</h5>
-                        <canvas id="entlyr"></canvas>
+                        <canvas id="minimap2"></canvas>
                     </div>
-                    <div class="col">
+                    <div class="col map">
                         <h5 class="mapTitle">Map</h5>
                         <canvas id="map"></canvas>
+                    </div>
+                    <br class="clear"/>
+                    <div class="col input w50">
+                        <h5>Zones</h5>
+                        <textarea class="meta"></textarea>
+                    </div>
+                    <div class="col data w50">
+                        <h5>Output Data</h5>
+                        <pre class="meta"></pre>
                     </div>
                 </div>
                 <br class="clear"/>

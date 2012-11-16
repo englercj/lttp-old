@@ -1,5 +1,4 @@
-define([
-], function() {
+define([], function() {
     var EDITOR = {
         _init: function() {
             EDITOR.bindEvents();
@@ -11,6 +10,20 @@ define([
                     Upload: EDITOR.utils.doImageUpload,
                     Cancel: function() { $(this). dialog('close'); }
                 }
+            });
+
+            EDITOR.$workspace = $('#workspace');
+
+            require([
+                'editors/collisions',
+                'editors/entity',
+                'editors/replacer'
+            ], function(cEditor, eEditor, rEditor) {
+                EDITOR.editors = {
+                    collisions: cEditor,
+                    entity: eEditor,
+                    replacer: rEditor
+                };
             });
         },
         _destroy: function() {
@@ -46,9 +59,11 @@ define([
         newMaps: function(tsz, tilemap, tileset) {
             EDITOR.$activeEditor = $('#activeEditor');
             EDITOR.$minimap = $('#minimap');
+            EDITOR.$minimap2 = $('#minimap2');
             EDITOR.$map = $('#map');
 
             EDITOR.ctxMinimap = EDITOR.$minimap[0].getContext('2d');
+            EDITOR.ctxMinimap2 = EDITOR.$minimap2[0].getContext('2d');
             EDITOR.ctxMap = EDITOR.$map[0].getContext('2d');
 
             EDITOR.tileSize = parseInt(tsz, 10);
@@ -57,6 +72,7 @@ define([
 
             EDITOR.tool = 0;
 
+            //draw initial minimap
             EDITOR.$minimap.attr({
                 width: tilemap.width,
                 height: tilemap.height
@@ -87,7 +103,6 @@ define([
             EDITOR._eid = id;
             EDITOR.editors[id]._init();
         },
-        editors: {},
         utils: {
             getPixel: function(data, x, y) {
                 var index = (y * data.width + x) * 4,
@@ -118,6 +133,19 @@ define([
                     case 3: return 'rgba(200, 0, 0, ' + opacity + ')'; //red, block
                     default: return 'rgba(255, 255, 255, ' + opacity + ')'; //purple
                 }
+            },
+            pointInPoly: function(vertices, point) {
+                var x = 0, y = 1, c = false, len = vertices.length;
+
+                for(var i = 0, j = len - 1; i < len; j = i++) {
+                    if( ((vertices[i][y] > point[y]) != (vertices[j][y] > point[y])) &&
+                        (point[x] < (vertices[j][x] - vertices[i][x]) * (point[y] - vertices[i][y]) / (vertices[j][y] - vertices[i][y]) + vertices[i][x]) )
+                    {
+                        c = !c;
+                    }
+                }
+
+                return c;
             },
             doImageUpload: function(cb) {
                 var $form = $('#upload'),

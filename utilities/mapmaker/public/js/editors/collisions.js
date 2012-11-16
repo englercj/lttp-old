@@ -1,5 +1,7 @@
-(function($, window, undefined) {
-    var cEditor = EDITOR.editors.collisions = {
+define([
+    'mapeditor'
+], function(EDITOR) {
+    var cEditor = {
         _init: function() {
             //setup some variables
             cEditor.tilecanvas = document.createElement('canvas');
@@ -32,10 +34,16 @@
                 cEditor.bindEvents();
             }, false);
             cEditor.stripes.src = '/img/stripes.png';
+
+            //show our workspace
+            EDITOR.$workspace.find('.minimap, .map').show();
         },
         _destroy: function() {
             cEditor.unbindEvents();
             cEditor.tilecanvas = cEditor.ctxTile = cEditor.dragMinimap = cEditor.viewSize = cEditor.stripes = null;
+
+            //hide our workspace
+            EDITOR.$workspace.find('.minimap, .map').hide();
         },
         bindEvents: function() {
             //Minimap events
@@ -218,4 +226,6 @@
             cEditor.drawMinimap();
         }
     };
-})(jQuery, window);
+
+    return cEditor;
+});
