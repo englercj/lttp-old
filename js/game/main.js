@@ -11,7 +11,7 @@ require([
     $(function() {
         //Detect if webgl is supported, and if not exit
         if (!Detector.webgl) {
-            $('#game').append(Detector.getWebGLErrorMessage());
+            $('body').append(Detector.getWebGLErrorMessage());
             return;
         }
 
