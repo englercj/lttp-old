@@ -116,6 +116,30 @@ define([
         loadZone: function(zone) {
             this.map.loadZone(zone);
 
+            for(var i = 0, il = this.map.zones[this.map.zone].entities.length; i < il; ++i) {
+                var ent = this.map.zones[this.map.zone].entities[i];
+
+                console.log(ent.locations.length);
+                for(var e = 0, el = ent.locations.length; e < el && e < 60; ++e) {
+                    if(ent.locationUnits === data.types.UNIT.PIXELS)
+                        this.map.upgradeCoord(ent.locations[e]);
+
+                    //shallow copy this ent's properties
+                    var props = $.extend({}, ent);
+
+                    delete props.locations;
+                    delete props.locationUnits;
+                    props.location = ent.locations[e];
+                    //console.log(props);
+
+                    var spawn = new Entity(props, this);
+                    spawn.addToScene(this.scene);
+
+                    this.entities.push(spawn);
+                }
+                ent.locationUnits = data.types.UNIT.OFFSETS;
+            }
+
             //spawn entities
             /*var newZone = this.map.zones[this.map.zone],
                 verts = newZone.vertices,

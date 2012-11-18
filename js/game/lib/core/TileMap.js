@@ -179,10 +179,20 @@ define([
             //Convert the vertices from pixels to offsets if necessary
             //pixel offsets are from the topleft of the tilemap, but offset units are from the center of the screen
             for (var i = 0, il = zone.vertices.length; i < il; ++i) {
-                zone.vertices[i][0] = (zone.vertices[i][0] - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
-                zone.vertices[i][1] = ((this.tilemapSize.y / 2) - zone.vertices[i][1]) * this.tileSize * this.tileScale;
-            };
+                this.upgradeCoord(zone.vertices[i]);
+            }
             zone.vertexUnits = types.UNIT.OFFSETS;
+        },
+        upgradeCoord: function(coord) {
+            if(coord instanceof THREE.Vector2) {
+                coord.x = (coord.x - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
+                coord.y = ((this.tilemapSize.y / 2) - coord.y) * this.tileSize * this.tileScale;
+            } else if(coord instanceof Array) {
+                coord[0] = (coord[0] - (this.tilemapSize.x / 2)) * this.tileSize * this.tileScale;
+                coord[1] = ((this.tilemapSize.y / 2) - coord[1]) * this.tileSize * this.tileScale;
+            }
+
+            return coord;
         },
         eachLayer: function(fn) {
             for(var i = 0, il = this.layers.length; i < il; ++i) {

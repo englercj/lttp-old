@@ -34,9 +34,14 @@ define([
                 left: false, right: false
             };
 
+            this.canMove = data.canMove || false;
+
             this.ray = new THREE.Ray();
 
             data.sprite = data.sprite || { size: [0, 0], area: [1, 1] };
+
+            //initialize visual sprite
+            this._super(data.sprite, engine);
 
             if(!data.sprite.texture) {
                 var loader = new AssetLoader(), self = this;
@@ -45,39 +50,41 @@ define([
                     if(err) console.error('BAD TEXTURE LOAD!', err);
 
                     self.setTexture(texture);
+
+                    self.setAnimation('idle');
+                    self.setPosition(data.location[0], data.location[1]);
                 });
+            } else {
+                this.setAnimation('idle');
+                this.setPosition(data.location[0], data.location[1]);
             }
-
-            //initialize visual sprite
-            this._super(data.sprite, engine);
-
-            this.setAnimation('idle');
-            this.setPosition(data.location[0], data.location[1]);
 
             this.bindEvents();
         },
         bindEvents: function() {
             var self = this;
 
-            //set moving animations
-            self.engine.controls.on('move::*', function(dir, startMoving) {
-                if(!self.engine.controls.isMoving) {
-                    self.setAnimation('idle_' + self.lastDirection);
-                    self.setAnimation();
-                }
-                else {
-                    this.moving[dir] = startMoving;
-                    if(this.moving.up) self.setAnimation('move_up');
-                    else if(this.moving.down) self.setAnimation('move_down');
-                    else if(this.moving.left) self.setAnimation('move_left');
-                    else if(this.moving.right) self.setAnimation('move_right');
-                }
-            });
+            if(this.canMove) {
+                //set moving animations
+                self.engine.controls.on('move::*', function(dir, startMoving) {
+                    if(!self.engine.controls.isMoving) {
+                        self.setAnimation('idle_' + self.lastDirection);
+                        self.setAnimation();
+                    }
+                    else {
+                        this.moving[dir] = startMoving;
+                        if(this.moving.up) self.setAnimation('move_up');
+                        else if(this.moving.down) self.setAnimation('move_down');
+                        else if(this.moving.left) self.setAnimation('move_left');
+                        else if(this.moving.right) self.setAnimation('move_right');
+                    }
+                });
+            }
         },
         update: function(delta) {
             this._super(delta);
 
-            if(this.freeze) return;
+            if(this.freeze || !this.canMove) return;
 
             //calculate actual sprite movement accross the world
             var speed = delta * this.moveSpeed,

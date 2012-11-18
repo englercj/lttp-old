@@ -182,29 +182,27 @@ define([
         update: function(delta) {
             this._super(delta);
 
-            if(this.currentAnim) {
-                if(this.currentAnim._done) return;
+            if(!this.currentAnim || this.currentAnim._done || this.currentAnim.numFrames < 2) return;
 
-                var ms = delta * 1000;
+            var ms = delta * 1000;
 
-                this.currentFrameTime += ms;
-                while(this.currentFrameTime > this.currentAnim._frameTime) {
-                    this.currentFrameTime -= this.currentAnim._frameTime;
-                    this.currentTile++;
+            this.currentFrameTime += ms;
+            while(this.currentFrameTime > this.currentAnim._frameTime) {
+                this.currentFrameTime -= this.currentAnim._frameTime;
+                this.currentTile++;
 
-                    if(this.currentTile == this.currentAnim.numFrames) {
-                        if(this.currentAnim.loop) {
-                            this.currentTile = 0;
-                        }
-                        else {
-                            this.currentAnim._done = true;
-                            this.emit('animDone', this.currentAnim);
-                            return;
-                        }
+                if(this.currentTile == this.currentAnim.numFrames) {
+                    if(this.currentAnim.loop) {
+                        this.currentTile = 0;
                     }
-
-                    this._setOffset();
+                    else {
+                        this.currentAnim._done = true;
+                        this.emit('animDone', this.currentAnim);
+                        return;
+                    }
                 }
+
+                this._setOffset();
             }
         },
         _setOffset: function() {
