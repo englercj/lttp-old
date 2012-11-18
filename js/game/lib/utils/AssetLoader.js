@@ -4,6 +4,8 @@ define([
     'game/data/items',
     'game/data/sprites'
 ], function(Emitter, types, items, sprites) {
+    var _cache = {};
+
     var AssetLoader = Emitter.extend({
         init: function() {
         },
@@ -38,6 +40,9 @@ define([
             };
         },
         loadResource: function(resource, cb) {
+            if(_cache[resource.src])
+                return _cache[resource.src];
+
             //massage type into the class name
             var self = this,
                 type = resource.type[0].toUpperCase() + resource.type.substring(1);
@@ -56,6 +61,7 @@ define([
                 });
 
                 loader.addEventListener('load', function(evt) {
+                    _cache[resource.src] = evt.content;
                     if(cb) cb(null, evt.content);
                 });
 
@@ -94,6 +100,8 @@ define([
                                 data.sprite  = sprites[spr[0]][spr[1]];
                             }
                         }
+
+                        _cache[resource.src] = data;
 
                         if(cb) cb(null, data);
                     }

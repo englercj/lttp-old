@@ -29,6 +29,7 @@ define([
         maxHealth: 3,
         magic: 50,
         maxMagic: 100,
+        canMove: true,
         inventory: {
             rupees: 0,
             bombs: 0,
