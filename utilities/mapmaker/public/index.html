@@ -30,13 +30,33 @@
 
         <!-- main js modules -->
         <script src="js/vendor/require.js" data-main="js/main"></script>
+
+        <script type="text/javascript" src="js/colliders.js"></script>
     </head>
     <body>
         <section id="tabs">
             <ul>
                 <li><a href="#generator">Map Generator</a></li>
                 <li><a href="#editor">Map Editor</a></li>
+                <li><a href="#collisions">Tileset Collisions</a></li>
             </ul>
+            <div id="collisions">
+                <form id="colUpload">
+                    <input type="file" name="upTileset" id="colTileset" />
+                </form>
+                <div id="colTools" class="tools">
+                    <span class="tool empty" data-toolid="0">Empty</span>
+                    <span class="tool solid" data-toolid="1">Solid</span>
+                    <span class="tool cliff" data-toolid="2">Cliff</span>
+                    <span class="tool stairs" data-toolid="3">Stairs</span>
+                    <span class="tool shallow" data-toolid="4">Shallow water</span>
+                    <span class="tool deep" data-toolid="5">Deep water</span>
+                    <span class="tool cactus" data-toolid="6">Cactus</span>
+                </div>
+                <canvas id="colSet"></canvas>
+                <canvas id="colTile"></canvas>
+                <canvas id="colSlice"></canvas>
+            </div>
             <div id="generator">
                 <form id="makemap" enctype="multipart/form-data">
                     <label for="tilesize">Tile Size:</label>
