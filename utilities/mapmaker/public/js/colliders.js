@@ -5,6 +5,7 @@ $(function() {
         dragMap = false,
         tileSize = 16,
         lastSlice = null,
+        mapJson = null,
         colliders = {},
         $set = $('#colSet'),
         $tile = $('#colTile'),
@@ -26,9 +27,16 @@ $(function() {
 
     stripes.src = '/img/stripes.png';
 
-    $('#colTools').show();
+    $('#colTools, #colInput, #colOutput, #collisions .col').show();
 
     $('#colTileset').on('change', function(e) {
+        mapJson = JSON.parse($('#colInput').val());
+
+        for(var p in mapJson.tilesets[0].properties) {
+            colliders[p] = mapJson.tilesets[0].tileproperties[p].colliders.split('|').map(function(n) { return parseInt(n, 10) });
+            console.log(colliders[p]);
+        }
+
         var formData = new FormData($('#colUpload')[0]);
 
         tileSize = parseInt($('#upTilesize').val(), 10);
@@ -47,6 +55,16 @@ $(function() {
                 alert('Couldn\'t upload images!', errorThrown);
             }
         });
+    });
+
+    $('#btnColDone').on('click', function() {
+        for(var p in colliders) {
+            mapJson.tilesets[0].tileproperties[p] = {
+                colliders: colliders[p].join('|')
+            };
+        }
+
+        $('#colOutput').html(pretify(mapJson));
     });
 
     $(tileset).on('load', function(e) {
@@ -88,7 +106,7 @@ $(function() {
             //draw tile's collision info
             var tx = Math.floor(lastSlice.x / 2),
                 ty = Math.floor(lastSlice.y / 2),
-                index = tx + (ty * (tileset.width / tileSize));
+                index = (tx + (ty * (tileset.width / tileSize))).toString();
 
             if(colliders[index]) {
                 var decX = (lastSlice.x / 2) - tx,
@@ -155,7 +173,7 @@ $(function() {
     function updateMapCollisionPoint(x, y) {
         var tx = Math.floor(x / 2),
             ty = Math.floor(y / 2),
-            index = tx + (ty * (tileset.width / tileSize));
+            index = (tx + (ty * (tileset.width / tileSize))).toString();
 
         if(!colliders[index])
             colliders[index] = [0, 0, 0, 0];
@@ -191,7 +209,7 @@ $(function() {
 
     function drawTile(x, y) {
         //calculate index
-        var index = x + (y * (tileset.width / tileSize));
+        var index = (x + (y * (tileset.width / tileSize))).toString();
 
         if(!colliders[index]) {
             var tile = guessTileCollisions(x, y);

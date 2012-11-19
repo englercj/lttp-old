@@ -72,7 +72,7 @@
     // in the array.
     function stringifyArray(ary, options, level) {
         var out = [];
-        var pretty = options.pretty && (ary.length > 4 || ary.some(function (o) {
+        var pretty = options.pretty && (ary.length > Infinity || ary.some(function (o) {
             return (o !== null && typeof(o) === 'object' && Object.keys(o).length > 0) ||
                    (Array.isArray(o) && o.length > 0);
         }));
