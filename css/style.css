@@ -206,11 +206,11 @@ p, .rog, #dialog, #hud {
     position: absolute;
     top: -384px;
     width: 1024px;
-    display: none;
+    /*display: none;*/
 }
 
 #game canvas {
-    display: block;
+    /*display: block;*/
     height: 768px;
     left: 0;
     margin: 0;

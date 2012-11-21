@@ -1,6 +1,6 @@
 /*require.config({
     waitSeconds: 2000
-});*/
+});
 
 require([
     'global/class',
@@ -9,23 +9,44 @@ require([
     var $game = $('#game'),
     $win = $(window);
     
-    /*$win.on('resize', checkWinSize);
-    checkWinSize();
-    
-    function checkWinSize() {
-        var winHeight = $win.height(),
-        winWidth = $win.width();
-        
-        $game.removeClass('tiny small');
-
-        if(winHeight < 450 || winWidth < 750)
-            $game.addClass('tiny');
-        else if(winHeight < 700 || winWidth < 1200)
-            $game.addClass('small');
-    }*/
-    
     $('.progressbar').progressbar();
     $('button, .button').button();
 
     require(['game/main']);
+});*/
+
+
+var resources = [
+    {
+        name: 'lightworld_world',
+        type: 'world',
+        src: '/assets/worlds/lightworld/lightworld.json'
+    }
+];
+
+gf.debug.showFps = true;
+
+$(function() {
+    //initialize the renderer
+    gf.renderer.init('game');
+
+    //initialize the controls
+    gf.controls.init();
+
+    //load resources
+    gf.loader.load(resources, {
+        error: onResourcesError,
+        complete: onResourcesLoaded
+    });
 });
+
+function onResourcesLoaded(resources) {
+    var map = new gf.Tilemap(gf.resources.lightworld_world.data);
+    gf.renderer.addObject(map);
+
+    gf.renderer.render();
+}
+
+function onResourcesError() {
+    console.log(arguments);
+}
