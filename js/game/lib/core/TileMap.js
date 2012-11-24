@@ -246,10 +246,10 @@ define([
             this.tileset.flipY = false;
             if(this.filtered) {
                 this.tileset.magFilter = THREE.LinearFilter;
-                this.tileset.minFilter = THREE.LinearMipMapLinearFilter;
+                this.tileset.minFilter = THREE.LinearFilter;
             } else {
                 this.tileset.magFilter = THREE.NearestFilter;
-                this.tileset.minFilter = THREE.NearestMipMapNearestFilter;
+                this.tileset.minFilter = THREE.NearestFilter;
             }
 
             //setup shader uniforms
