@@ -1,21 +1,3 @@
-/*require.config({
-    waitSeconds: 2000
-});
-
-require([
-    'global/class',
-    'global/game-shim'
-], function() {
-    var $game = $('#game'),
-    $win = $(window);
-    
-    $('.progressbar').progressbar();
-    $('button, .button').button();
-
-    require(['game/main']);
-});*/
-
-
 var resources = [
     {
         name: 'lightworld_world',
@@ -49,8 +31,61 @@ function onResourcesLoaded(resources) {
     var map = new gf.Tilemap(gf.resources.lightworld_world.data);
     gf.game.addObject(map);
 
+    //bind the keymap
+    gf.controls.bindKey(gf.types.KEY.W, 'moveup');
+    gf.controls.bindKey(gf.types.KEY.A, 'moveleft');
+    gf.controls.bindKey(gf.types.KEY.S, 'movedown');
+    gf.controls.bindKey(gf.types.KEY.D, 'moveright');
+
     //initialize link and add to scene
-    var link = new gf.Sprite([0, 0], {
+    var Link = gf.Sprite.extend({
+        init: function(pos, settings) {
+            this._super(pos, settings);
+        },
+        update: function(delta) {
+            //check if the player is moving, and update the velocity
+            this.checkMovement(delta);
+     
+            //update player movement
+            this.moveEntity();
+
+            //check for collisions with other entities
+            /*var collider = gf.game.checkCollision(this);
+         
+            if(collider) {
+                //if we collide with an enemy
+                if(collider.type == me.game.ENEMY_OBJECT) {
+                    //TODO: take damage, and do damage animation
+                    // let's flicker in case we touched an enemy
+                    this.flicker(45);
+                }
+            }*/
+     
+            //update animation if necessary
+            if(this.velocity.x != 0 || this.velocity.y != 0) {
+                this._super(delta);
+            }
+        },
+        checkMovement: function(delta) {
+            if(gf.controls.isActionActive('moveleft')) {
+                this.velocity.x = -this.maxVelocity.x;//this.accel.x * delta;
+            } else if(gf.controls.isActionActive('moveright')) {
+                this.velocity.x = this.maxVelocity.x;//this.accel.x * delta;
+            } else {
+                this.velocity.x = 0;
+            }
+
+            if(gf.controls.isActionActive('movedown')) {
+                this.velocity.y = -this.maxVelocity.y;//this.accel.y * delta;
+            } else if(gf.controls.isActionActive('moveup')) {
+                this.velocity.y = this.maxVelocity.y;//this.accel.y * delta;
+            } else {
+                this.velocity.y = 0;
+            }
+        }
+    });
+
+    var link = new Link([0, 0], {
         scale: 2,
         zindex: 5,
         texture: gf.resources.link_sprite.data,
@@ -61,6 +96,9 @@ function onResourcesLoaded(resources) {
         type: gf.types.ENTITY.PLAYER
     });
     gf.game.addObject(link);
+
+    //setup controls for the character
+
 
     //start render loop
     gf.game.render();
