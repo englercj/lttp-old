@@ -50,16 +50,16 @@ function onResourcesLoaded(resources) {
             this.moveEntity();
 
             //check for collisions with other entities
-            /*var collider = gf.game.checkCollision(this);
+            var collider = gf.game.checkCollision(this);
          
             if(collider) {
                 //if we collide with an enemy
-                if(collider.type == me.game.ENEMY_OBJECT) {
+                if(collider.type == gf.types.ENTITY.ENEMY) {
                     //TODO: take damage, and do damage animation
                     // let's flicker in case we touched an enemy
                     this.flicker(45);
                 }
-            }*/
+            }
      
             //update animation if necessary
             if(this.velocity.x != 0 || this.velocity.y != 0) {
@@ -86,13 +86,14 @@ function onResourcesLoaded(resources) {
     });
 
     var link = new Link([0, 0], {
-        scale: 2,
+        scale: 1,
         zindex: 5,
         texture: gf.resources.link_sprite.data,
         size: [64, 64],
         offset: [0, 0],
         hitSize: [16, 24],
-        hitOffset: [0, -10],
+        hitOffset: [0, -5],
+        maxVelocity: [5, 5],
         type: gf.types.ENTITY.PLAYER
     });
     gf.game.addObject(link);
