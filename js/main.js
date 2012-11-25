@@ -35,10 +35,7 @@ gf.debug.showHitbox = true;
 
 $(function() {
     //initialize the renderer
-    gf.renderer.init('game');
-
-    //initialize the controls
-    gf.controls.init();
+    gf.game.init('game');
 
     //load resources
     gf.loader.load(resources, {
@@ -50,7 +47,7 @@ $(function() {
 function onResourcesLoaded(resources) {
     //initialize map and add to scene
     var map = new gf.Tilemap(gf.resources.lightworld_world.data);
-    gf.renderer.addObject(map);
+    gf.game.addObject(map);
 
     //initialize link and add to scene
     var link = new gf.Sprite([0, 0], {
@@ -59,15 +56,14 @@ function onResourcesLoaded(resources) {
         texture: gf.resources.link_sprite.data,
         size: [64, 64],
         offset: [0, 0],
-        hitSize: [32, 32],
+        hitSize: [16, 24],
         hitOffset: [0, -10],
         type: gf.types.ENTITY.PLAYER
     });
-    console.log(link);
-    gf.renderer.addObject(link);
+    gf.game.addObject(link);
 
     //start render loop
-    gf.renderer.render();
+    gf.game.render();
 }
 
 function onResourcesError() {
