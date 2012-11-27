@@ -1247,7 +1247,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-        "scale": 3.55
+        "scale": 1.0
     },
  "tileheight":16,
  "tilesets":[
