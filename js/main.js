@@ -24,10 +24,9 @@
             gf.game.init('game');
 
             //load resources
-            gf.loader.load(resources, {
-                error: onResourcesError,
-                complete: onResourcesLoaded
-            });
+            gf.event.subscribe(gf.types.EVENT.LOADER_COMPLETE, onResourcesLoaded);
+            gf.event.subscribe(gf.types.EVENT.LOADER_ERROR, onResourcesError);
+            gf.loader.load(resources);
         });
 
         function onResourcesLoaded(resources) {
