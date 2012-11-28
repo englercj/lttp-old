@@ -19,6 +19,9 @@ define([
             //is cutable by a sword
             this.isCutable = false;
 
+            //is this sprite attacking?
+            this.attacking = false;
+
             //will break the sprint of an entity that hits this one
             this.breakSprint = false;
 
@@ -44,7 +47,7 @@ define([
             this.moveEntity();
 
             //check for collisions with other entities
-            /*var collider = gf.game.checkCollision(this);
+            var collider = gf.game.checkCollision(this);
          
             if(collider) {
                 //if we collide with an enemy
@@ -58,7 +61,7 @@ define([
             //update animation if necessary
             if(this.velocity.x != 0 || this.velocity.y != 0) {
                 this._super(delta);
-            }*/
+            }
         },
         checkMovement: function(delta) {
             if(gf.controls.isActionActive('moveleft')) {
