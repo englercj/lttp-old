@@ -39,15 +39,15 @@ define([
 
             gf.game.cameraTrack(this);
         },
-        update: function(delta) {
+        update: function() {
             //check if the player is moving, and update the velocity
-            this.checkMovement(delta);
+            this.checkMovement();
      
             //update player movement
             this.moveEntity();
 
             //check for collisions with other entities
-            var collider = gf.game.checkCollision(this);
+            var collider = gf.game.checkCollisions(this);
          
             if(collider) {
                 //if we collide with an enemy
@@ -60,22 +60,22 @@ define([
      
             //update animation if necessary
             if(this.velocity.x != 0 || this.velocity.y != 0) {
-                this._super(delta);
+                this._super();
             }
         },
-        checkMovement: function(delta) {
+        checkMovement: function() {
             if(gf.controls.isActionActive('moveleft')) {
-                this.velocity.x = -this.accel.x * delta;
+                this.velocity.x = -this.accel.x * gf.game._delta;
             } else if(gf.controls.isActionActive('moveright')) {
-                this.velocity.x = this.accel.x * delta;
+                this.velocity.x = this.accel.x * gf.game._delta;
             } else {
                 this.velocity.x = 0;
             }
 
             if(gf.controls.isActionActive('movedown')) {
-                this.velocity.y = -this.accel.y * delta;
+                this.velocity.y = -this.accel.y * gf.game._delta;
             } else if(gf.controls.isActionActive('moveup')) {
-                this.velocity.y = this.accel.y * delta;
+                this.velocity.y = this.accel.y * gf.game._delta;
             } else {
                 this.velocity.y = 0;
             }
