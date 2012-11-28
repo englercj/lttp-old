@@ -26,7 +26,7 @@
             //load resources
             gf.event.subscribe(gf.types.EVENT.LOADER_COMPLETE, function() {
                 //initialize map and add to game
-                var map = new gf.Tilemap(gf.resources.lightworld_world.data);
+                var map = new gf.TiledMap(gf.resources.lightworld_world.data);
                 gf.game.addObject(map);
 
                 //bind the keymap
@@ -38,13 +38,12 @@
                 //initialize the player and add to game
                 var link = new entities.Link([0, 0], {
                     scale: 1,
-                    zindex: 5,
+                    zIndex: 10,
                     texture: gf.resources.link_sprite.data,
                     size: [64, 64],
                     offset: [0, 0],
                     hitSize: [16, 24],
                     hitOffset: [0, -5],
-                    maxVelocity: [5, 5],
                     name: 'Link',
                     type: gf.types.ENTITY.PLAYER
                 });
@@ -54,7 +53,7 @@
                 gf.game.render();
             });
 
-            gf.event.subscribe(gf.types.EVENT.LOADER_ERROR, console.log);
+            gf.event.subscribe(gf.types.EVENT.LOADER_ERROR, function() { console.log.call(console, arguments); });
             gf.loader.load(resources);
         });
     });
