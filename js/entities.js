@@ -57,27 +57,46 @@ define([
                     this.flicker(45);
                 }
             }
-     
-            //update animation if necessary
-            if(this.velocity.x != 0 || this.velocity.y != 0) {
-                this._super();
-            }
+
+            this._super();
         },
         checkMovement: function() {
-            if(gf.controls.isActionActive('moveleft')) {
+            if(gf.controls.isActionActive('move_left'))
                 this.velocity.x = -this.accel.x * gf.game._delta;
-            } else if(gf.controls.isActionActive('moveright')) {
+            else if(gf.controls.isActionActive('move_right'))
                 this.velocity.x = this.accel.x * gf.game._delta;
-            } else {
+            else
                 this.velocity.x = 0;
-            }
 
-            if(gf.controls.isActionActive('movedown')) {
+            if(gf.controls.isActionActive('move_down'))
                 this.velocity.y = -this.accel.y * gf.game._delta;
-            } else if(gf.controls.isActionActive('moveup')) {
+            else if(gf.controls.isActionActive('move_up'))
                 this.velocity.y = this.accel.y * gf.game._delta;
-            } else {
+            else
                 this.velocity.y = 0;
+
+            //if not moving, there is a currentAnimation, and the currentAnimation isn't an idle one
+            if(this.velocity.isZero() && this.currentAnim && this.currentAnim.name.indexOf('idle') === -1)
+                this.setActiveAnimation(this.currentAnim.name + '_idle');
+        },
+        onMove: function(vel) {
+            this._super(vel);
+
+            if(vel.y > 0) {
+                if(!this.isActiveAnimation('move_up'))
+                    this.setActiveAnimation('move_up');
+            }
+            else if(vel.y < 0) {
+                if(!this.isActiveAnimation('move_down'))
+                    this.setActiveAnimation('move_down');
+            }
+            else if(vel.x > 0) {
+                if(!this.isActiveAnimation('move_right'))
+                    this.setActiveAnimation('move_right');
+            }
+            else if(vel.x < 0) {
+                if(!this.isActiveAnimation('move_left'))
+                    this.setActiveAnimation('move_left');
             }
         }
     });
