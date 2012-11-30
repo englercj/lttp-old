@@ -33,7 +33,7 @@ define([
     });
 
     //Link Player sprite
-    entities.Link = entities.Sprite.extend({
+    entities.Link = gf.entityPool.add('link', entities.Sprite.extend({
         init: function(pos, settings) {
             this._super(pos, settings);
 
@@ -99,7 +99,7 @@ define([
                     this.setActiveAnimation('move_left');
             }
         }
-    });
+    }));
 
     return entities;
 });
