@@ -31,8 +31,7 @@
             //load resources
             gf.event.subscribe(gf.types.EVENT.LOADER_COMPLETE, function() {
                 //initialize map and add to game
-                var map = new gf.TiledMap(gf.resources.lightworld_world.data);
-                gf.game.addObject(map);
+                gf.game.loadWorld('lightworld_world');
 
                 //bind the keymap
                 gf.controls.bindKey(gf.types.KEY.W, 'move_up');
