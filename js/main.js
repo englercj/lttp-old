@@ -41,10 +41,11 @@
                 gf.controls.bindKey(gf.types.KEY.D, 'move_right');
 
                 //initialize the player and add to game
-                var link = window.link = new entities.Link([0, 0], {
+                var link = window.link = gf.entityPool.create('link', {
                     scale: 1,
                     zIndex: 10,
                     texture: gf.resources.link_sprite.data,
+                    position: [0, 0],
                     size: [64, 64],
                     hitSize: [16, 24],
                     hitOffset: [0, -5],
