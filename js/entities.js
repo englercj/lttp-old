@@ -32,11 +32,44 @@ define([
         }
     });
 
+    //Base enemy object
+    entities.Enemy = gf.entityPool.add('enemy', entities.Sprite.extend({
+        init: function(pos, settings) {
+            settings = settings || {};
+
+            //enemy type
+            settings.type = gf.types.ENTITY.ENEMY;
+
+            //set the index of enemies
+            settings.zIndex = 10;
+
+            /****************************************************************************
+             * Call base constructor
+             ****************************************************************************/
+            this._super(pos, settings);
+        }
+    }));
+
     //Link Player sprite
     entities.Link = gf.entityPool.add('link', entities.Sprite.extend({
         init: function(pos, settings) {
+            settings = settings || {};
+
+            //player type
+            settings.type = gf.types.ENTITY.PLAYER;
+
+            //set name of Link
+            settings.name = 'link';
+
+            //set the zindex of the player
+            settings.zIndex = 10;
+
+            /****************************************************************************
+             * Call base constructor
+             ****************************************************************************/
             this._super(pos, settings);
 
+            //make the camera track this entity
             gf.game.cameraTrack(this);
         },
         update: function() {
@@ -44,7 +77,7 @@ define([
             this.checkMovement();
      
             //update player movement
-            this.moveEntity();
+            this.updateMovement();
 
             //check for collisions with other entities
             var collider = gf.game.checkCollisions(this);

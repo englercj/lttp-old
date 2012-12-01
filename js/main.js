@@ -9,6 +9,11 @@
                 src: '/assets/worlds/lightworld/lightworld.json'
             },
             {
+                name: 'darkworld_world',
+                type: 'world',
+                src: '/assets/worlds/darkworld/darkworld.json'
+            },
+            {
                 name: 'link_sprite',
                 type: 'texture',
                 src: '/assets/entities/link/link.png'
@@ -17,9 +22,11 @@
 
         //turn on some debugging properties
         gf.debug.showFps = true;            //show the FPS box
+        gf.debug.showInfo = true;           //show detailed debug info
         gf.debug.showOutline = true;        //show the outline of an entity (size)
         gf.debug.showHitbox = true;         //show the outline of an entity hitbox
         gf.debug.accessTiledUniforms = true;//gf.debug.tiledUniforms with an array of shader uniforms used by the TiledMapLayer object
+        gf.debug.showMapColliders = true;   //show the map colliders
 
         $(function() {
             //initialize the renderer
@@ -31,7 +38,7 @@
             //load resources
             gf.event.subscribe(gf.types.EVENT.LOADER_COMPLETE, function() {
                 //initialize map and add to game
-                gf.game.loadWorld('lightworld_world');
+                gf.game.loadWorld('darkworld_world');
 
                 //bind the keymap
                 gf.controls.bindKey(gf.types.KEY.W, 'move_up');
@@ -42,21 +49,16 @@
                 //initialize the player and add to game
                 var link = window.link = gf.entityPool.create('link', {
                     scale: 1,
-                    zIndex: 10,
                     texture: gf.resources.link_sprite.data,
                     position: [0, 0],
                     size: [64, 64],
-                    hitSize: [16, 24],
-                    hitOffset: [0, -5],
-                    name: 'Link',
-                    type: gf.types.ENTITY.PLAYER
+                    hitSize: [16, 12],
+                    hitOffset: [0, -11]
                 });
                 link.addAnimation('move_right', {
                     frames: [0, 1, 2, 3, 4, 5, 6, 7],
                     duration: 500,
-                    loop: true,
-                    hitSize: [32, 48],
-                    hitOffset: [10, 1]
+                    loop: true
                 });
                 link.addAnimation('move_left', {
                     frames: [12, 13, 14, 15, 16, 17, 18, 19],
