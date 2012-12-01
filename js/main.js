@@ -48,12 +48,12 @@
 
                 //initialize the player and add to game
                 var link = window.link = gf.entityPool.create('link', {
-                    scale: 1,
+                    scale: 2,
                     texture: gf.resources.link_sprite.data,
                     position: [0, 0],
                     size: [64, 64],
-                    hitSize: [16, 12],
-                    hitOffset: [0, -11]
+                    hitSize: [12, 18],
+                    hitOffset: [0, -8]
                 });
                 link.addAnimation('move_right', {
                     frames: [0, 1, 2, 3, 4, 5, 6, 7],
