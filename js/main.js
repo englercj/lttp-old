@@ -4,6 +4,11 @@
     ], function(entities) {
         var resources = [
             {
+                name: 'lightworld_music',
+                type: 'audio',
+                src: '/assets/audio/music/Map - ALTTP - Light World.ogg'
+            },
+            {
                 name: 'lightworld_world',
                 type: 'world',
                 src: '/assets/worlds/lightworld/lightworld.json'
