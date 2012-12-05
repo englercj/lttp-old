@@ -6,7 +6,7 @@
             {
                 name: 'lightworld_music',
                 type: 'audio',
-                src: '/assets/audio/music/Map - ALTTP - Light World.ogg'
+                src: '/assets/audio/music/Map - ALTTP - Light World.lite.ogg'
             },
             {
                 name: 'lightworld_world',
