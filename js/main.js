@@ -4,9 +4,9 @@
     ], function(entities) {
         var resources = [
             {
-                name: 'lightworld_music',
+                name: 'darkworld_music',
                 type: 'audio',
-                src: '/assets/audio/music/Map - ALTTP - Light World.lite.ogg'
+                src: '/assets/audio/music/dark_world.lite.ogg'
             },
             {
                 name: 'lightworld_world',
@@ -31,19 +31,21 @@
         gf.debug.showOutline = true;        //show the outline of an entity (size)
         gf.debug.showHitbox = true;         //show the outline of an entity hitbox
         gf.debug.accessTiledUniforms = true;//gf.debug.tiledUniforms with an array of shader uniforms used by the TiledMapLayer object
-        gf.debug.showMapColliders = true;   //show the map colliders
+        //gf.debug.showMapColliders = true;   //show the map colliders
 
         $(function() {
             //initialize the renderer
-            gf.game.init('game');
-
-            gf.game.friction = new THREE.Vector2(0, 0);
-            gf.game.gravity = 0;
+            gf.game.init('game', {
+                gravity: 0,
+                friction: [0, 0]
+            });
 
             //load resources
             gf.event.subscribe(gf.types.EVENT.LOADER_COMPLETE, function() {
                 //initialize map and add to game
                 gf.game.loadWorld('darkworld_world');
+                //play some MUSIKA
+                gf.audio.play('darkworld_music');
 
                 //bind the keymap
                 gf.controls.bindKey(gf.types.KEY.W, 'move_up');
