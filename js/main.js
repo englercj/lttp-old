@@ -45,7 +45,7 @@
                 //initialize map and add to game
                 gf.game.loadWorld('darkworld_world');
                 //play some MUSIKA
-                gf.audio.play('darkworld_music');
+                gf.audio.play('darkworld_music', { loop: true });
 
                 //bind the keymap
                 gf.controls.bindKey(gf.types.KEY.W, 'move_up');
