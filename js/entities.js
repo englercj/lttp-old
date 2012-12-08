@@ -1,36 +1,35 @@
 define([
 ], function() {
-    var entities = {};
+    var entities = {
+        Sprite: gf.Sprite.extend({
+            init: function(pos, settings) {
+                /****************************************************************************
+                 * Properties that are defined in the `settings` object,
+                 * these can be specified in the properties of the object layer
+                 * in Tiled, and overriden on a per-object basis
+                 ****************************************************************************/
+                //can be lifted by another entity
+                this.isLiftable = false;
 
-    //Extend the core Entity object with some Zelda specific stuffs
-    entities.Sprite = gf.Sprite.extend({
-        init: function(pos, settings) {
-            /****************************************************************************
-             * Properties that are defined in the `settings` object,
-             * these can be specified in the properties of the object layer
-             * in Tiled, and overriden on a per-object basis
-             ****************************************************************************/
-            //can be lifted by another entity
-            this.isLiftable = false;
+                //can be effected by bombs
+                this.isExplodable = true;
 
-            //can be effected by bombs
-            this.isExplodable = true;
+                //is cutable by a sword
+                this.isCutable = false;
 
-            //is cutable by a sword
-            this.isCutable = false;
+                //is this sprite attacking?
+                this.attacking = false;
 
-            //is this sprite attacking?
-            this.attacking = false;
+                //will break the sprint of an entity that hits this one
+                this.breakSprint = false;
 
-            //will break the sprint of an entity that hits this one
-            this.breakSprint = false;
-
-            /****************************************************************************
-             * Call base constructor
-             ****************************************************************************/
-            this._super(pos, settings);
-        }
-    });
+                /****************************************************************************
+                 * Call base constructor
+                 ****************************************************************************/
+                this._super(pos, settings);
+            }
+        })
+    };
 
     //Base enemy object
     entities.Enemy = gf.entityPool.add('enemy', entities.Sprite.extend({

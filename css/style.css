@@ -55,12 +55,12 @@ p, .rog, #dialog, #hud {
 }
 
 /* HUD */
-#hud {
+.gf-hud {
     color: #FFF;
     font-style: italic;
     text-align: center;
 
-    height: 150px;
+    /*height: 150px;
     top: -275px;
 
     width: 700px;
@@ -69,24 +69,24 @@ p, .rog, #dialog, #hud {
     position: absolute;
 
     display:none;
-    z-index: 100;
+    z-index: 100;*/
 }
 
-#hud > div { position: absolute; }
+/*.gf-hud > div { position: absolute; }*/
 
-#hud .meter {
+.gf-hud-item.gf-hud-meter {
     background: left top url(../assets/ui/magic_meter.png) no-repeat;
     width: 32px;
     height: 84px;
 }
 
-#hud .meter.upgraded {
+.gf-hud-item.gf-hud-meter.upgraded {
     background: left top url(../assets/ui/magic_meter_2.png) no-repeat;
     width: 32px;
     height: 86px;
 }
 
-#hud .meter .meter-value {
+.gf-hud-item.gf-hud-meter-value {
     background: center bottom url(../assets/ui/magic_meter_value.png) no-repeat;
     width: 20px;
     height: 70px;
@@ -94,7 +94,7 @@ p, .rog, #dialog, #hud {
     margin: 6px 0  0 6px;
 }
 
-#hud .item {
+.gf-hud-item.gf-hud-equipted {
     background: left top url(../assets/ui/item-frame.png) no-repeat;
     width: 44px;
     height: 44px;
@@ -102,7 +102,7 @@ p, .rog, #dialog, #hud {
     left: 40px;
 }
 
-#hud .rupees, #hud .bombs, #hud .arrows {
+.gf-hud-item.gf-hud-inventory {
     background-position: center top;
     background-repeat: no-repeat;
     padding-top: 20px;
@@ -116,11 +116,11 @@ p, .rog, #dialog, #hud {
     text-indent: -7px;
 }
 
-#hud .rupees { background-image: url(../assets/ui/indicator-rupees.png); left: 130px; }
-#hud .bombs { background-image: url(../assets/ui/indicator-bombs.png); left: 200px; }
-#hud .arrows { background-image: url(../assets/ui/indicator-arrows.png); left: 270px; }
+.gf-hud-item.gf-hud-inventory.rupees { background-image: url(../assets/ui/indicator-rupees.png); left: 130px; }
+.gf-hud-item.gf-hud-inventory.bombs { background-image: url(../assets/ui/indicator-bombs.png); left: 200px; }
+.gf-hud-item.gf-hud-inventory.arrows { background-image: url(../assets/ui/indicator-arrows.png); left: 270px; }
 
-#hud .life {
+.gf-hud-item.gf-hud-health {
     font-style: normal;
     text-shadow:
         1px 1px 0 #000,
@@ -130,7 +130,7 @@ p, .rog, #dialog, #hud {
     font-size: 22px;
 }
 
-#hud .life .dash {
+.gf-hud-item.gf-hud-health .dash {
     background: left top url(../assets/ui/life-dash.png) no-repeat;
     width: 24px;
     height: 4px;
@@ -138,11 +138,11 @@ p, .rog, #dialog, #hud {
     margin-bottom: 5px;
 }
 
-#hud .life .hearts {
+.gf-hud-item.gf-hud-health .hearts {
     width:180px;
 }
 
-#hud .life .hearts .heart {
+.gf-hud-item.gf-hud-health .hearts .heart {
     background: center top url(../assets/ui/heart-full.png) no-repeat;
     width: 14px;
     height: 14px;
@@ -151,10 +151,10 @@ p, .rog, #dialog, #hud {
     float: left;
 }
 
-/*#life .hearts .heart.3-4 { background-image: url(../assets/ui/heart-4-3.png); }*/
-#hud .life .hearts .heart.half { background-image: url(../assets/ui/heart-half.png); }
-/*#life .hearts .heart.1-4 { background-image: url(../assets/ui/heart-1-4.png); }*/
-#hud .life .hearts .heart.empty { background-image: url(../assets/ui/heart-empty.png); }
+/*gf-hud-item.gf-hud-health .hearts .heart.3-4 { background-image: url(../assets/ui/heart-4-3.png); }*/
+.gf-hud-item.gf-hud-health .hearts .heart.half { background-image: url(../assets/ui/heart-half.png); }
+/*gf-hud-item.gf-hud-health .hearts .heart.1-4 { background-image: url(../assets/ui/heart-1-4.png); }*/
+.gf-hud-item.gf-hud-health .hearts .heart.empty { background-image: url(../assets/ui/heart-empty.png); }
 
 /* modal box */
 .modal { z-index: 40001; display: none; }
