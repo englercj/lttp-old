@@ -1,7 +1,8 @@
 (function($, window, undefined) {
     require([
-        'entities'
-    ], function(entities) {
+        'entities',
+        'huditems'
+    ], function(entities, huditems) {
         var resources = [
             {
                 name: 'darkworld_music',
@@ -45,7 +46,7 @@
                 //initialize map and add to game
                 gf.game.loadWorld('darkworld_world');
                 //play some MUSIKA
-                gf.audio.play('darkworld_music', { loop: true });
+                //gf.audio.play('darkworld_music', { loop: true });
 
                 //bind the keymap
                 gf.controls.bindKey(gf.types.KEY.W, 'move_up');
@@ -53,41 +54,11 @@
                 gf.controls.bindKey(gf.types.KEY.S, 'move_down');
                 gf.controls.bindKey(gf.types.KEY.D, 'move_right');
 
-                //initialize the player and add to game
-                var link = window.link = gf.entityPool.create('link', {
-                    scale: 2,
-                    texture: gf.resources.link_sprite.data,
-                    position: [0, 0],
-                    size: [64, 64],
-                    hitSize: [12, 18],
-                    hitOffset: [0, -8]
-                });
-                link.addAnimation('move_right', {
-                    frames: [0, 1, 2, 3, 4, 5, 6, 7],
-                    duration: 500,
-                    loop: true
-                });
-                link.addAnimation('move_left', {
-                    frames: [12, 13, 14, 15, 16, 17, 18, 19],
-                    duration: 500,
-                    loop: true
-                });
-                link.addAnimation('move_down', {
-                    frames: [24, 25, 26, 27, 28, 29, 30, 31],
-                    duration: 500,
-                    loop: true
-                });
-                link.addAnimation('move_up', {
-                    frames: [36, 37, 38, 39, 40, 41, 42, 43],
-                    duration: 500,
-                    loop: true
-                });
-                link.addAnimation('move_right_idle', [0]);
-                link.addAnimation('move_left_idle', [12]);
-                link.addAnimation('move_down_idle', [24]);
-                link.addAnimation('move_up_idle', [36]);
-                link.setActiveAnimation('move_down_idle');
-                gf.game.addObject(link);
+                //initialize player
+                initLink();
+
+                //initialize HUD
+                initHud();
 
                 //start render loop
                 gf.game.render();
@@ -96,5 +67,53 @@
             gf.event.subscribe(gf.types.EVENT.LOADER_ERROR, function() { console.log.call(console, arguments); });
             gf.loader.load(resources);
         });
+
+        function initHud() {
+            gf.HUD.init();
+
+            gf.HUD.addItem('Magic Meter', new huditems.MagicMeter(0, 0, { value: 100 }));
+            gf.HUD.addItem('Rupees', new huditems.InventoryCounter(130, 0, { value: 0 }));
+            gf.HUD.addItem('Bombs', new huditems.InventoryCounter(260, 0, { value: 0 }));
+            gf.HUD.addItem('Arrows', new huditems.InventoryCounter(390, 0, { value: 0 }));
+            gf.HUD.addItem('Life Meter', new huditems.LifeMeter(500, 0, { value: 3 }));
+        }
+
+        function initLink() {
+            //initialize the player and add to game
+            var link = window.link = gf.entityPool.create('link', {
+                scale: 2,
+                texture: gf.resources.link_sprite.data,
+                position: [0, 0],
+                size: [64, 64],
+                hitSize: [12, 18],
+                hitOffset: [0, -8]
+            });
+            link.addAnimation('move_right', {
+                frames: [0, 1, 2, 3, 4, 5, 6, 7],
+                duration: 500,
+                loop: true
+            });
+            link.addAnimation('move_left', {
+                frames: [12, 13, 14, 15, 16, 17, 18, 19],
+                duration: 500,
+                loop: true
+            });
+            link.addAnimation('move_down', {
+                frames: [24, 25, 26, 27, 28, 29, 30, 31],
+                duration: 500,
+                loop: true
+            });
+            link.addAnimation('move_up', {
+                frames: [36, 37, 38, 39, 40, 41, 42, 43],
+                duration: 500,
+                loop: true
+            });
+            link.addAnimation('move_right_idle', [0]);
+            link.addAnimation('move_left_idle', [12]);
+            link.addAnimation('move_down_idle', [24]);
+            link.addAnimation('move_up_idle', [36]);
+            link.setActiveAnimation('move_down_idle');
+            gf.game.addObject(link);
+        }
     });
 })(jQuery, window);
