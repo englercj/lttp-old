@@ -1,31 +1,9 @@
 (function($, window, undefined) {
     require([
+        'resources',
         'entities',
         'huditems'
-    ], function(entities, huditems) {
-        var resources = [
-            {
-                name: 'darkworld_music',
-                type: 'audio',
-                src: '/assets/audio/music/dark_world.lite.ogg'
-            },
-            {
-                name: 'lightworld_world',
-                type: 'world',
-                src: '/assets/worlds/lightworld/lightworld.json'
-            },
-            {
-                name: 'darkworld_world',
-                type: 'world',
-                src: '/assets/worlds/darkworld/darkworld.json'
-            },
-            {
-                name: 'link_sprite',
-                type: 'texture',
-                src: '/assets/entities/link/link.png'
-            }
-        ];
-
+    ], function(resourceList, entities, huditems) {
         //turn on some debugging properties
         gf.debug.showFps = true;            //show the FPS box
         gf.debug.showInfo = true;           //show detailed debug info
@@ -64,18 +42,18 @@
                 gf.game.render();
             });
 
-            gf.event.subscribe(gf.types.EVENT.LOADER_ERROR, function() { console.log.call(console, arguments); });
-            gf.loader.load(resources);
+            gf.event.subscribe(gf.types.EVENT.LOADER_ERROR, function(err, resource) { console.log(err, resource); });
+            gf.loader.load(resourceList);
         });
 
         function initHud() {
             gf.HUD.init();
 
-            gf.HUD.addItem('Magic Meter', new huditems.MagicMeter(0, 0, { value: 100 }));
-            gf.HUD.addItem('Rupees', new huditems.InventoryCounter(130, 0, { value: 0 }));
-            gf.HUD.addItem('Bombs', new huditems.InventoryCounter(260, 0, { value: 0 }));
-            gf.HUD.addItem('Arrows', new huditems.InventoryCounter(390, 0, { value: 0 }));
-            gf.HUD.addItem('Life Meter', new huditems.LifeMeter(500, 0, { value: 3 }));
+            gf.HUD.addItem('magic-meter', new huditems.MagicMeter(0, 0, { value: 100 }));
+            gf.HUD.addItem('rupees', new huditems.InventoryCounter(130, 0, { value: 0, name: 'rupees' }));
+            gf.HUD.addItem('bombs', new huditems.InventoryCounter(260, 0, { value: 0, name: 'bombs' }));
+            gf.HUD.addItem('arrows', new huditems.InventoryCounter(390, 0, { value: 0, name: 'arrows' }));
+            gf.HUD.addItem('life', new huditems.LifeMeter(500, 0, { value: 3 }));
         }
 
         function initLink() {
