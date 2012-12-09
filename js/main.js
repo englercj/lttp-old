@@ -64,8 +64,8 @@
                 texture: gf.resources.link_sprite.data,
                 position: [0, 0],
                 size: [64, 64],
-                hitSize: [12, 18],
-                hitOffset: [0, -8]
+                hitSize: [12, 12],
+                hitOffset: [0, -10]
             });
             link.addAnimation('move_right', {
                 frames: [0, 1, 2, 3, 4, 5, 6, 7],
