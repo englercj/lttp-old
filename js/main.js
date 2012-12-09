@@ -49,11 +49,12 @@
         function initHud() {
             gf.HUD.init();
 
-            gf.HUD.addItem('magic-meter', new huditems.MagicMeter(0, 0, { value: 100 }));
-            gf.HUD.addItem('rupees', new huditems.InventoryCounter(130, 0, { value: 0, name: 'rupees' }));
-            gf.HUD.addItem('bombs', new huditems.InventoryCounter(260, 0, { value: 0, name: 'bombs' }));
-            gf.HUD.addItem('arrows', new huditems.InventoryCounter(390, 0, { value: 0, name: 'arrows' }));
-            gf.HUD.addItem('life', new huditems.LifeMeter(500, 0, { value: 3 }));
+            gf.HUD.addItem('magic-meter', new huditems.MagicMeter(50, 50, { value: 100 }));
+            gf.HUD.addItem('equipted', new huditems.EquiptedItem(90, 50, { value: '' }));
+            gf.HUD.addItem('rupees', new huditems.InventoryCounter(215, 35, { value: 0, name: 'rupees' }));
+            gf.HUD.addItem('bombs', new huditems.InventoryCounter(300, 35, { value: 0, name: 'bombs' }));
+            gf.HUD.addItem('arrows', new huditems.InventoryCounter(375, 35, { value: 0, name: 'arrows' }));
+            gf.HUD.addItem('life', new huditems.LifeMeter(800, 35, { value: 20 }));
         }
 
         function initLink() {

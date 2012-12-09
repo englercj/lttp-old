@@ -65,6 +65,23 @@ define([
                 this.$hearts = $('<div/>', { 'class' : 'gf-hud-heath hearts' }).appendTo(this.$elm);
             }
         }),
+        EquiptedItem: gf.HudItem.extend({
+            init: function(x, y, settings) {
+                this._super(x, y, settings);
+            },
+            update: function() {
+                if(!this.dirty) return;
+
+                this.$item.attr('src', this.value);
+                return this;
+            },
+            _createElement: function(x, y) {
+                this._super(x, y);
+                this.$elm.addClass('gf-hud-equipted');
+
+                this.$item = $('<img/>', { src: '#' }).appendTo(this.$elm);
+            }
+        }),
         InventoryCounter: gf.HudItem.extend({
             init: function(x, y, settings) {
                 this._super(x, y, settings);
