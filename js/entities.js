@@ -23,6 +23,12 @@ define([
                 //will break the sprint of an entity that hits this one
                 this.breakSprint = false;
 
+                //maximum health of this entity
+                this.maxHealth = 3;
+
+                //current health of this entity
+                this.health = 3;
+
                 /****************************************************************************
                  * Call base constructor
                  ****************************************************************************/
