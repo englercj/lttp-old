@@ -1,5 +1,6 @@
 define([
-], function() {
+    'game/data/types'
+], function(types) {
     var entities = {
         Sprite: gf.Sprite.extend({
             init: function(pos, settings) {
@@ -28,6 +29,12 @@ define([
 
                 //current health of this entity
                 this.health = 3;
+
+                //current inventory of the entity
+                this.inventory = {};
+
+                //loot of the entity that is dropped when it dies
+                this.loot = [];
 
                 /****************************************************************************
                  * Call base constructor
@@ -73,6 +80,15 @@ define([
              * Call base constructor
              ****************************************************************************/
             this._super(pos, settings);
+
+            //bind the keymap
+            gf.controls.bindKey(gf.types.KEY.W, 'move_up');
+            gf.controls.bindKey(gf.types.KEY.A, 'move_left');
+            gf.controls.bindKey(gf.types.KEY.S, 'move_down');
+            gf.controls.bindKey(gf.types.KEY.D, 'move_right');
+
+            gf.controls.bindKey(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
+            gf.controls.bindKey(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
 
             //make the camera track this entity
             gf.game.cameraTrack(this);
@@ -136,7 +152,11 @@ define([
             //if not moving, there is a currentAnimation, and the currentAnimation isn't an idle one
             if(this.velocity.isZero() && this.currentAnim && this.currentAnim.name.indexOf('idle') === -1)
                 this.setActiveAnimation(this.currentAnim.name + '_idle');
-        }
+        },
+        //use equipted item
+        onUseItem: function() {},
+        //when attack key is pressed
+        onAttack: function() {}
     }));
 
     return entities;

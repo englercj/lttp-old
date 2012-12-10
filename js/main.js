@@ -1,9 +1,9 @@
 (function($, window, undefined) {
     require([
-        'resources',
-        'entities',
-        'huditems'
-    ], function(resourceList, entities, huditems) {
+        'game/data/data',
+        'game/entities',
+        'game/huditems'
+    ], function(data, entities, huditems) {
         //turn on some debugging properties
         gf.debug.showFps = true;            //show the FPS box
         gf.debug.showInfo = true;           //show detailed debug info
@@ -26,11 +26,9 @@
                 //play some MUSIKA
                 //gf.audio.play('darkworld_music', { loop: true });
 
-                //bind the keymap
-                gf.controls.bindKey(gf.types.KEY.W, 'move_up');
-                gf.controls.bindKey(gf.types.KEY.A, 'move_left');
-                gf.controls.bindKey(gf.types.KEY.S, 'move_down');
-                gf.controls.bindKey(gf.types.KEY.D, 'move_right');
+                //bind some game related keys
+                gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));
+                gf.controls.bindKey(gf.types.KEY.M, 'toggle_map', onToggleMap.bind(this));
 
                 //initialize player
                 initLink();
@@ -43,7 +41,7 @@
             });
 
             gf.event.subscribe(gf.types.EVENT.LOADER_ERROR, function(err, resource) { console.log(err, resource); });
-            gf.loader.load(resourceList);
+            gf.loader.load(data.resources);
         });
 
         function initHud() {
@@ -94,5 +92,9 @@
             link.setActiveAnimation('move_down_idle');
             gf.game.addObject(link);
         }
+
+        function onToggleInventory() {}
+
+        function onToggleMap() {}
     });
 })(jQuery, window);
