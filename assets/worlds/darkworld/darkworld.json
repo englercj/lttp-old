@@ -66,21 +66,25 @@
                 },
              "1":
                 {
+                 "half":"left",
                  "isCollidable":"true",
                  "type":"solid"
                 },
              "2":
                 {
+                 "half":"right",
                  "isCollidable":"true",
                  "type":"solid"
                 },
              "3":
                 {
+                 "half":"top",
                  "isCollidable":"true",
                  "type":"solid"
                 },
              "4":
                 {
+                 "half":"bottom",
                  "isCollidable":"true",
                  "type":"solid"
                 },

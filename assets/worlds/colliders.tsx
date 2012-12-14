@@ -9,24 +9,28 @@
  </tile>
  <tile id="1">
   <properties>
+   <property name="half" value="left"/>
    <property name="isCollidable" value="true"/>
    <property name="type" value="solid"/>
   </properties>
  </tile>
  <tile id="2">
   <properties>
+   <property name="half" value="right"/>
    <property name="isCollidable" value="true"/>
    <property name="type" value="solid"/>
   </properties>
  </tile>
  <tile id="3">
   <properties>
+   <property name="half" value="top"/>
    <property name="isCollidable" value="true"/>
    <property name="type" value="solid"/>
   </properties>
  </tile>
  <tile id="4">
   <properties>
+   <property name="half" value="bottom"/>
    <property name="isCollidable" value="true"/>
    <property name="type" value="solid"/>
   </properties>
