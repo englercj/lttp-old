@@ -81,7 +81,7 @@ define([
              ****************************************************************************/
             this._super(pos, settings);
 
-            //bind the keymap
+            //bind the keyboard
             gf.controls.bindKey(gf.types.KEY.W, 'move_up');
             gf.controls.bindKey(gf.types.KEY.A, 'move_left');
             gf.controls.bindKey(gf.types.KEY.S, 'move_down');
@@ -89,6 +89,15 @@ define([
 
             gf.controls.bindKey(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
             gf.controls.bindKey(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
+
+            //bind the gamepad
+            gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'move_left');
+            gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'move_right');
+            gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'move_up');
+            gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'move_down');
+
+            gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
+            gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
 
             //make the camera track this entity
             gf.game.cameraTrack(this);

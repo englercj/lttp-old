@@ -10,6 +10,7 @@
         gf.debug.showOutline = true;        //show the outline of an entity (size)
         gf.debug.showHitbox = true;         //show the outline of an entity hitbox
         gf.debug.accessTiledUniforms = true;//gf.debug.tiledUniforms with an array of shader uniforms used by the TiledMapLayer object
+        gf.debug.showGamepadInfo = true;    //show the gamepad state
         //gf.debug.showMapColliders = true;   //show the map colliders
 
         $(function() {
