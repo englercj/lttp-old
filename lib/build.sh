@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
-cd ../../grapefruit &&
+cd ~/repos/grapefruit &&
 grunt &&
-cp build/gf.js ../lttp-webgl/lib/gf.js
+cp build/gf.js ~/repos/lttp-webgl/lib/gf.js &&
+cd ~/repos/lttp-webgl
