@@ -13,10 +13,11 @@ the below listed dependencies).
 
 ### Running the Game
 
-The current state of the game is highly in flux, but you can always run the current state of master by installing [Node.js](http://nodejs.org) and running the `server.js` file:
+The current state of the game is highly in flux, but you can always run the current state of master by installing [Node.js](http://nodejs.org), and running the `server.js` file:
 
 ```shell
 cd lttp-webgl
+npm install express
 node server.js
 ```
 
