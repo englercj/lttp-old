@@ -11,6 +11,17 @@ from the original Link to the Past are copyrights of Nintendo; I claim no owners
 None of the code was taken from the original game, all the code is written by me and released under the MPL 2.0 license (with the exception of
 the below listed dependencies).
 
+### Running the Game
+
+The current state of the game is highly in flux, but you can always run the current state of master by installing [Node.js](http://nodejs.org) and running the `server.js` file:
+
+```shell
+cd lttp-webgl
+node server.js
+```
+
+Then point your browser to `http://localhost:3001`
+
 ### Dependencies
 
 Here is a list of external dependencies and what they are used for. Each is released under its own respective license:
