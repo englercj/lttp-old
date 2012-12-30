@@ -5,26 +5,24 @@ define([
             init: function(x, y, settings) {
                 this._super(x, y, settings);
 
-                this.maxHeight = parseInt(this.$val.css('max-height').replace('px', ''), 10);
+                this.maxHeight = gf.utils.getStyle(gf.game._cont, 'max-height');
             },
             update: function() {
                 if(!this.dirty) return;
 
-                this.$val.css({
-                    height: this.maxHeight * this.value,
-                    marginTop: this.maxHeight - (this.maxHeight * this.value) + 6
-                });
+                this.val.height = this.maxHeight * this.value;
+                this.val.style['margin-top'] = this.maxHeight - (this.maxHeight * this.value) + 6;
 
                 this.dirty = false;
                 return this;
             },
             _createElement: function(x, y) {
                 this._super(x, y);
-                this.$elm.addClass('gf-hud-meter');
+                this.elm.className = this.elm.className + ' gf-hud-meter';
 
-                this.$val = $('<div/>', {
-                    'class': 'gf-hud-meter-value ' + this.name
-                }).appendTo(this.$elm);
+                this.val = document.createElement('div');
+                this.val.className = 'gf-hud-meter-value ' + this.name;
+                this.elm.appendChild(this.val);
             }
         }),
         LifeMeter: gf.HudItem.extend({
@@ -52,17 +50,19 @@ define([
                     }
                 }
 
-                this.$hearts.html(hearts);
+                this.hearts.innerHtml = hearts;
 
                 this.dirty = false;
                 return this;
             },
             _createElement: function(x, y) {
                 this._super(x, y);
-                this.$elm.addClass('gf-hud-health');
+                this.elm.className = this.elm.className + ' gf-hud-health';
 
-                this.$elm.append('<span class="gf-hud-health dash"></span>LIFE<span class="gf-hud-health dash"></span>');
-                this.$hearts = $('<div/>', { 'class' : 'gf-hud-heath hearts' }).appendTo(this.$elm);
+                this.elm.innerHtml = '<span class="gf-hud-health dash"></span>LIFE<span class="gf-hud-health dash"></span>';
+                this.hearts = document.createElement('div');
+                this.hearts.className = 'gf-hud-heath hearts';
+                this.elm.appendChild(this.hearts);
             }
         }),
         EquiptedItem: gf.HudItem.extend({
@@ -72,21 +72,23 @@ define([
             update: function() {
                 if(!this.dirty) return;
 
-                this.$item.attr('src', this.value);
+                this.item.src = this.value;
                 return this;
             },
             _createElement: function(x, y) {
                 this._super(x, y);
-                this.$elm.addClass('gf-hud-equipted');
+                this.elm.className = this.elm.className + ' gf-hud-equipted';
 
-                this.$item = $('<img/>', { src: '#' }).appendTo(this.$elm);
+                this.item = document.createElement('img');
+                this.item.src = '#';
+                this.elm.appendChild(this.item);
             }
         }),
         InventoryCounter: gf.HudItem.extend({
             init: function(x, y, settings) {
                 this._super(x, y, settings);
 
-                this.$elm.addClass('gf-hud-inventory');
+                this.elm.className = this.elm.className + ' gf-hud-inventory';
             }
         })
     };

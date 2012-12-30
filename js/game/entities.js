@@ -159,7 +159,7 @@ define([
             } 
 
             //if not moving, there is a currentAnimation, and the currentAnimation isn't an idle one
-            if(this.velocity.isZero() && this.currentAnim && this.currentAnim.name.indexOf('idle') === -1)
+            if(this.velocity.x === 0 && this.velocity.y === 0 && this.currentAnim && this.currentAnim.name.indexOf('idle') === -1)
                 this.setActiveAnimation(this.currentAnim.name + '_idle');
         },
         //use equipted item

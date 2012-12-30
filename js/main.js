@@ -37,6 +37,12 @@
                 //initialize HUD
                 initHud();
 
+                /*window.player = new gf.Sprite([0, 0], {
+                    texture: gf.resources.link_sprite.data,
+                    size: [32, 32]
+                });
+                gf.game.addObject(player);*/
+
                 //start render loop
                 gf.game.render();
             });
@@ -59,7 +65,7 @@
         function initLink() {
             //initialize the player and add to game
             var link = window.link = gf.entityPool.create('link', {
-                scale: 2,
+                scale: 1,
                 texture: gf.resources.link_sprite.data,
                 position: [0, 0],
                 size: [64, 64],
