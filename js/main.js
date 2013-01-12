@@ -24,8 +24,6 @@
             gf.event.subscribe(gf.types.EVENT.LOADER_COMPLETE, function() {
                 //initialize map and add to game
                 gf.game.loadWorld('darkworld_world');
-                //play some MUSIKA
-                //gf.audio.play('darkworld_music', { loop: true });
 
                 //bind some game related keys
                 gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));
@@ -36,12 +34,6 @@
 
                 //initialize HUD
                 initHud();
-
-                /*window.player = new gf.Sprite([0, 0], {
-                    texture: gf.resources.link_sprite.data,
-                    size: [32, 32]
-                });
-                gf.game.addObject(player);*/
 
                 //start render loop
                 gf.game.render();
@@ -65,7 +57,7 @@
         function initLink() {
             //initialize the player and add to game
             var link = window.link = gf.entityPool.create('link', {
-                scale: 1,
+                scale: 2,
                 texture: gf.resources.link_sprite.data,
                 position: [0, 0],
                 size: [64, 64],
