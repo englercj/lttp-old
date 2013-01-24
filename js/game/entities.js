@@ -65,7 +65,6 @@ define([
     //Link Player sprite
     entities.Link = gf.entityPool.add('link', entities.Sprite.extend({
         init: function(pos, settings) {
-            console.log(pos, settings);
             settings = settings || {};
 
             //player type
@@ -80,9 +79,6 @@ define([
             //set default scale
             settings.scale = 2;
 
-            //texture
-            settings.texture = gf.resources.link_sprite.data;
-
             //size
             settings.size = [64, 64];
 
@@ -91,8 +87,6 @@ define([
 
             //hitOffset
             settings.hitOffset = [0, -10];
-
-            console.log(settings);
 
             /****************************************************************************
              * Call base constructor
