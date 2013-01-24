@@ -20,10 +20,9 @@
                 friction: [0, 0]
             });
 
-            //load resources
-            gf.event.subscribe(gf.types.EVENT.LOADER_COMPLETE, function() {
+            gf.loader.load(data.resources, function(err, resources) {
                 //initialize map and add to game
-                gf.game.loadWorld('world_darkworld');
+                gf.game.loadWorld('world_lightworld');
 
                 //bind some game related keys
                 gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));
@@ -35,9 +34,6 @@
                 //start render loop
                 gf.game.render();
             });
-
-            gf.event.subscribe(gf.types.EVENT.LOADER_ERROR, function(err, resource) { console.log(err, resource); });
-            gf.loader.load(data.resources);
         });
 
         function initHud() {
