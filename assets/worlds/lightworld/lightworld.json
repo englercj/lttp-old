@@ -1243,11 +1243,36 @@
          "width":256,
          "x":0,
          "y":0
+        }, 
+        {
+         "height":256,
+         "name":"player",
+         "objects":[
+                {
+                 "height":21,
+                 "name":"link",
+                 "properties":
+                    {
+                     "texture":"sprite_link"
+                    },
+                 "type":"",
+                 "width":18,
+                 "x":2241,
+                 "y":2834
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":256,
+         "x":0,
+         "y":0
         }],
  "orientation":"orthogonal",
  "properties":
     {
-        "scale": 1.0
+     "music":"music_lightworld",
+     "music_loop":"true",
+     "scale":"2"
     },
  "tileheight":16,
  "tilesets":[

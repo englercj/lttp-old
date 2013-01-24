@@ -31,7 +31,7 @@
                  "name":"link",
                  "properties":
                     {
-                     "texture":"link_sprite"
+                     "texture":"sprite_link"
                     },
                  "type":"",
                  "width":16,
