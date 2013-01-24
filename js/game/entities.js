@@ -65,6 +65,7 @@ define([
     //Link Player sprite
     entities.Link = gf.entityPool.add('link', entities.Sprite.extend({
         init: function(pos, settings) {
+            console.log(pos, settings);
             settings = settings || {};
 
             //player type
@@ -75,6 +76,23 @@ define([
 
             //set the zindex of the player
             settings.zIndex = 10;
+
+            //set default scale
+            settings.scale = 2;
+
+            //texture
+            settings.texture = gf.resources.link_sprite.data;
+
+            //size
+            settings.size = [64, 64];
+
+            //hitSize
+            settings.hitSize = [12, 12];
+
+            //hitOffset
+            settings.hitOffset = [0, -10];
+
+            console.log(settings);
 
             /****************************************************************************
              * Call base constructor
@@ -98,6 +116,33 @@ define([
 
             gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
             gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
+
+            //add our animations
+            this.addAnimation('move_right', {
+                frames: [0, 1, 2, 3, 4, 5, 6, 7],
+                duration: 500,
+                loop: true
+            });
+            this.addAnimation('move_left', {
+                frames: [12, 13, 14, 15, 16, 17, 18, 19],
+                duration: 500,
+                loop: true
+            });
+            this.addAnimation('move_down', {
+                frames: [24, 25, 26, 27, 28, 29, 30, 31],
+                duration: 500,
+                loop: true
+            });
+            this.addAnimation('move_up', {
+                frames: [36, 37, 38, 39, 40, 41, 42, 43],
+                duration: 500,
+                loop: true
+            });
+            this.addAnimation('move_right_idle', [0]);
+            this.addAnimation('move_left_idle', [12]);
+            this.addAnimation('move_down_idle', [24]);
+            this.addAnimation('move_up_idle', [36]);
+            this.setActiveAnimation('move_down_idle');
 
             //make the camera track this entity
             gf.game.cameraTrack(this);

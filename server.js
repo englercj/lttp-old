@@ -1,5 +1,5 @@
 var express = require('express'),
-    app = express().
+    app = express(),
     PORT = 3001;
 
 app.use(express.bodyParser());

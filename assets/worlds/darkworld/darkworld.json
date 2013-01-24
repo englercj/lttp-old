@@ -21,10 +21,34 @@
          "width":256,
          "x":0,
          "y":0
+        }, 
+        {
+         "height":256,
+         "name":"player",
+         "objects":[
+                {
+                 "height":19,
+                 "name":"link",
+                 "properties":
+                    {
+                     "texture":"link_sprite"
+                    },
+                 "type":"",
+                 "width":16,
+                 "x":2241,
+                 "y":2841
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":256,
+         "x":0,
+         "y":0
         }],
  "orientation":"orthogonal",
  "properties":
     {
+     "music":"darkworld_music",
      "scale":"2"
     },
  "tileheight":16,

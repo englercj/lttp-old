@@ -1,23 +1,26 @@
 define([], function() {
     return [
+        //Lightworld
         {
-            name: 'darkworld_music',
-            type: gf.types.RESOURCE.AUDIO,
-            src: '/assets/audio/music/dark_world.lite.ogg'
-        },
-        {
-            name: 'lightworld_world',
+            name: 'world_lightworld',
             type: gf.types.RESOURCE.WORLD,
             src: '/assets/worlds/lightworld/lightworld.json'
         },
+        //Darkworld
         {
-            name: 'darkworld_world',
+            name: 'world_darkworld',
             type: gf.types.RESOURCE.WORLD,
             src: '/assets/worlds/darkworld/darkworld.json'
         },
         {
-            name: 'link_sprite',
-            type: gf.types.RESOURCE.TEXTURE,
+            name: 'music_darkworld',
+            type: gf.types.RESOURCE.MUSIC,
+            src: '/assets/audio/music/dark_world.lite.ogg'
+        },
+        //Misc
+        {
+            name: 'sprite_link',
+            type: gf.types.RESOURCE.SPRITE,
             src: '/assets/entities/link/link.png'
         }
     ];
