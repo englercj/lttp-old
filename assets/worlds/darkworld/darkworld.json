@@ -55,7 +55,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "image":"darkworld-Tileset.png",
+         "image":"darkworld-tileset.png",
          "imageheight":1280,
          "imagewidth":1168,
          "margin":0,
