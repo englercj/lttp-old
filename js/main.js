@@ -27,6 +27,7 @@
                 //bind some game related keys
                 gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));
                 gf.controls.bindKey(gf.types.KEY.M, 'toggle_map', onToggleMap.bind(this));
+                gf.controls.bindKey(gf.types.KEY.P, 'toggle_audio', onToggleAudio.bind(this));
 
                 //initialize HUD
                 initHud();
@@ -50,5 +51,9 @@
         function onToggleInventory() {}
 
         function onToggleMap() {}
+
+        function onToggleAudio() {
+            gf.audio.pauseAll();
+        }
     });
 })(jQuery, window);
