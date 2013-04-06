@@ -5,24 +5,36 @@
         'game/huditems'
     ], function(data, entities, huditems) {
         //turn on some debugging properties
-        gf.debug.showFps = true;            //show the FPS box
+        /*gf.debug.showFps = true;            //show the FPS box
         gf.debug.showInfo = true;           //show detailed debug info
         gf.debug.showOutline = true;        //show the outline of an entity (size)
         gf.debug.showHitbox = true;         //show the outline of an entity hitbox
         gf.debug.accessTiledUniforms = true;//gf.debug.tiledUniforms with an array of shader uniforms used by the TiledMapLayer object
         gf.debug.showGamepadInfo = true;    //show the gamepad state
+        */
         //gf.debug.showMapColliders = true;   //show the map colliders
 
         $(function() {
+            $(window).on('resize', onWindowResize);
+
+            var $game = $('#game');
             //initialize the renderer
             gf.game.init('game', {
                 gravity: 0,
-                friction: [0, 0]
+                friction: [0, 0],
+                width: $game.width(),
+                height: $game.height()
             });
 
-            gf.loader.load(data.resources, function(err, resources) {
+            window.loader = new gf.AssetLoader(data.resources);
+
+            loader.on('progress', function(err, e) {
+
+            });
+
+            loader.on('complete', function() {
                 //initialize map and add to game
-                gf.game.loadWorld('world_lightworld');
+                gf.game.loadWorld('world_lightworld2');
 
                 //bind some game related keys
                 gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));
@@ -30,11 +42,13 @@
                 gf.controls.bindKey(gf.types.KEY.P, 'toggle_audio', onToggleAudio.bind(this));
 
                 //initialize HUD
-                initHud();
+                //initHud();
 
                 //start render loop
                 gf.game.render();
             });
+
+            loader.load();
         });
 
         function initHud() {
@@ -54,6 +68,14 @@
 
         function onToggleAudio() {
             gf.audio.pauseAll();
+        }
+
+        function onWindowResize()
+        {
+            var w = $(window).width(),
+                h = $(window).height();
+
+            gf.game.resize(w, h);
         }
     });
 })(jQuery, window);

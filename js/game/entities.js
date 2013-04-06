@@ -1,146 +1,131 @@
 define([
     'game/data/types'
 ], function(types) {
-    var entities = {
-        Sprite: gf.Sprite.extend({
-            init: function(pos, settings) {
-                /****************************************************************************
-                 * Properties that are defined in the `settings` object,
-                 * these can be specified in the properties of the object layer
-                 * in Tiled, and overriden on a per-object basis
-                 ****************************************************************************/
-                //can be lifted by another entity
-                this.isLiftable = false;
+    var Sprite = function(pos, settings) {
+        //can be lifted by another entity
+        this.isLiftable = false;
 
-                //can be effected by bombs
-                this.isExplodable = true;
+        //can be effected by bombs
+        this.isExplodable = true;
 
-                //is cutable by a sword
-                this.isCutable = false;
+        //is cutable by a sword
+        this.isCutable = false;
 
-                //is this sprite attacking?
-                this.attacking = false;
+        //is this sprite attacking?
+        this.attacking = false;
 
-                //will break the sprint of an entity that hits this one
-                this.breakSprint = false;
+        //will break the sprint of an entity that hits this one
+        this.breakSprint = false;
 
-                //maximum health of this entity
-                this.maxHealth = 3;
+        //maximum health of this entity
+        this.maxHealth = 3;
 
-                //current health of this entity
-                this.health = 3;
+        //current health of this entity
+        this.health = 3;
 
-                //current inventory of the entity
-                this.inventory = {};
+        //current inventory of the entity
+        this.inventory = {};
 
-                //loot of the entity that is dropped when it dies
-                this.loot = [];
+        //loot of the entity that is dropped when it dies
+        this.loot = [];
 
-                /****************************************************************************
-                 * Call base constructor
-                 ****************************************************************************/
-                this._super(pos, settings);
-            }
-        })
+        gf.Entity.call(this, pos, settings);
     };
 
-    //Base enemy object
-    entities.Enemy = gf.entityPool.add('enemy', entities.Sprite.extend({
-        init: function(pos, settings) {
-            settings = settings || {};
+    gf.inherits(Sprite, gf.Entity);
 
-            //enemy type
-            settings.type = gf.types.ENTITY.ENEMY;
+    var Enemy = function(pos, settings) {
+        settings = settings || {};
 
-            //set the index of enemies
-            settings.zIndex = 10;
+        //enemy type
+        settings.type = gf.types.ENTITY.ENEMY;
 
-            /****************************************************************************
-             * Call base constructor
-             ****************************************************************************/
-            this._super(pos, settings);
-        }
-    }));
+        //set the index of enemies
+        settings.zIndex = 10;
 
-    //Link Player sprite
-    entities.Link = gf.entityPool.add('link', entities.Sprite.extend({
-        init: function(pos, settings) {
-            settings = settings || {};
+        Sprite.call(this, pos, settings);
+    };
 
-            //player type
-            settings.type = gf.types.ENTITY.PLAYER;
+    gf.inherits(Enemy, Sprite);
 
-            //set name of Link
-            settings.name = 'link';
+    gf.entityPool.add('enemy', Enemy);
 
-            //set the zindex of the player
-            settings.zIndex = 10;
+    var Link = function(pos, settings) {
+        settings = settings || {};
 
-            //set default scale
-            settings.scale = 2;
+        //player type
+        settings.type = gf.types.ENTITY.PLAYER;
 
-            //size
-            settings.size = [64, 64];
+        //set name of Link
+        settings.name = 'link';
 
-            //hitSize
-            settings.hitSize = [12, 12];
+        //set the zindex of the player
+        settings.zIndex = 10;
 
-            //hitOffset
-            settings.hitOffset = [0, -10];
+        //set default scale
+        settings.scale = 2;
 
-            /****************************************************************************
-             * Call base constructor
-             ****************************************************************************/
-            this._super(pos, settings);
+        //size
+        settings.size = [64, 64];
 
-            //bind the keyboard
-            gf.controls.bindKey(gf.types.KEY.W, 'move_up');
-            gf.controls.bindKey(gf.types.KEY.A, 'move_left');
-            gf.controls.bindKey(gf.types.KEY.S, 'move_down');
-            gf.controls.bindKey(gf.types.KEY.D, 'move_right');
+        //hitSize
+        settings.hitSize = [12, 12];
 
-            gf.controls.bindKey(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
-            gf.controls.bindKey(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
+        //hitOffset
+        settings.hitOffset = [0, -10];
 
-            //bind the gamepad
-            gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'move_left');
-            gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'move_right');
-            gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'move_up');
-            gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'move_down');
+        Sprite.call(this, pos, settings);
 
-            gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
-            gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
+        //bind the keyboard
+        gf.controls.bindKey(gf.types.KEY.W, 'move_up');
+        gf.controls.bindKey(gf.types.KEY.A, 'move_left');
+        gf.controls.bindKey(gf.types.KEY.S, 'move_down');
+        gf.controls.bindKey(gf.types.KEY.D, 'move_right');
 
-            //add our animations
-            this.addAnimation('move_right', {
-                frames: [0, 1, 2, 3, 4, 5, 6, 7],
-                duration: 500,
-                loop: true
-            });
-            this.addAnimation('move_left', {
-                frames: [12, 13, 14, 15, 16, 17, 18, 19],
-                duration: 500,
-                loop: true
-            });
-            this.addAnimation('move_down', {
-                frames: [24, 25, 26, 27, 28, 29, 30, 31],
-                duration: 500,
-                loop: true
-            });
-            this.addAnimation('move_up', {
-                frames: [36, 37, 38, 39, 40, 41, 42, 43],
-                duration: 500,
-                loop: true
-            });
-            this.addAnimation('move_right_idle', [0]);
-            this.addAnimation('move_left_idle', [12]);
-            this.addAnimation('move_down_idle', [24]);
-            this.addAnimation('move_up_idle', [36]);
-            this.setActiveAnimation('move_down_idle');
+        gf.controls.bindKey(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
+        gf.controls.bindKey(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
 
-            //make the camera track this entity
-            gf.game.cameraTrack(this);
-        },
+        //bind the gamepad
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'move_left');
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'move_right');
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'move_up');
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'move_down');
+
+        gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
+        gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
+
+        //add our animations
+        this.addAnimation('move_right', {
+            frames: [0, 1, 2, 3, 4, 5, 6, 7],
+            duration: 500,
+            loop: true
+        });
+        this.addAnimation('move_left', {
+            frames: [12, 13, 14, 15, 16, 17, 18, 19],
+            duration: 500,
+            loop: true
+        });
+        this.addAnimation('move_down', {
+            frames: [24, 25, 26, 27, 28, 29, 30, 31],
+            duration: 500,
+            loop: true
+        });
+        this.addAnimation('move_up', {
+            frames: [36, 37, 38, 39, 40, 41, 42, 43],
+            duration: 500,
+            loop: true
+        });
+        this.addAnimation('move_right_idle', [0]);
+        this.addAnimation('move_left_idle', [12]);
+        this.addAnimation('move_down_idle', [24]);
+        this.addAnimation('move_up_idle', [36]);
+        this.setActiveAnimation('move_down_idle');
+
+        //make the camera track this entity
+        gf.game.cameraTrack(this);
+    };
+
+    gf.inherits(Link, Sprite, {
         update: function() {
             //check if the player is moving, and update the velocity
             this.checkMovement();
@@ -205,7 +190,13 @@ define([
         onUseItem: function() {},
         //when attack key is pressed
         onAttack: function() {}
-    }));
+    });
 
-    return entities;
+    gf.entityPool.add('link', Link);
+
+    return {
+        Sprite: Sprite,
+        Enemy: Enemy,
+        Link: Link
+    };
 });
