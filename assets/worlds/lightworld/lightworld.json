@@ -1281,8 +1281,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-     "music":"darkworld_music",
-     "scale":"2"
+     "scale":"1"
     },
  "tileheight":16,
  "tilesets":[

@@ -5,8 +5,8 @@
         'game/huditems'
     ], function(data, entities, huditems) {
         //turn on some debugging properties
-        /*gf.debug.showFps = true;            //show the FPS box
-        gf.debug.showInfo = true;           //show detailed debug info
+        gf.debug.showFps = true;            //show the FPS box
+        /*gf.debug.showInfo = true;           //show detailed debug info
         gf.debug.showOutline = true;        //show the outline of an entity (size)
         gf.debug.showHitbox = true;         //show the outline of an entity hitbox
         gf.debug.accessTiledUniforms = true;//gf.debug.tiledUniforms with an array of shader uniforms used by the TiledMapLayer object
@@ -33,7 +33,7 @@
 
             loader.on('complete', function() {
                 //initialize map and add to game
-                gf.game.loadWorld('world_lightworld2');
+                gf.game.loadWorld('world_lightworld');
 
                 //bind some game related keys
                 gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));

@@ -29,6 +29,9 @@ define([
         //loot of the entity that is dropped when it dies
         this.loot = [];
 
+        //speed the ent moves at
+        this.speed = 1.5;
+
         gf.Entity.call(this, pos, settings);
     };
 
@@ -59,22 +62,25 @@ define([
         //size
         settings.size = [16, 22];
 
+        //accelleration = 0
+        settings.accel = [0, 0];
+
         Sprite.call(this, pos, settings);
 
         //bind the keyboard
-        gf.controls.bindKey(gf.types.KEY.W, 'move_up', this.onMove.bind(this, 'up'));
-        gf.controls.bindKey(gf.types.KEY.A, 'move_left', this.onMove.bind(this, 'left'));
-        gf.controls.bindKey(gf.types.KEY.S, 'move_down', this.onMove.bind(this, 'down'));
-        gf.controls.bindKey(gf.types.KEY.D, 'move_right', this.onMove.bind(this, 'right'));
+        gf.controls.bindKey(gf.types.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
+        gf.controls.bindKey(gf.types.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
+        gf.controls.bindKey(gf.types.KEY.S, 'walk_down', this.onWalk.bind(this, 'down'));
+        gf.controls.bindKey(gf.types.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
 
         gf.controls.bindKey(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
         gf.controls.bindKey(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
 
         //bind the gamepad
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'move_left', this.onMove.bind(this, 'left'));
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'move_right', this.onMove.bind(this, 'right'));
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'move_up', this.onMove.bind(this, 'up'));
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'move_down', this.onMove.bind(this, 'down'));
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'walk_right', this.onWalk.bind(this, 'right'));
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'walk_up', this.onWalk.bind(this, 'up'));
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'walk_down', this.onWalk.bind(this, 'down'));
 
         gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
         gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
@@ -131,11 +137,28 @@ define([
     };
 
     gf.inherits(Link, Sprite, {
-        onMove: function(dir, action, kpress) {
+        onWalk: function(dir, action, kpress) {
+            var p = (dir === 'left' || dir === 'right' ? 'x' : 'y'),
+                amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed);
+
             if(kpress) {
                 this.setActiveAnimation('walk_' + dir);
+                this.velocity[p] = amt;
+                gf.game.world.position[p] += amt;
+                gf.game.world
             } else {
                 this.setActiveAnimation('idle_' + dir);
+                this.velocity[p] = 0;
+
+                //this fixes an issue if you hold more than one at once and release one
+                if(gf.controls.isActionActive('walk_left')) 
+                    this.setActiveAnimation('walk_left');
+                else if(gf.controls.isActionActive('walk_right'))
+                    this.setActiveAnimation('walk_right');
+                else if(gf.controls.isActionActive('walk_down'))
+                    this.setActiveAnimation('walk_down');
+                else if(gf.controls.isActionActive('walk_up'))
+                    this.setActiveAnimation('walk_up');
             }
         },/*
         update: function() {
@@ -160,38 +183,38 @@ define([
             this._super();
         },
         checkMovement: function() {
-            if(gf.controls.isActionActive('move_left')) {
+            if(gf.controls.isActionActive('walk_left')) {
                 this.velocity.x = -this.accel.x * gf.game._delta;
             }
-            else if(gf.controls.isActionActive('move_right')) {
+            else if(gf.controls.isActionActive('walk_right')) {
                 this.velocity.x = this.accel.x * gf.game._delta;
             }
             else {
                 this.velocity.x = 0;
             }
 
-            if(gf.controls.isActionActive('move_down')) {
+            if(gf.controls.isActionActive('walk_down')) {
                 this.velocity.y = -this.accel.y * gf.game._delta;
             }
-            else if(gf.controls.isActionActive('move_up')) {
+            else if(gf.controls.isActionActive('walk_up')) {
                 this.velocity.y = this.accel.y * gf.game._delta;
             }
             else {
                 this.velocity.y = 0;
             }
 
-            if(gf.controls.isActionActive('move_up')) {
-                if(!this.isActiveAnimation('move_up'))
-                    this.setActiveAnimation('move_up');
-            } else if(gf.controls.isActionActive('move_down')) {
-                if(!this.isActiveAnimation('move_down'))
-                    this.setActiveAnimation('move_down');
-            } else if(gf.controls.isActionActive('move_left')) {
-                if(!this.isActiveAnimation('move_left'))
-                    this.setActiveAnimation('move_left');
-            } else if(gf.controls.isActionActive('move_right')) {
-                if(!this.isActiveAnimation('move_right'))
-                    this.setActiveAnimation('move_right');
+            if(gf.controls.isActionActive('walk_up')) {
+                if(!this.isActiveAnimation('walk_up'))
+                    this.setActiveAnimation('walk_up');
+            } else if(gf.controls.isActionActive('walk_down')) {
+                if(!this.isActiveAnimation('walk_down'))
+                    this.setActiveAnimation('walk_down');
+            } else if(gf.controls.isActionActive('walk_left')) {
+                if(!this.isActiveAnimation('walk_left'))
+                    this.setActiveAnimation('walk_left');
+            } else if(gf.controls.isActionActive('walk_right')) {
+                if(!this.isActiveAnimation('walk_right'))
+                    this.setActiveAnimation('walk_right');
             } 
 
             //if not moving, there is a currentAnimation, and the currentAnimation isn't an idle one
