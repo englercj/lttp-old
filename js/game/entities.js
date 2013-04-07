@@ -145,7 +145,6 @@ define([
                 this.setActiveAnimation('walk_' + dir);
                 this.velocity[p] = amt;
                 gf.game.world.position[p] += amt;
-                gf.game.world
             } else {
                 this.setActiveAnimation('idle_' + dir);
                 this.velocity[p] = 0;
