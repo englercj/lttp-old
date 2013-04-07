@@ -3,13 +3,13 @@ define([
 ], function(types) {
     var Sprite = function(pos, settings) {
         //can be lifted by another entity
-        this.isLiftable = false;
+        this.liftable = false;
 
         //can be effected by bombs
-        this.isExplodable = true;
+        this.explodable = true;
 
         //is cutable by a sword
-        this.isCutable = false;
+        this.cutable = false;
 
         //is this sprite attacking?
         this.attacking = false;
@@ -40,9 +40,6 @@ define([
         //enemy type
         settings.type = gf.types.ENTITY.ENEMY;
 
-        //set the index of enemies
-        settings.zIndex = 10;
-
         Sprite.call(this, pos, settings);
     };
 
@@ -59,73 +56,88 @@ define([
         //set name of Link
         settings.name = 'link';
 
-        //set the zindex of the player
-        settings.zIndex = 10;
-
-        //set default scale
-        settings.scale = 2;
-
         //size
-        settings.size = [64, 64];
-
-        //hitSize
-        settings.hitSize = [12, 12];
-
-        //hitOffset
-        settings.hitOffset = [0, -10];
+        settings.size = [16, 22];
 
         Sprite.call(this, pos, settings);
 
         //bind the keyboard
-        gf.controls.bindKey(gf.types.KEY.W, 'move_up');
-        gf.controls.bindKey(gf.types.KEY.A, 'move_left');
-        gf.controls.bindKey(gf.types.KEY.S, 'move_down');
-        gf.controls.bindKey(gf.types.KEY.D, 'move_right');
+        gf.controls.bindKey(gf.types.KEY.W, 'move_up', this.onMove.bind(this, 'up'));
+        gf.controls.bindKey(gf.types.KEY.A, 'move_left', this.onMove.bind(this, 'left'));
+        gf.controls.bindKey(gf.types.KEY.S, 'move_down', this.onMove.bind(this, 'down'));
+        gf.controls.bindKey(gf.types.KEY.D, 'move_right', this.onMove.bind(this, 'right'));
 
         gf.controls.bindKey(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
         gf.controls.bindKey(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
 
         //bind the gamepad
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'move_left');
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'move_right');
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'move_up');
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'move_down');
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'move_left', this.onMove.bind(this, 'left'));
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'move_right', this.onMove.bind(this, 'right'));
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'move_up', this.onMove.bind(this, 'up'));
+        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'move_down', this.onMove.bind(this, 'down'));
 
         gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
         gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
 
         //add our animations
-        this.addAnimation('move_right', {
-            frames: [0, 1, 2, 3, 4, 5, 6, 7],
-            duration: 500,
-            loop: true
-        });
-        this.addAnimation('move_left', {
-            frames: [12, 13, 14, 15, 16, 17, 18, 19],
-            duration: 500,
-            loop: true
-        });
-        this.addAnimation('move_down', {
-            frames: [24, 25, 26, 27, 28, 29, 30, 31],
-            duration: 500,
-            loop: true
-        });
-        this.addAnimation('move_up', {
-            frames: [36, 37, 38, 39, 40, 41, 42, 43],
-            duration: 500,
-            loop: true
-        });
-        this.addAnimation('move_right_idle', [0]);
-        this.addAnimation('move_left_idle', [12]);
-        this.addAnimation('move_down_idle', [24]);
-        this.addAnimation('move_up_idle', [36]);
-        this.setActiveAnimation('move_down_idle');
+        this.addAnimation('walk_left', [
+            'walk_left/walk_left_1.png',
+            'walk_left/walk_left_2.png',
+            'walk_left/walk_left_3.png',
+            'walk_left/walk_left_4.png',
+            'walk_left/walk_left_5.png',
+            'walk_left/walk_left_6.png',
+            'walk_left/walk_left_7.png',
+            'walk_left/walk_left_8.png'
+        ], 0.23);
+        this.addAnimation('walk_right', [
+            'walk_right/walk_right_1.png',
+            'walk_right/walk_right_2.png',
+            'walk_right/walk_right_3.png',
+            'walk_right/walk_right_4.png',
+            'walk_right/walk_right_5.png',
+            'walk_right/walk_right_6.png',
+            'walk_right/walk_right_7.png',
+            'walk_right/walk_right_8.png'
+        ], 0.23);
+        this.addAnimation('walk_down', [
+            'walk_down/walk_down_1.png',
+            'walk_down/walk_down_2.png',
+            'walk_down/walk_down_3.png',
+            'walk_down/walk_down_4.png',
+            'walk_down/walk_down_5.png',
+            'walk_down/walk_down_6.png',
+            'walk_down/walk_down_7.png',
+            'walk_down/walk_down_8.png'
+        ], 0.23);
+        this.addAnimation('walk_up', [
+            'walk_up/walk_up_1.png',
+            'walk_up/walk_up_2.png',
+            'walk_up/walk_up_3.png',
+            'walk_up/walk_up_4.png',
+            'walk_up/walk_up_5.png',
+            'walk_up/walk_up_6.png',
+            'walk_up/walk_up_7.png',
+            'walk_up/walk_up_8.png'
+        ], 0.23);
+        this.addAnimation('idle_left', 'idle_left/idle_left_1.png');
+        this.addAnimation('idle_right', 'idle_right/idle_right_1.png');
+        this.addAnimation('idle_down', 'idle_down/idle_down_1.png');
+        this.addAnimation('idle_up', 'idle_up/idle_up_1.png');
+        this.setActiveAnimation('idle_down');
 
         //make the camera track this entity
         gf.game.cameraTrack(this);
     };
 
     gf.inherits(Link, Sprite, {
+        onMove: function(dir, action, kpress) {
+            if(kpress) {
+                this.setActiveAnimation('walk_' + dir);
+            } else {
+                this.setActiveAnimation('idle_' + dir);
+            }
+        },/*
         update: function() {
             //check if the player is moving, and update the velocity
             this.checkMovement();
@@ -185,7 +197,7 @@ define([
             //if not moving, there is a currentAnimation, and the currentAnimation isn't an idle one
             if(this.velocity.x === 0 && this.velocity.y === 0 && this.currentAnim && this.currentAnim.name.indexOf('idle') === -1)
                 this.setActiveAnimation(this.currentAnim.name + '_idle');
-        },
+        },*/
         //use equipted item
         onUseItem: function() {},
         //when attack key is pressed

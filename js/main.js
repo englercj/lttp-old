@@ -28,8 +28,7 @@
 
             window.loader = new gf.AssetLoader(data.resources);
 
-            loader.on('progress', function(err, e) {
-
+            loader.on('progress', function(e) {
             });
 
             loader.on('complete', function() {

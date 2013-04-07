@@ -1,0 +1,39 @@
+{ "height":10,
+ "layers":[
+        {
+         "data":[0, 0, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1],
+         "height":10,
+         "name":"base",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":10,
+         "x":0,
+         "y":0
+        }],
+ "orientation":"orthogonal",
+ "properties":
+    {
+
+    },
+ "tileheight":16,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "image":"testset.png",
+         "imageheight":16,
+         "imagewidth":32,
+         "margin":0,
+         "name":"checker",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tileheight":16,
+         "tilewidth":16
+        }],
+ "tilewidth":16,
+ "version":1,
+ "width":10
+}
