@@ -5,8 +5,8 @@
         'game/huditems'
     ], function(data, entities, huditems) {
         //turn on some debugging properties
-        gf.debug.showFps = true;            //show the FPS box
-        /*gf.debug.showInfo = true;           //show detailed debug info
+        /*gf.debug.showFps = true;            //show the FPS box
+        gf.debug.showInfo = true;           //show detailed debug info
         gf.debug.showOutline = true;        //show the outline of an entity (size)
         gf.debug.showHitbox = true;         //show the outline of an entity hitbox
         gf.debug.accessTiledUniforms = true;//gf.debug.tiledUniforms with an array of shader uniforms used by the TiledMapLayer object
@@ -27,6 +27,7 @@
                 width: $game.width(),
                 height: $game.height()
             });
+            gf.debug.showFpsCounter();
 
             window.game = game;
 

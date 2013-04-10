@@ -41,7 +41,7 @@ define([
         settings = settings || {};
 
         //enemy type
-        settings.type = gf.types.ENTITY.ENEMY;
+        settings.type = gf.Entity.TYPE.ENEMY;
 
         Sprite.call(this, game, pos, settings);
     };
@@ -54,7 +54,7 @@ define([
         settings = settings || {};
 
         //player type
-        settings.type = gf.types.ENTITY.PLAYER;
+        settings.type = gf.Entity.TYPE.PLAYER;
 
         //set name of Link
         settings.name = 'link';
@@ -68,22 +68,22 @@ define([
         Sprite.call(this, game, pos, settings);
 
         //bind the keyboard
-        this.game.input.keyboard.bind(gf.types.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
-        this.game.input.keyboard.bind(gf.types.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
-        this.game.input.keyboard.bind(gf.types.KEY.S, 'walk_down', this.onWalk.bind(this, 'down'));
-        this.game.input.keyboard.bind(gf.types.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
+        this.game.input.keyboard.bind(gf.input.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
+        this.game.input.keyboard.bind(gf.input.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
+        this.game.input.keyboard.bind(gf.input.KEY.S, 'walk_down', this.onWalk.bind(this, 'down'));
+        this.game.input.keyboard.bind(gf.input.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
 
-        this.game.input.keyboard.bind(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
-        this.game.input.keyboard.bind(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
+        this.game.input.keyboard.bind(gf.input.KEY.E, 'use_item', this.onUseItem.bind(this));
+        this.game.input.keyboard.bind(gf.input.KEY.K, 'attack', this.onAttack.bind(this));
 
         //bind the gamepad
-        this.game.input.gamepad.bindStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
-        this.game.input.gamepad.bindStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'walk_right', this.onWalk.bind(this, 'right'));
-        this.game.input.gamepad.bindStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'walk_up', this.onWalk.bind(this, 'up'));
-        this.game.input.gamepad.bindStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'walk_down', this.onWalk.bind(this, 'down'));
+        this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
+        this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, false, 'walk_right', this.onWalk.bind(this, 'right'));
+        this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, true, 'walk_up', this.onWalk.bind(this, 'up'));
+        this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, false, 'walk_down', this.onWalk.bind(this, 'down'));
 
-        this.game.input.gamepad.bindButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
-        this.game.input.gamepad.bindButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
+        this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_1, 'use_item', this.onUseItem.bind(this));
+        this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_2, 'attack', this.onAttack.bind(this));
 
         //add our animations
         this.addAnimation('walk_left', [
