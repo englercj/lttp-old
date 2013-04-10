@@ -1,7 +1,7 @@
 define([
     'game/data/types'
 ], function(types) {
-    var Sprite = function(pos, settings) {
+    var Sprite = function(game, pos, settings) {
         //can be lifted by another entity
         this.liftable = false;
 
@@ -32,25 +32,25 @@ define([
         //speed the ent moves at
         this.speed = 1.5;
 
-        gf.Entity.call(this, pos, settings);
+        gf.Entity.call(this, game, pos, settings);
     };
 
     gf.inherits(Sprite, gf.Entity);
 
-    var Enemy = function(pos, settings) {
+    var Enemy = function(game, pos, settings) {
         settings = settings || {};
 
         //enemy type
         settings.type = gf.types.ENTITY.ENEMY;
 
-        Sprite.call(this, pos, settings);
+        Sprite.call(this, game, pos, settings);
     };
 
     gf.inherits(Enemy, Sprite);
 
     gf.entityPool.add('enemy', Enemy);
 
-    var Link = function(pos, settings) {
+    var Link = function(game, pos, settings) {
         settings = settings || {};
 
         //player type
@@ -65,25 +65,25 @@ define([
         //accelleration = 0
         settings.accel = [0, 0];
 
-        Sprite.call(this, pos, settings);
+        Sprite.call(this, game, pos, settings);
 
         //bind the keyboard
-        gf.controls.bindKey(gf.types.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
-        gf.controls.bindKey(gf.types.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
-        gf.controls.bindKey(gf.types.KEY.S, 'walk_down', this.onWalk.bind(this, 'down'));
-        gf.controls.bindKey(gf.types.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
+        this.game.input.keyboard.bind(gf.types.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
+        this.game.input.keyboard.bind(gf.types.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
+        this.game.input.keyboard.bind(gf.types.KEY.S, 'walk_down', this.onWalk.bind(this, 'down'));
+        this.game.input.keyboard.bind(gf.types.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
 
-        gf.controls.bindKey(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
-        gf.controls.bindKey(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
+        this.game.input.keyboard.bind(gf.types.KEY.E, 'use_item', this.onUseItem.bind(this));
+        this.game.input.keyboard.bind(gf.types.KEY.K, 'attack', this.onAttack.bind(this));
 
         //bind the gamepad
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'walk_right', this.onWalk.bind(this, 'right'));
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'walk_up', this.onWalk.bind(this, 'up'));
-        gf.controls.bindGamepadStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'walk_down', this.onWalk.bind(this, 'down'));
+        this.game.input.gamepad.bindStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
+        this.game.input.gamepad.bindStick(gf.types.GP_AXES.LEFT_ANALOGUE_HOR, false, 'walk_right', this.onWalk.bind(this, 'right'));
+        this.game.input.gamepad.bindStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, true, 'walk_up', this.onWalk.bind(this, 'up'));
+        this.game.input.gamepad.bindStick(gf.types.GP_AXES.LEFT_ANALOGUE_VERT, false, 'walk_down', this.onWalk.bind(this, 'down'));
 
-        gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
-        gf.controls.bindGamepadButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
+        this.game.input.gamepad.bindButton(gf.types.GP_BUTTONS.FACE_1, 'use_item', this.onUseItem.bind(this));
+        this.game.input.gamepad.bindButton(gf.types.GP_BUTTONS.FACE_2, 'attack', this.onAttack.bind(this));
 
         //add our animations
         this.addAnimation('walk_left', [
@@ -133,7 +133,8 @@ define([
         this.setActiveAnimation('idle_down');
 
         //make the camera track this entity
-        gf.game.cameraTrack(this);
+        //this.game.camera.follow(this);
+        window.link = this;
     };
 
     gf.inherits(Link, Sprite, {
@@ -144,19 +145,18 @@ define([
             if(kpress) {
                 this.setActiveAnimation('walk_' + dir);
                 this.velocity[p] = amt;
-                gf.game.world.position[p] += amt;
             } else {
                 this.setActiveAnimation('idle_' + dir);
                 this.velocity[p] = 0;
 
                 //this fixes an issue if you hold more than one at once and release one
-                if(gf.controls.isActionActive('walk_left')) 
+                if(this.game.input.isActionActive('walk_left')) 
                     this.setActiveAnimation('walk_left');
-                else if(gf.controls.isActionActive('walk_right'))
+                else if(this.game.input.isActionActive('walk_right'))
                     this.setActiveAnimation('walk_right');
-                else if(gf.controls.isActionActive('walk_down'))
+                else if(this.game.input.isActionActive('walk_down'))
                     this.setActiveAnimation('walk_down');
-                else if(gf.controls.isActionActive('walk_up'))
+                else if(this.game.input.isActionActive('walk_up'))
                     this.setActiveAnimation('walk_up');
             }
         },/*

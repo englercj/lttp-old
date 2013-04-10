@@ -14,40 +14,42 @@
         */
         //gf.debug.showMapColliders = true;   //show the map colliders
 
+        var $game, game;
+
         $(function() {
             $(window).on('resize', onWindowResize);
 
-            var $game = $('#game');
-            //initialize the renderer
-            gf.game.init('game', {
+            $game = $('#game');
+
+            game = new gf.Game('game', {
                 gravity: 0,
                 friction: [0, 0],
                 width: $game.width(),
                 height: $game.height()
             });
 
-            window.loader = new gf.AssetLoader(data.resources);
+            window.game = game;
 
-            loader.on('progress', function(e) {
+            game.loader.on('progress', function(e) {
             });
 
-            loader.on('complete', function() {
+            game.loader.on('complete', function() {
                 //initialize map and add to game
-                gf.game.loadWorld('world_lightworld');
+                game.loadWorld('world_lightworld');
 
                 //bind some game related keys
-                gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));
-                gf.controls.bindKey(gf.types.KEY.M, 'toggle_map', onToggleMap.bind(this));
-                gf.controls.bindKey(gf.types.KEY.P, 'toggle_audio', onToggleAudio.bind(this));
+                //gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));
+                //gf.controls.bindKey(gf.types.KEY.M, 'toggle_map', onToggleMap.bind(this));
+                //gf.controls.bindKey(gf.types.KEY.P, 'toggle_audio', onToggleAudio.bind(this));
 
                 //initialize HUD
                 //initHud();
 
                 //start render loop
-                gf.game.render();
+                game.render();
             });
 
-            loader.load();
+            game.loader.load(data.resources);
         });
 
         function initHud() {
@@ -74,7 +76,7 @@
             var w = $(window).width(),
                 h = $(window).height();
 
-            gf.game.resize(w, h);
+            game.resize(w, h);
         }
     });
 })(jQuery, window);
