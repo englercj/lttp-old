@@ -133,7 +133,7 @@ define([
         this.setActiveAnimation('idle_down');
 
         //make the camera track this entity
-        //this.game.camera.follow(this);
+        this.game.camera.follow(this);
         window.link = this;
     };
 
