@@ -37,7 +37,7 @@
             game.loader.on('complete', function() {
                 //initialize map and add to game
                 game.loadWorld('world_lightworld');
-                game.camera.follow(game.players[0], gf.Camera.FOLLOW.PLATFORMER);
+                game.camera.follow(game.players[0]);
 
                 //bind some game related keys
                 game.input.keyboard.bind(gf.input.KEY.I, 'toggle_inventory', onToggleInventory);

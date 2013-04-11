@@ -67,6 +67,10 @@ define([
 
         Sprite.call(this, game, pos, settings);
 
+        this.bindKeys();
+        this.bindGamepad();
+        this.addAnimations();
+
         //bind the keyboard
         this.game.input.keyboard.bind(gf.input.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
         this.game.input.keyboard.bind(gf.input.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
@@ -74,7 +78,7 @@ define([
         this.game.input.keyboard.bind(gf.input.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
 
         this.game.input.keyboard.bind(gf.input.KEY.E, 'use_item', this.onUseItem.bind(this));
-        this.game.input.keyboard.bind(gf.input.KEY.K, 'attack', this.onAttack.bind(this));
+        this.game.input.keyboard.bind(gf.input.KEY.SPACE, 'attack', this.onAttack.bind(this));
 
         //bind the gamepad
         this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
@@ -84,53 +88,6 @@ define([
 
         this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_1, 'use_item', this.onUseItem.bind(this));
         this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_2, 'attack', this.onAttack.bind(this));
-
-        //add our animations
-        this.addAnimation('walk_left', [
-            'walk_left/walk_left_1.png',
-            'walk_left/walk_left_2.png',
-            'walk_left/walk_left_3.png',
-            'walk_left/walk_left_4.png',
-            'walk_left/walk_left_5.png',
-            'walk_left/walk_left_6.png',
-            'walk_left/walk_left_7.png',
-            'walk_left/walk_left_8.png'
-        ], 0.23);
-        this.addAnimation('walk_right', [
-            'walk_right/walk_right_1.png',
-            'walk_right/walk_right_2.png',
-            'walk_right/walk_right_3.png',
-            'walk_right/walk_right_4.png',
-            'walk_right/walk_right_5.png',
-            'walk_right/walk_right_6.png',
-            'walk_right/walk_right_7.png',
-            'walk_right/walk_right_8.png'
-        ], 0.23);
-        this.addAnimation('walk_down', [
-            'walk_down/walk_down_1.png',
-            'walk_down/walk_down_2.png',
-            'walk_down/walk_down_3.png',
-            'walk_down/walk_down_4.png',
-            'walk_down/walk_down_5.png',
-            'walk_down/walk_down_6.png',
-            'walk_down/walk_down_7.png',
-            'walk_down/walk_down_8.png'
-        ], 0.23);
-        this.addAnimation('walk_up', [
-            'walk_up/walk_up_1.png',
-            'walk_up/walk_up_2.png',
-            'walk_up/walk_up_3.png',
-            'walk_up/walk_up_4.png',
-            'walk_up/walk_up_5.png',
-            'walk_up/walk_up_6.png',
-            'walk_up/walk_up_7.png',
-            'walk_up/walk_up_8.png'
-        ], 0.23);
-        this.addAnimation('idle_left', 'idle_left/idle_left_1.png');
-        this.addAnimation('idle_right', 'idle_right/idle_right_1.png');
-        this.addAnimation('idle_down', 'idle_down/idle_down_1.png');
-        this.addAnimation('idle_up', 'idle_up/idle_up_1.png');
-        this.setActiveAnimation('idle_down');
 
         //make the camera track this entity
         window.link = this;
@@ -142,7 +99,7 @@ define([
                 amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed);
 
             if(kpress) {
-                this.setActiveAnimation('walk_' + dir);
+                this.setActiveAnimation('walk_shield_' + dir, true);
                 this.velocity[p] = amt;
             } else {
                 this.setActiveAnimation('idle_' + dir);
@@ -150,15 +107,90 @@ define([
 
                 //this fixes an issue if you hold more than one at once and release one
                 if(this.game.input.isActionActive('walk_left')) 
-                    this.setActiveAnimation('walk_left');
+                    this.setActiveAnimation('walk_shield_left', true);
                 else if(this.game.input.isActionActive('walk_right'))
-                    this.setActiveAnimation('walk_right');
+                    this.setActiveAnimation('walk_shield_right', true);
                 else if(this.game.input.isActionActive('walk_down'))
-                    this.setActiveAnimation('walk_down');
+                    this.setActiveAnimation('walk_shield_down', true);
                 else if(this.game.input.isActionActive('walk_up'))
-                    this.setActiveAnimation('walk_up');
+                    this.setActiveAnimation('walk_shield_up', true);
             }
-        },/*
+        },
+        bindKeys: function() {
+
+        },
+        bindGamepad: function() {
+
+        },
+        addAnimations: function() {
+            //add walking animations
+            this._addDirectionalFrames('walk', 8, 0.23);
+
+            //add idle animations
+            this.addAnimation('idle_left', ['walk_shield_left/walk_shield_left_1.png']);
+            this.addAnimation('idle_right', ['walk_shield_right/walk_shield_right_1.png']);
+            this.addAnimation('idle_down', ['walk_shield_down/walk_shield_down_1.png']);
+            this.addAnimation('idle_up', ['walk_shield_up/walk_shield_up_1.png']);
+            //this._addDirectionalFrames('idle', 1);
+
+            //add attack animations
+            this._addDirectionalFrames('attack', 7, 0.35); //should be 9, but attack_down is different?
+
+            //add bow attack animations
+            this._addDirectionalFrames('attack_bow', 3, 0.23);
+
+            //add spin attack animations
+            this._addDirectionalFrames('attack_spin', 12, 0.23);
+
+            //add attack tap animations
+            this._addDirectionalFrames('attack_tap', 3, 0.23);
+
+            //add fall in hole animations
+            this._addFrames('fall_in_hole', 4, 0.23);
+
+            //add lifting animations
+            this._addDirectionalFrames('lift', 4, 0.23);
+
+            //add lifting walking animations
+            this._addFrames(['lift_walk_left', 'lift_walk_right'], 3, 0.23);
+            this._addFrames(['lift_walk_down', 'lift_walk_up'], 6, 0.23);
+
+            //add pulling animations
+            this._addDirectionalFrames('pull', 5, 0.23);
+
+            //add walking-attacking animations
+            this._addFrames(['walk_attack_left', 'walk_attack_right'], 3, 0.23);
+            this._addFrames(['walk_attack_down', 'walk_attack_up'], 6, 0.23);
+
+            //add walking with shield animations
+            this._addDirectionalFrames('walk_shield', 8, 0.23);
+
+            //set active
+            this.setActiveAnimation('idle_down');
+        },
+        _addDirectionalFrames: function(type, num, speed) {
+            this._addFrames([
+                type + '_left',
+                type + '_right',
+                type + '_down',
+                type + '_up'
+            ], num, speed);
+        },
+        _addFrames: function(types, num, speed) {
+            if(!(types instanceof Array))
+                types = [types];
+
+            for(var t = 0, tl = types.length; t < tl; ++t) {
+                var frames = [],
+                    type = types[t];
+
+                for(var f = 1; f <= num; ++f) {
+                    frames.push(type + '/' + type + '_' + f + '.png');
+                }
+                this.addAnimation(type, frames, speed);
+            }
+        },
+        /*
         update: function() {
             //check if the player is moving, and update the velocity
             this.checkMovement();
@@ -222,7 +254,18 @@ define([
         //use equipted item
         onUseItem: function() {},
         //when attack key is pressed
-        onAttack: function() {}
+        onAttack: function(action, kpress) {
+            if(!kpress || this.currentAnim.name.indexOf('attack') !== -1)
+                return;
+
+            var name = this.currentAnim.name,
+                dir = name.split('_').pop(),
+                self = this;
+
+            this.setActiveAnimation('attack_' + dir, false, function() {
+                self.setActiveAnimation(name);
+            });
+        }
     });
 
     gf.entityPool.add('link', Link);
