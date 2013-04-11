@@ -37,31 +37,33 @@
             game.loader.on('complete', function() {
                 //initialize map and add to game
                 game.loadWorld('world_lightworld');
+                game.camera.follow(game.players[0], gf.Camera.FOLLOW.PLATFORMER);
 
                 //bind some game related keys
-                //gf.controls.bindKey(gf.types.KEY.I, 'toggle_inventory', onToggleInventory.bind(this));
-                //gf.controls.bindKey(gf.types.KEY.M, 'toggle_map', onToggleMap.bind(this));
-                //gf.controls.bindKey(gf.types.KEY.P, 'toggle_audio', onToggleAudio.bind(this));
+                game.input.keyboard.bind(gf.input.KEY.I, 'toggle_inventory', onToggleInventory);
+                game.input.keyboard.bind(gf.input.KEY.M, 'toggle_map', onToggleMap);
+                game.input.keyboard.bind(gf.input.KEY.P, 'toggle_audio', onToggleAudio);
 
                 //initialize HUD
-                //initHud();
+                initHud();
 
                 //start render loop
                 game.render();
             });
-
             game.loader.load(data.resources);
         });
 
         function initHud() {
-            gf.HUD.init();
+            var hud = new gf.Hud();
+            hud.items = {};
 
-            gf.HUD.addItem('magic-meter', new huditems.MagicMeter(50, 50, { value: 100 }));
-            gf.HUD.addItem('equipted', new huditems.EquiptedItem(90, 50, { value: '' }));
-            gf.HUD.addItem('rupees', new huditems.InventoryCounter(215, 35, { value: 0, name: 'rupees' }));
-            gf.HUD.addItem('bombs', new huditems.InventoryCounter(300, 35, { value: 0, name: 'bombs' }));
-            gf.HUD.addItem('arrows', new huditems.InventoryCounter(375, 35, { value: 0, name: 'arrows' }));
-            gf.HUD.addItem('life', new huditems.LifeMeter(800, 35, { value: 20 }));
+            /*hud.addChild(hud.items['magic-meter'] = new huditems.MagicMeter([50, 50], { value: 100 }));
+            hud.addChild(hud.items['equipted'] = new huditems.EquiptedItem([90, 50], { value: '' }));
+            hud.addChild(hud.items['rupees'] = new huditems.InventoryCounter([215, 35], { value: 0, name: 'rupees' }));
+            hud.addChild(hud.items['bombs'] = new huditems.InventoryCounter([300, 35], { value: 0, name: 'bombs' }));
+            hud.addChild(hud.items['arrows'] = new huditems.InventoryCounter([375, 35], { value: 0, name: 'arrows' }));
+            hud.addChild(hud.items['life'] = new huditems.LifeMeter([800, 35], { value: 20 }));
+            */
         }
 
         function onToggleInventory() {}
