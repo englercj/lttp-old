@@ -95,6 +95,8 @@ define([
 
     gf.inherits(Link, Sprite, {
         onWalk: function(dir, action, kpress) {
+            if(this.freeze) return;
+
             var p = (dir === 'left' || dir === 'right' ? 'x' : 'y'),
                 amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed);
 
@@ -134,7 +136,7 @@ define([
             //this._addDirectionalFrames('idle', 1);
 
             //add attack animations
-            this._addDirectionalFrames('attack', 7, 0.35); //should be 9, but attack_down is different?
+            this._addDirectionalFrames('attack', 9, 0.6);
 
             //add bow attack animations
             this._addDirectionalFrames('attack_bow', 3, 0.23);
@@ -259,11 +261,17 @@ define([
                 return;
 
             var name = this.currentAnim.name,
+                oldVel = this.velocity.clone(),
                 dir = name.split('_').pop(),
                 self = this;
 
+            this.velocity.set(0, 0);
+            this.freeze = true;
+
             this.setActiveAnimation('attack_' + dir, false, function() {
                 self.setActiveAnimation(name);
+                self.velocity.copy(oldVel);
+                self.freeze = false;
             });
         }
     });
