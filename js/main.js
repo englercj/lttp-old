@@ -45,7 +45,8 @@
                 game.input.keyboard.bind(gf.input.KEY.P, 'toggle_audio', onToggleAudio);
 
                 //initialize HUD
-                initHud();
+                var hud = initHud();
+                game.addObject(hud);
 
                 //start render loop
                 game.render();
@@ -57,8 +58,13 @@
             var hud = new gf.Hud();
             hud.items = {};
 
-            /*hud.addChild(hud.items['magic-meter'] = new huditems.MagicMeter([50, 50], { value: 100 }));
-            hud.addChild(hud.items['equipted'] = new huditems.EquiptedItem([90, 50], { value: '' }));
+            hud.addChild(hud.items.magicMeter = new huditems.MagicMeter([50, 50], { value: 100 }));
+            setInterval(function() {
+                hud.items.magicMeter.set('TESTING @ (' + Date.now() + ')' + (Math.random() * 100 > 65 ? '!##**//&&' : ''));
+            }, 1000);
+
+            return hud;
+            /*hud.addChild(hud.items['equipted'] = new huditems.EquiptedItem([90, 50], { value: '' }));
             hud.addChild(hud.items['rupees'] = new huditems.InventoryCounter([215, 35], { value: 0, name: 'rupees' }));
             hud.addChild(hud.items['bombs'] = new huditems.InventoryCounter([300, 35], { value: 0, name: 'bombs' }));
             hud.addChild(hud.items['arrows'] = new huditems.InventoryCounter([375, 35], { value: 0, name: 'arrows' }));

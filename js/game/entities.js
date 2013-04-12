@@ -14,6 +14,9 @@ define([
         //is this sprite attacking?
         this.attacking = false;
 
+        //is this sprite able to move?
+        this.freeze = false;
+
         //will break the sprint of an entity that hits this one
         this.breakSprint = false;
 
@@ -213,46 +216,7 @@ define([
             }
 
             this._super();
-        },
-        checkMovement: function() {
-            if(gf.controls.isActionActive('walk_left')) {
-                this.velocity.x = -this.accel.x * gf.game._delta;
-            }
-            else if(gf.controls.isActionActive('walk_right')) {
-                this.velocity.x = this.accel.x * gf.game._delta;
-            }
-            else {
-                this.velocity.x = 0;
-            }
-
-            if(gf.controls.isActionActive('walk_down')) {
-                this.velocity.y = -this.accel.y * gf.game._delta;
-            }
-            else if(gf.controls.isActionActive('walk_up')) {
-                this.velocity.y = this.accel.y * gf.game._delta;
-            }
-            else {
-                this.velocity.y = 0;
-            }
-
-            if(gf.controls.isActionActive('walk_up')) {
-                if(!this.isActiveAnimation('walk_up'))
-                    this.setActiveAnimation('walk_up');
-            } else if(gf.controls.isActionActive('walk_down')) {
-                if(!this.isActiveAnimation('walk_down'))
-                    this.setActiveAnimation('walk_down');
-            } else if(gf.controls.isActionActive('walk_left')) {
-                if(!this.isActiveAnimation('walk_left'))
-                    this.setActiveAnimation('walk_left');
-            } else if(gf.controls.isActionActive('walk_right')) {
-                if(!this.isActiveAnimation('walk_right'))
-                    this.setActiveAnimation('walk_right');
-            } 
-
-            //if not moving, there is a currentAnimation, and the currentAnimation isn't an idle one
-            if(this.velocity.x === 0 && this.velocity.y === 0 && this.currentAnim && this.currentAnim.name.indexOf('idle') === -1)
-                this.setActiveAnimation(this.currentAnim.name + '_idle');
-        },*/
+        }*/
         //use equipted item
         onUseItem: function() {},
         //when attack key is pressed
@@ -267,8 +231,9 @@ define([
 
             this.velocity.set(0, 0);
             this.freeze = true;
+            this.attacking = true;
 
-            this.setActiveAnimation('attack_' + dir, false, function() {
+            this.setActiveAnimation('attack_' + dir, function() {
                 self.setActiveAnimation(name);
                 self.velocity.copy(oldVel);
                 self.freeze = false;

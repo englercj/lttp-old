@@ -26,6 +26,10 @@ define([], function() {
         {
             name: 'sprite_link',
             src: '/assets/entities/link/link.json'
+        },
+        {
+            name: 'sprite_ui',
+            src: '/assets/ui/ui.json'
         }
     ];
 });

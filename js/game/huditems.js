@@ -1,29 +1,41 @@
 define([
 ], function() {
-    var MagicMeter = function(x, y, settings) {
-        gf.HudItem.call(this, x, y, settings);
-
-        this.maxHeight = gf.utils.getStyle(gf.game._cont, 'max-height');
+    var MagicMeter = function(pos, settings) {
+        settings.font = new gf.TextureFont(
+            'sprite_font',
+            {
+                ext: '.png',
+                size: 32,
+                map: {
+                    '@': 'at',
+                    ')': 'close_paren',
+                    ':': 'colon',
+                    ',': 'comma',
+                    '-': 'dash',
+                    '=': 'equal',
+                    '!': 'exclamation',
+                    '>': 'gt',
+                    '<': 'lt',
+                    '#': 'heart',
+                    '(': 'open_paren',
+                    '%': 'percent',
+                    '.': 'period',
+                    '+': 'plus',
+                    '?': 'questionmark',
+                    '"': 'quote',
+                    ' ': 'space',
+                    ';': 'semicolon',
+                    '\'': 'single_quote',
+                    '/': 'slash',
+                    '*': 'star',
+                    '&': 'arrow_left'
+                }
+            }
+        );
+        gf.HudItem.call(this, pos, settings);
     };
 
     gf.inherits(MagicMeter, gf.HudItem, {
-        update: function() {
-            if(!this.dirty) return;
-
-            this.val.height = this.maxHeight * this.value;
-            this.val.style['margin-top'] = this.maxHeight - (this.maxHeight * this.value) + 6;
-
-            this.dirty = false;
-            return this;
-        },
-        _createElement: function(x, y) {
-            this._super(x, y);
-            this.elm.className = this.elm.className + ' gf-hud-meter';
-
-            this.val = document.createElement('div');
-            this.val.className = 'gf-hud-meter-value ' + this.name;
-            this.elm.appendChild(this.val);
-        }
     });
 
     var LifeMeter = function(x, y, settings) {
