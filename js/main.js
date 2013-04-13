@@ -14,7 +14,7 @@
         */
         //gf.debug.showMapColliders = true;   //show the map colliders
 
-        var $game, game;
+        var $game, game, hud;
 
         $(function() {
             $(window).on('resize', onWindowResize);
@@ -55,20 +55,27 @@
         });
 
         function initHud() {
-            var hud = new gf.Hud();
+            hud = new gf.Hud();
             hud.items = {};
 
             hud.addChild(hud.items.magicMeter = new huditems.MagicMeter([50, 50], { value: 100 }));
-            setInterval(function() {
-                hud.items.magicMeter.set('TESTING @ (' + Date.now() + ')' + (Math.random() * 100 > 65 ? '!##**//&&' : ''));
-            }, 1000);
+
+
+            hud.addChild(
+                hud.items.life = new huditems.LifeMeter(
+                    [
+                        game.camera.size.x - (175), //160 is 10 hearts + 15 pad
+                        15
+                    ],
+                    { value: 5 }
+                )
+            );
 
             return hud;
             /*hud.addChild(hud.items['equipted'] = new huditems.EquiptedItem([90, 50], { value: '' }));
             hud.addChild(hud.items['rupees'] = new huditems.InventoryCounter([215, 35], { value: 0, name: 'rupees' }));
             hud.addChild(hud.items['bombs'] = new huditems.InventoryCounter([300, 35], { value: 0, name: 'bombs' }));
             hud.addChild(hud.items['arrows'] = new huditems.InventoryCounter([375, 35], { value: 0, name: 'arrows' }));
-            hud.addChild(hud.items['life'] = new huditems.LifeMeter([800, 35], { value: 20 }));
             */
         }
 
@@ -84,6 +91,9 @@
         {
             var w = $(window).width(),
                 h = $(window).height();
+
+            hud.items.life.position.x = game.camera.size.x - (175); //160 is 10 hearts + 15 pad
+            hud.items.life.position.y = 15;
 
             game.resize(w, h);
         }

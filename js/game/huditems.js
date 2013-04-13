@@ -24,7 +24,7 @@ define([
             var x = 0,
                 y = 0,
                 size = 16,
-                perRow = 8,
+                perRow = 10,
                 done = 0;
 
             for(var hp = this.value; hp > 0; --hp) {
@@ -46,7 +46,7 @@ define([
                 spr.position.y = y + off;
                 spr.visible = true;
 
-                if((x / size) >= perRow) {
+                if((x / size) >= (perRow - 1)) {
                     x = 0;
                     y += size;
                 } else {
