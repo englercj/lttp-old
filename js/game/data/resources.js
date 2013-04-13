@@ -8,10 +8,6 @@ define([], function() {
         {
             name: 'music_lightworld',
             src: '/assets/audio/music/overworld.lite.ogg'
-        },/*
-        {
-            name: 'world_lightworld2',
-            src: '/assets/worlds/lightworld2/lightworld.json'
         },
         //Darkworld
         {
@@ -21,15 +17,15 @@ define([], function() {
         {
             name: 'music_darkworld',
             src: '/assets/audio/music/dark_world.lite.ogg'
-        },*/
+        },
         //Misc
         {
             name: 'sprite_link',
-            src: '/assets/entities/link/link.json'
+            src: '/assets/sprites/entities/link.json'
         },
         {
             name: 'sprite_ui',
-            src: '/assets/ui/ui.json'
+            src: '/assets/sprites/ui/hud.json'
         }
     ];
 });

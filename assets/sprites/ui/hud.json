@@ -99,10 +99,10 @@
 "meta": {
 	"app": "http://www.texturepacker.com",
 	"version": "1.0",
-	"image": "ui.png",
+	"image": "hud.png",
 	"format": "RGBA8888",
 	"size": {"w":128,"h":128},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:0a2e9adbc5be0cf38be1e6f8e54a2160$"
+	"smartupdate": "$TexturePacker:SmartUpdate:4aa732748d423b566cc9f39fb2d3e684$"
 }
 }
