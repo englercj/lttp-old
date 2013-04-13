@@ -1,82 +1,80 @@
 define([
 ], function() {
     var MagicMeter = function(pos, settings) {
-        settings.font = new gf.TextureFont(
-            'sprite_font',
-            {
-                ext: '.png',
-                size: 32,
-                map: {
-                    '@': 'at',
-                    ')': 'close_paren',
-                    ':': 'colon',
-                    ',': 'comma',
-                    '-': 'dash',
-                    '=': 'equal',
-                    '!': 'exclamation',
-                    '>': 'gt',
-                    '<': 'lt',
-                    '#': 'heart',
-                    '(': 'open_paren',
-                    '%': 'percent',
-                    '.': 'period',
-                    '+': 'plus',
-                    '?': 'questionmark',
-                    '"': 'quote',
-                    ' ': 'space',
-                    ';': 'semicolon',
-                    '\'': 'single_quote',
-                    '/': 'slash',
-                    '*': 'star',
-                    '&': 'arrow_left'
-                }
-            }
-        );
         gf.HudItem.call(this, pos, settings);
     };
 
     gf.inherits(MagicMeter, gf.HudItem, {
     });
 
-    var LifeMeter = function(x, y, settings) {
-       gf.HudItem.call(this, x, y, settings);
+    var LifeMeter = function(pos, settings) {
+        this.textures = gf.assetCache.sprite_ui;
+
+        gf.HudItem.call(this, pos, settings);
     };
 
     gf.inherits(LifeMeter, gf.HudItem, {
         update: function() {
             if(!this.dirty) return;
 
-            var hearts = '', done = 0;
+            this.sprites.freeAll();
+            for(var i = 0, il = this.children.length; i < il; ++i)
+                this.children[i].visible = false;
+
+            var x = 0,
+                y = 0,
+                size = 16,
+                perRow = 8,
+                done = 0;
+
             for(var hp = this.value; hp > 0; --hp) {
                 done++;
-                hearts += '<span class="gf-hud-health heart';
 
+                var off = 0,
+                    spr,
+                    tx;
                 if(hp < 1) { //partial
-                    hearts += ' half';
+                    tx = this.textures['heart-half.png'];
+                    off = 2;
+                } else {
+                    tx = this.textures['heart-full.png'];
                 }
 
-                hearts += '"></span>';
+                spr = this.sprites.create(tx);
+                spr.setTexture(tx);
+                spr.position.x = x;
+                spr.position.y = y + off;
+                spr.visible = true;
+
+                if((x / size) >= perRow) {
+                    x = 0;
+                    y += size;
+                } else {
+                    x += size;
+                }
             }
 
             if(done < this.default) {
                 for(done; done < this.default; ++done) {
-                    hearts += '<span class="gf-hud-health heart empty"></span>';
+                    var tx = this.textures['heart-empty.png'],
+                        spr = this.sprites.create(tx);
+
+                    spr.setTexture(tx);
+                    spr.position.x = x;
+                    spr.position.y = y;
+                    spr.visible = true;
+
+                    if((x / size) >= perRow) {
+                        x = 0;
+                        y += size;
+                    } else {
+                        x += size;
+                    }
                 }
             }
 
-            this.hearts.innerHtml = hearts;
-
             this.dirty = false;
             return this;
-        },
-        _createElement: function(x, y) {
-            this._super(x, y);
-            this.elm.className = this.elm.className + ' gf-hud-health';
-
-            this.elm.innerHtml = '<span class="gf-hud-health dash"></span>LIFE<span class="gf-hud-health dash"></span>';
-            this.hearts = document.createElement('div');
-            this.hearts.className = 'gf-hud-heath hearts';
-            this.elm.appendChild(this.hearts);
         }
     });
 
