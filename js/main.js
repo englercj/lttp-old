@@ -63,10 +63,8 @@
 
             hud.addChild(
                 hud.items.life = new huditems.LifeMeter(
-                    [
-                        game.camera.size.x - (175), //160 is 10 hearts + 15 pad
-                        15
-                    ],
+                    //160 is 10 hearts + 15 pad
+                    [game.camera.size.x - (175), 15],
                     { value: 5 }
                 )
             );
