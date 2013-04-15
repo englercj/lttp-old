@@ -24,12 +24,16 @@ define([], function() {
             src: '/assets/sprites/entities/link.json'
         },
         {
-            name: 'sprite_ui',
+            name: 'sprite_hud',
             src: '/assets/sprites/ui/hud.json'
         },
         {
             name: 'font_retofganon',
             src: '/assets/sprites/fonts/retofganon.json'
+        },
+        {
+            name: 'sprite_life',
+            src: '/assets/ui/life.png'
         }
     ];
 });

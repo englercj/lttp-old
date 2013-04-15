@@ -1,29 +1,79 @@
 define([
 ], function() {
     var MagicMeter = function(pos, settings) {
+        this.textures = gf.assetCache.sprite_hud;
+
         gf.HudItem.call(this, pos, settings);
+
+        //add the background
+        this.sprites.create(this.textures['magic_meter.png']);
+        //add the value
+        this.sprValue = this.sprites.create(this.textures['magic_meter_value.png']);
+
+        this.maxHeight = this.sprValue.height;
+        this.sprValue.position.x = 6;
+        this.set(settings.value);
     };
 
     gf.inherits(MagicMeter, gf.HudItem, {
+        set: function(val) {
+            this.value = val;
+
+            this.sprValue.height = this.maxHeight * this.value;
+            this.sprValue.position.y = (this.maxHeight - this.sprValue.height) + 8;
+        }
     });
 
     var LifeMeter = function(pos, settings) {
-        this.textures = gf.assetCache.sprite_ui;
+        this.textures = gf.assetCache.sprite_hud;
 
         gf.HudItem.call(this, pos, settings);
+
+        this.dash1 = this.sprites.create(this.textures['life-dash.png']);
+        this.dash1.position.x = this.dash1X = 35;
+        this.dash1.position.y = this.dashY = 0;
+
+        this.life = this.sprites.create(gf.assetCache.sprite_life);
+        this.life.position.x = this.lifeX = 65;
+        this.life.position.y = this.lifeY = -7;
+
+        this.dash2 = this.sprites.create(this.textures['life-dash.png']);
+        this.dash2.position.x = this.dash2X = 100;
+        this.dash1.position.y = this.dashY = 0;
+
+        this.set(settings.value);
     };
 
     gf.inherits(LifeMeter, gf.HudItem, {
         set: function(val) {
-            //this.font.setText(val);
             this.value = val;
 
             this.sprites.freeAll();
             for(var i = 0, il = this.children.length; i < il; ++i)
                 this.children[i].visible = false;
 
+            this.font.visible = true;
+
+            this.dash1 = this.sprites.create(this.textures['life-dash.png']);
+            this.dash1.setTexture(this.textures['life-dash.png']);
+            this.dash1.position.x = this.dash1X;
+            this.dash1.position.y = this.dashY;
+            this.dash1.visible = true;
+
+            this.dash2 = this.sprites.create(this.textures['life-dash.png']);
+            this.dash2.setTexture(this.textures['life-dash.png']);
+            this.dash2.position.x = this.dash2X;
+            this.dash2.position.y = this.dashY;
+            this.dash2.visible = true;
+
+            this.life = this.sprites.create(gf.assetCache.sprite_life);
+            this.life.setTexture(gf.assetCache.sprite_life);
+            this.life.position.x = this.lifeX;
+            this.life.position.y = this.lifeY;
+            this.life.visible = true;
+
             var x = 0,
-                y = 0,
+                y = 20,
                 size = 16,
                 perRow = 10,
                 done = 0;
@@ -79,23 +129,22 @@ define([
         }
     });
 
-    var EquiptedItem = function(x, y, settings) {
-        this.textures = gf.assetCache.sprite_ui;
+    var EquiptedItem = function(pos, settings) {
+        this.textures = gf.assetCache.sprite_hud;
 
-        gf.HudItem.call(this, x, y, settings);
+        gf.HudItem.call(this, pos, settings);
 
         //add the frame
-        this.addChild(this.sprites.create(this.textures['item-frame.png']));
+        this.sprites.create(this.textures['item-frame.png']);
     };
 
     gf.inherits(EquiptedItem, gf.HudItem, {
         set: function(val) {
-            //this.font.setText(val);
             this.value = val;
 
             //add the sprite
             if(!this.children[1]) {
-                this.addChild(this.sprites.create(this.value + '.png'));
+                this.sprites.create(this.value + '.png');
             }
             //set the sprite of the image shown
             else {
@@ -105,18 +154,33 @@ define([
         }
     });
 
-    var InventoryCounter = function(x, y, settings) {
-        this.textures = gf.assetCache.sprite_ui;
+    var InventoryCounter = function(pos, settings) {
+        this.textures = gf.assetCache.sprite_hud;
 
-        gf.HudItem.call(this, x, y, settings);
+        gf.HudItem.call(this, pos, settings);
 
         //add the icon
-        this.addChild(this.sprites.create(this.textures['indicator-' + this.name + '.png']));
+        this.icon = this.sprites.create(this.textures['indicator-' + this.name + '.png']);
+
+        if(this.name === 'bombs' || this.name === 'rupees')
+            this.icon.position.x += 5;
+        else if(this.name === 'arrows')
+            this.font.position.x += 2;
 
         this.font.position.y = 20;
+        this.set(settings.value);
     };
 
-    gf.inherits(InventoryCounter, gf.HudItem);
+    gf.inherits(InventoryCounter, gf.HudItem, {
+        set: function(val) {
+            val = val.toString();
+            while(val.length < 3) {
+                val = '0' + val;
+            }
+
+            gf.HudItem.prototype.set.call(this, val)
+        }
+    });
 
     return {
         MagicMeter: MagicMeter,

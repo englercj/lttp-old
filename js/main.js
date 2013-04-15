@@ -4,15 +4,7 @@
         'game/entities',
         'game/huditems'
     ], function(data, entities, huditems) {
-        //turn on some debugging properties
-        /*gf.debug.showFps = true;            //show the FPS box
-        gf.debug.showInfo = true;           //show detailed debug info
-        gf.debug.showOutline = true;        //show the outline of an entity (size)
-        gf.debug.showHitbox = true;         //show the outline of an entity hitbox
-        gf.debug.accessTiledUniforms = true;//gf.debug.tiledUniforms with an array of shader uniforms used by the TiledMapLayer object
-        gf.debug.showGamepadInfo = true;    //show the gamepad state
-        */
-        //gf.debug.showMapColliders = true;   //show the map colliders
+        gf.debug.showFpsCounter();
 
         var $game, game, hud;
 
@@ -21,21 +13,18 @@
 
             $game = $('#game');
 
-            game = new gf.Game('game', {
+            window.GAME = game = new gf.Game('game', {
                 gravity: 0,
                 friction: [0, 0],
                 width: $game.width(),
                 height: $game.height()
             });
-            gf.debug.showFpsCounter();
-
-            window.game = game;
 
             game.loader.on('progress', function(e) {
             });
 
             game.loader.on('complete', function() {
-                //initialize map and add to game
+                //initialize world and track link with camera
                 game.loadWorld('world_lightworld');
                 game.camera.follow(game.players[0]);
 
@@ -44,13 +33,13 @@
                 game.input.keyboard.bind(gf.input.KEY.M, 'toggle_map', onToggleMap);
                 game.input.keyboard.bind(gf.input.KEY.P, 'toggle_audio', onToggleAudio);
 
-                //initialize HUD
-                var hud = initHud();
-                game.addObject(hud);
+                //initialize HUD objects
+                game.addObject(initHud());
 
                 //start render loop
                 game.render();
             });
+
             game.loader.load(data.resources);
         });
 
@@ -72,24 +61,28 @@
                 map: mp
             });
 
-            hud = new gf.Hud();
+            window.HUD = hud = new gf.Hud();
             hud.items = {};
 
-            hud.addChild(hud.items.magicMeter = new huditems.MagicMeter([50, 50], { value: 100 }));
+            //Add magic meter
+            hud.addChild(hud.items.magicMeter = new huditems.MagicMeter([50, 15], { value: 1 }));
 
+            //Add life hearts
             hud.addChild(
                 hud.items.life = new huditems.LifeMeter(
                     //160 is 10 hearts + 15 pad
                     [game.camera.size.x - (175), 15],
-                    { value: 5 }
+                    { value: 10, font: fnt.clone() }
                 )
             );
 
-            hud.addChild(hud.items.rupees = new huditems.InventoryCounter([215, 35], { value: 0, name: 'rupees', font: fnt.clone() }));
-            hud.addChild(hud.items.bombs = new huditems.InventoryCounter([300, 35], { value: 0, name: 'bombs', font: fnt.clone() }));
-            hud.addChild(hud.items.arrows = new huditems.InventoryCounter([375, 35], { value: 0, name: 'arrows', font: fnt.clone() }));
-            /*hud.addChild(hud.items['equipted'] = new huditems.EquiptedItem([90, 50], { value: '' }));
-            */
+            //Add inventory counters
+            hud.addChild(hud.items.rupees = new huditems.InventoryCounter([215, 15], { value: 0, name: 'rupees', font: fnt.clone() }));
+            hud.addChild(hud.items.bombs = new huditems.InventoryCounter([300, 15], { value: 0, name: 'bombs', font: fnt.clone() }));
+            hud.addChild(hud.items.arrows = new huditems.InventoryCounter([375, 15], { value: 0, name: 'arrows', font: fnt.clone() }));
+
+            //Add equipted item
+            hud.addChild(hud.items.equipted = new huditems.EquiptedItem([90, 15], { value: '' }));
 
             return hud;
         }
