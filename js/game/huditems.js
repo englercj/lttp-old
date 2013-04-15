@@ -14,8 +14,9 @@ define([
     };
 
     gf.inherits(LifeMeter, gf.HudItem, {
-        update: function() {
-            if(!this.dirty) return;
+        set: function(val) {
+            //this.font.setText(val);
+            this.value = val;
 
             this.sprites.freeAll();
             for(var i = 0, il = this.children.length; i < il; ++i)
@@ -79,31 +80,43 @@ define([
     });
 
     var EquiptedItem = function(x, y, settings) {
+        this.textures = gf.assetCache.sprite_ui;
+
         gf.HudItem.call(this, x, y, settings);
+
+        //add the frame
+        this.addChild(this.sprites.create(this.textures['item-frame.png']));
     };
 
     gf.inherits(EquiptedItem, gf.HudItem, {
-        update: function() {
-            if(!this.dirty) return;
+        set: function(val) {
+            //this.font.setText(val);
+            this.value = val;
 
-            this.item.src = this.value;
+            //add the sprite
+            if(!this.children[1]) {
+                this.addChild(this.sprites.create(this.value + '.png'));
+            }
+            //set the sprite of the image shown
+            else {
+                this.children[1].setTexture(this.value + '.png');
+            }
             return this;
-        },
-        _createElement: function(x, y) {
-            this._super(x, y);
-            this.elm.className = this.elm.className + ' gf-hud-equipted';
-
-            this.item = document.createElement('img');
-            this.item.src = '#';
-            this.elm.appendChild(this.item);
         }
     });
 
     var InventoryCounter = function(x, y, settings) {
+        this.textures = gf.assetCache.sprite_ui;
+
         gf.HudItem.call(this, x, y, settings);
 
-        this.elm.className = this.elm.className + ' gf-hud-inventory';
+        //add the icon
+        this.addChild(this.sprites.create(this.textures['indicator-' + this.name + '.png']));
+
+        this.font.position.y = 20;
     };
+
+    gf.inherits(InventoryCounter, gf.HudItem);
 
     return {
         MagicMeter: MagicMeter,

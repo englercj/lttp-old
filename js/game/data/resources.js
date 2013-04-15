@@ -26,6 +26,10 @@ define([], function() {
         {
             name: 'sprite_ui',
             src: '/assets/sprites/ui/hud.json'
+        },
+        {
+            name: 'font_retofganon',
+            src: '/assets/sprites/fonts/retofganon.json'
         }
     ];
 });

@@ -55,11 +55,27 @@
         });
 
         function initHud() {
+            var mp = {};
+            'abcdefghijklmnopqrstuvwxyz'.split('').forEach(function(c) {
+                mp[c] = '_' + c;
+            });
+            mp[':'] = 'colon';
+            mp[','] = 'comma';
+            mp['-'] = 'dash';
+            mp['!'] = 'exclamation';
+            mp['.'] = 'period';
+            mp['?'] = 'question';
+            mp[';'] = 'semicolon';
+
+            var fnt = new gf.TextureFont('font_retofganon', {
+                ext: '.png',
+                map: mp
+            });
+
             hud = new gf.Hud();
             hud.items = {};
 
             hud.addChild(hud.items.magicMeter = new huditems.MagicMeter([50, 50], { value: 100 }));
-
 
             hud.addChild(
                 hud.items.life = new huditems.LifeMeter(
@@ -69,12 +85,13 @@
                 )
             );
 
-            return hud;
+            hud.addChild(hud.items.rupees = new huditems.InventoryCounter([215, 35], { value: 0, name: 'rupees', font: fnt.clone() }));
+            hud.addChild(hud.items.bombs = new huditems.InventoryCounter([300, 35], { value: 0, name: 'bombs', font: fnt.clone() }));
+            hud.addChild(hud.items.arrows = new huditems.InventoryCounter([375, 35], { value: 0, name: 'arrows', font: fnt.clone() }));
             /*hud.addChild(hud.items['equipted'] = new huditems.EquiptedItem([90, 50], { value: '' }));
-            hud.addChild(hud.items['rupees'] = new huditems.InventoryCounter([215, 35], { value: 0, name: 'rupees' }));
-            hud.addChild(hud.items['bombs'] = new huditems.InventoryCounter([300, 35], { value: 0, name: 'bombs' }));
-            hud.addChild(hud.items['arrows'] = new huditems.InventoryCounter([375, 35], { value: 0, name: 'arrows' }));
             */
+
+            return hud;
         }
 
         function onToggleInventory() {}
