@@ -32,6 +32,10 @@ define([], function() {
             src: '/assets/sprites/fonts/retofganon.json'
         },
         {
+            name: 'font_hud',
+            src: '/assets/sprites/fonts/hud.json'
+        },
+        {
             name: 'sprite_life',
             src: '/assets/ui/life.png'
         }

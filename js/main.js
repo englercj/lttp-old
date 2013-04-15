@@ -56,10 +56,8 @@
             mp['?'] = 'question';
             mp[';'] = 'semicolon';
 
-            var fnt = new gf.TextureFont('font_retofganon', {
-                ext: '.png',
-                map: mp
-            });
+            var retofganon = new gf.TextureFont('font_retofganon', { ext: '.png', map: mp }),
+                hudfnt = new gf.TextureFont('font_hud', { ext: '.png' });
 
             window.HUD = hud = new gf.Hud();
             hud.items = {};
@@ -72,14 +70,14 @@
                 hud.items.life = new huditems.LifeMeter(
                     //160 is 10 hearts + 15 pad
                     [game.camera.size.x - (175), 15],
-                    { value: 10, font: fnt.clone() }
+                    { value: 10, font: retofganon.clone() }
                 )
             );
 
             //Add inventory counters
-            hud.addChild(hud.items.rupees = new huditems.InventoryCounter([215, 15], { value: 0, name: 'rupees', font: fnt.clone() }));
-            hud.addChild(hud.items.bombs = new huditems.InventoryCounter([300, 15], { value: 0, name: 'bombs', font: fnt.clone() }));
-            hud.addChild(hud.items.arrows = new huditems.InventoryCounter([375, 15], { value: 0, name: 'arrows', font: fnt.clone() }));
+            hud.addChild(hud.items.rupees = new huditems.InventoryCounter([215, 15], { value: 0, name: 'rupees', font: hudfnt.clone() }));
+            hud.addChild(hud.items.bombs = new huditems.InventoryCounter([300, 15], { value: 0, name: 'bombs', font: hudfnt.clone() }));
+            hud.addChild(hud.items.arrows = new huditems.InventoryCounter([365, 15], { value: 0, name: 'arrows', font: hudfnt.clone() }));
 
             //Add equipted item
             hud.addChild(hud.items.equipted = new huditems.EquiptedItem([90, 15], { value: '' }));

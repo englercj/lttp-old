@@ -162,10 +162,10 @@ define([
         //add the icon
         this.icon = this.sprites.create(this.textures['indicator-' + this.name + '.png']);
 
-        if(this.name === 'bombs' || this.name === 'rupees')
+        if(this.name === 'rupees')
+            this.icon.position.x += 13;
+        else if(this.name === 'bombs')
             this.icon.position.x += 5;
-        else if(this.name === 'arrows')
-            this.font.position.x += 2;
 
         this.font.position.y = 20;
         this.set(settings.value);
@@ -173,8 +173,9 @@ define([
 
     gf.inherits(InventoryCounter, gf.HudItem, {
         set: function(val) {
+            var l = this.name === 'rupees' ? 3 : 2;
             val = val.toString();
-            while(val.length < 3) {
+            while(val.length < l) {
                 val = '0' + val;
             }
 
