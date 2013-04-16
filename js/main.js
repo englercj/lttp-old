@@ -5,6 +5,7 @@
         'game/huditems'
     ], function(data, entities, huditems) {
         gf.debug.showFpsCounter();
+        gf.debug._showColliders = true;
 
         var $game, game, hud;
 
