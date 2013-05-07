@@ -26,8 +26,8 @@ Here is a list of external dependencies and what they are used for. Each is rele
 
 * [jQuery v1.8.2](http://jquery.com/) - For DOM manipulation and utility methods
 * [jQuery UI v1.8.23](http://jqueryui.com/) - For extension of jQuery's DOM manipulation methods
-* [Three.js](https://github.com/mrdoob/three.js) - For abstracting WebGL functionality
-* [require.js](http://requirejs.org/) - Provides dependency loading/management
+* [GrapeFruit](https://github.com/grapefruitjs/grapefruit) - The GameEngine used for all game logic and rendering
+* [require.js](http://requirejs.org/) - For logical code seperation and dependency management
 * [Return of Ganon Font](http://www.zone38.net/font/#ganon) - For dialog and other text
 
 All of these dependencies are included in this repository and there is no need to download or add them individually.
