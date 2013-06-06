@@ -1,7 +1,7 @@
 define([
     'game/data/types'
 ], function(types) {
-    var Sprite = function(game, pos, settings) {
+    var LttpEntity = function(game, pos, settings) {
         //can be lifted by another entity
         this.liftable = false;
 
@@ -26,6 +26,12 @@ define([
         //current health of this entity
         this.health = 3;
 
+        //maximum maxMagic of this entity
+        this.maxMagic = 10;
+
+        //current magic of this entity
+        this.magic = 10;
+
         //current inventory of the entity
         this.inventory = {};
 
@@ -38,7 +44,30 @@ define([
         gf.Entity.call(this, game, pos, settings);
     };
 
-    gf.inherits(Sprite, gf.Entity);
+    gf.inherits(LttpEntity, gf.Entity, {
+        _addDirectionalFrames: function(type, num, speed) {
+            this._addFrames([
+                type + '_left',
+                type + '_right',
+                type + '_down',
+                type + '_up'
+            ], num, speed);
+        },
+        _addFrames: function(types, num, speed) {
+            if(!(types instanceof Array))
+                types = [types];
+
+            for(var t = 0, tl = types.length; t < tl; ++t) {
+                var frames = [],
+                    type = types[t];
+
+                for(var f = 1; f <= num; ++f) {
+                    frames.push(type + '/' + type + '_' + f + '.png');
+                }
+                this.addAnimation(type, frames, speed);
+            }
+        }
+    });
 
     var Enemy = function(game, pos, settings) {
         settings = settings || {};
@@ -46,10 +75,10 @@ define([
         //enemy type
         settings.type = gf.Entity.TYPE.ENEMY;
 
-        Sprite.call(this, game, pos, settings);
+        LttpEntity.call(this, game, pos, settings);
     };
 
-    gf.inherits(Enemy, Sprite);
+    gf.inherits(Enemy, LttpEntity);
 
     gf.entityPool.add('enemy', Enemy);
 
@@ -68,35 +97,17 @@ define([
         //accelleration = 0
         settings.accel = [0, 0];
 
-        Sprite.call(this, game, pos, settings);
+        LttpEntity.call(this, game, pos, settings);
 
         this.bindKeys();
         this.bindGamepad();
         this.addAnimations();
 
-        //bind the keyboard
-        this.game.input.keyboard.bind(gf.input.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
-        this.game.input.keyboard.bind(gf.input.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
-        this.game.input.keyboard.bind(gf.input.KEY.S, 'walk_down', this.onWalk.bind(this, 'down'));
-        this.game.input.keyboard.bind(gf.input.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
-
-        this.game.input.keyboard.bind(gf.input.KEY.E, 'use_item', this.onUseItem.bind(this));
-        this.game.input.keyboard.bind(gf.input.KEY.SPACE, 'attack', this.onAttack.bind(this));
-
-        //bind the gamepad
-        this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
-        this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, false, 'walk_right', this.onWalk.bind(this, 'right'));
-        this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, true, 'walk_up', this.onWalk.bind(this, 'up'));
-        this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, false, 'walk_down', this.onWalk.bind(this, 'down'));
-
-        this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_1, 'use_item', this.onUseItem.bind(this));
-        this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_2, 'attack', this.onAttack.bind(this));
-
         //make the camera track this entity
         window.link = this;
     };
 
-    gf.inherits(Link, Sprite, {
+    gf.inherits(Link, LttpEntity, {
         onWalk: function(dir, action, kpress) {
             if(this.freeze) return;
 
@@ -122,10 +133,24 @@ define([
             }
         },
         bindKeys: function() {
+            //bind the keyboard
+            this.game.input.keyboard.bind(gf.input.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
+            this.game.input.keyboard.bind(gf.input.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
+            this.game.input.keyboard.bind(gf.input.KEY.S, 'walk_down', this.onWalk.bind(this, 'down'));
+            this.game.input.keyboard.bind(gf.input.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
 
+            this.game.input.keyboard.bind(gf.input.KEY.E, 'use_item', this.onUseItem.bind(this));
+            this.game.input.keyboard.bind(gf.input.KEY.SPACE, 'attack', this.onAttack.bind(this));
         },
         bindGamepad: function() {
+            //bind the gamepad
+            this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
+            this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, false, 'walk_right', this.onWalk.bind(this, 'right'));
+            this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, true, 'walk_up', this.onWalk.bind(this, 'up'));
+            this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, false, 'walk_down', this.onWalk.bind(this, 'down'));
 
+            this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_1, 'use_item', this.onUseItem.bind(this));
+            this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_2, 'attack', this.onAttack.bind(this));
         },
         addAnimations: function() {
             //add walking animations
@@ -172,28 +197,6 @@ define([
 
             //set active
             this.setActiveAnimation('idle_down');
-        },
-        _addDirectionalFrames: function(type, num, speed) {
-            this._addFrames([
-                type + '_left',
-                type + '_right',
-                type + '_down',
-                type + '_up'
-            ], num, speed);
-        },
-        _addFrames: function(types, num, speed) {
-            if(!(types instanceof Array))
-                types = [types];
-
-            for(var t = 0, tl = types.length; t < tl; ++t) {
-                var frames = [],
-                    type = types[t];
-
-                for(var f = 1; f <= num; ++f) {
-                    frames.push(type + '/' + type + '_' + f + '.png');
-                }
-                this.addAnimation(type, frames, speed);
-            }
         },
         /*
         update: function() {
@@ -244,7 +247,7 @@ define([
     gf.entityPool.add('link', Link);
 
     return {
-        Sprite: Sprite,
+        LttpEntity: LttpEntity,
         Enemy: Enemy,
         Link: Link
     };

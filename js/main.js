@@ -35,7 +35,7 @@
                 game.input.keyboard.bind(gf.input.KEY.P, 'toggle_audio', onToggleAudio);
 
                 //initialize HUD objects
-                game.addObject(initHud());
+                game.addChild(initHud());
 
                 //start render loop
                 game.render();
@@ -99,8 +99,10 @@
             var w = $(window).width(),
                 h = $(window).height();
 
-            hud.items.life.position.x = game.camera.size.x - (175); //160 is 10 hearts + 15 pad
-            hud.items.life.position.y = 15;
+            if(hud) {
+                hud.items.life.position.x = game.camera.size.x - (175); //160 is 10 hearts + 15 pad
+                hud.items.life.position.y = 15;
+            }
 
             game.resize(w, h);
         }
