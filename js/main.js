@@ -26,8 +26,8 @@
 
             game.loader.on('complete', function() {
                 //initialize world and track link with camera
-                game.loadWorld('smallworld');
-                //game.camera.follow(game.players[0]);
+                game.loadWorld('world_lightworld');
+                game.camera.follow(game.players[0]);
 
                 //bind some game related keys
                 game.input.keyboard.bind(gf.input.KEY.I, 'toggle_inventory', onToggleInventory);

@@ -39,7 +39,7 @@ define([
         this.loot = [];
 
         //speed the ent moves at
-        this.speed = 1.5;
+        this.speed = 50;
 
         gf.Entity.call(this, game, pos, settings);
     };
@@ -94,9 +94,6 @@ define([
         //size
         settings.size = [16, 22];
 
-        //accelleration = 0
-        settings.accel = [0, 0];
-
         LttpEntity.call(this, game, pos, settings);
 
         this.bindKeys();
@@ -112,14 +109,15 @@ define([
             if(this.freeze) return;
 
             var p = (dir === 'left' || dir === 'right' ? 'x' : 'y'),
-                amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed);
+                amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed),
+                vec = new gf.Vector();
 
             if(kpress) {
                 this.setActiveAnimation('walk_shield_' + dir, true);
-                this.velocity[p] = amt;
+                vec[p] = amt;
             } else {
                 this.setActiveAnimation('idle_' + dir);
-                this.velocity[p] = 0;
+                vec[p] = 0;
 
                 //this fixes an issue if you hold more than one at once and release one
                 if(this.game.input.isActionActive('walk_left')) 
@@ -131,6 +129,8 @@ define([
                 else if(this.game.input.isActionActive('walk_up'))
                     this.setActiveAnimation('walk_shield_up', true);
             }
+
+            this.setVelocity(vec);
         },
         bindKeys: function() {
             //bind the keyboard
@@ -198,28 +198,10 @@ define([
             //set active
             this.setActiveAnimation('idle_down');
         },
-        /*
-        update: function() {
-            //check if the player is moving, and update the velocity
-            this.checkMovement();
-     
-            //update player movement
-            this.updateMovement();
-
-            //check for collisions with other entities
-            var collider = gf.game.checkCollisions(this);
-         
-            if(collider) {
-                //if we collide with an enemy
-                if(collider.type == gf.types.ENTITY.ENEMY) {
-                    //TODO: take damage, and do damage animation
-                    // let's flicker in case we touched an enemy
-                    this.flicker(45);
-                }
-            }
-
-            this._super();
-        }*/
+        //on collision
+        onCollision: function(ent) {
+            console.log('Colliding with', ent);
+        },
         //use equipted item
         onUseItem: function() {},
         //when attack key is pressed
