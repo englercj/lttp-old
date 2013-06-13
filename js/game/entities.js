@@ -41,6 +41,9 @@ define([
         //speed the ent moves at
         this.speed = 50;
 
+        settings.width = 16;
+        settings.height = 16;
+
         gf.Entity.call(this, game, pos, settings);
     };
 
@@ -105,33 +108,6 @@ define([
     };
 
     gf.inherits(Link, LttpEntity, {
-        onWalk: function(dir, action, kpress) {
-            if(this.freeze) return;
-
-            var p = (dir === 'left' || dir === 'right' ? 'x' : 'y'),
-                amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed),
-                vec = new gf.Vector();
-
-            if(kpress) {
-                this.setActiveAnimation('walk_shield_' + dir, true);
-                vec[p] = amt;
-            } else {
-                this.setActiveAnimation('idle_' + dir);
-                vec[p] = 0;
-
-                //this fixes an issue if you hold more than one at once and release one
-                if(this.game.input.isActionActive('walk_left')) 
-                    this.setActiveAnimation('walk_shield_left', true);
-                else if(this.game.input.isActionActive('walk_right'))
-                    this.setActiveAnimation('walk_shield_right', true);
-                else if(this.game.input.isActionActive('walk_down'))
-                    this.setActiveAnimation('walk_shield_down', true);
-                else if(this.game.input.isActionActive('walk_up'))
-                    this.setActiveAnimation('walk_shield_up', true);
-            }
-
-            this.setVelocity(vec);
-        },
         bindKeys: function() {
             //bind the keyboard
             this.game.input.keyboard.bind(gf.input.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
@@ -198,8 +174,36 @@ define([
             //set active
             this.setActiveAnimation('idle_down');
         },
+        onWalk: function(dir, action, kpress) {
+            if(this.freeze) return;
+
+            var p = (dir === 'left' || dir === 'right' ? 'x' : 'y'),
+                amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed),
+                vec = new gf.Vector();
+
+            if(kpress) {
+                this.setActiveAnimation('walk_shield_' + dir, true);
+                vec[p] = amt;
+            } else {
+                this.setActiveAnimation('idle_' + dir);
+                vec[p] = 0;
+
+                //this fixes an issue if you hold more than one at once and release one
+                if(this.game.input.isActionActive('walk_left')) 
+                    this.setActiveAnimation('walk_shield_left', true);
+                else if(this.game.input.isActionActive('walk_right'))
+                    this.setActiveAnimation('walk_shield_right', true);
+                else if(this.game.input.isActionActive('walk_down'))
+                    this.setActiveAnimation('walk_shield_down', true);
+                else if(this.game.input.isActionActive('walk_up'))
+                    this.setActiveAnimation('walk_shield_up', true);
+            }
+
+            this.setVelocity(vec);
+        },
         //on collision
         onCollision: function(ent) {
+            LttpEntity.prototype.onCollision.call(this, ent);
             console.log('Colliding with', ent);
         },
         //use equipted item
