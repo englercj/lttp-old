@@ -4,9 +4,6 @@
         'game/entities',
         'game/huditems'
     ], function(data, entities, huditems) {
-        gf.debug.showFpsCounter();
-        gf.debug._showColliders = true;
-
         var $game, game, hud;
 
         $(function() {
@@ -25,6 +22,9 @@
             });
 
             game.loader.on('complete', function() {
+                game.entitypool.add('enemy', entities.Enemy);
+                game.entitypool.add('link', entities.Link);
+
                 //initialize world and track link with camera
                 game.loadWorld('world_lightworld');
                 game.camera.follow(game.players[0]);

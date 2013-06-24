@@ -48,9 +48,14 @@ define([
         set: function(val) {
             this.value = val;
 
-            this.sprites.freeAll();
-            for(var i = 0, il = this.children.length; i < il; ++i)
-                this.children[i].visible = false;
+            for(var i = 0, il = this.children.length; i < il; ++i) {
+                var child = this.children[i];
+
+                if(child instanceof PIXI.Sprite) {
+                    child.visible = false;
+                    this.sprites.free(child);
+                }
+            }
 
             this.font.visible = true;
 

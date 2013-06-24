@@ -80,8 +80,6 @@ define([
 
     gf.inherits(Enemy, LttpEntity);
 
-    gf.entityPool.add('enemy', Enemy);
-
     var Link = function(game, pos, settings) {
         settings = settings || {};
 
@@ -92,7 +90,8 @@ define([
         settings.name = 'link';
 
         //size
-        settings.size = [16, 22];
+        settings.width = 16;
+        settings.height = 22;
 
         LttpEntity.call(this, game, pos, settings);
 
@@ -200,7 +199,7 @@ define([
         },
         //on collision
         onCollision: function(ent) {
-            console.log('Colliding with', ent);
+            //console.log('Colliding with', ent);
         },
         //use equipted item
         onUseItem: function() {},
@@ -225,8 +224,6 @@ define([
             });
         }
     });
-
-    gf.entityPool.add('link', Link);
 
     return {
         LttpEntity: LttpEntity,
