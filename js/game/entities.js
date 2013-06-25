@@ -98,6 +98,8 @@ define([
 
         LttpEntity.call(this, game, pos, settings);
 
+        this.movement = new gf.Vector();
+
         this.bindKeys();
         this.bindGamepad();
         this.addAnimations();
@@ -177,15 +179,14 @@ define([
             if(this.freeze) return;
 
             var p = (dir === 'left' || dir === 'right' ? 'x' : 'y'),
-                amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed),
-                vec = new gf.Vector();
+                amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed);
 
             if(kpress) {
                 this.setActiveAnimation('walk_shield_' + dir, true);
-                vec[p] = amt;
+                this.movement[p] = amt;
             } else {
                 this.setActiveAnimation('idle_' + dir);
-                vec[p] = 0;
+                this.movement[p] = 0;
 
                 //this fixes an issue if you hold more than one at once and release one
                 if(this.game.input.isActionActive('walk_left')) 
@@ -198,12 +199,12 @@ define([
                     this.setActiveAnimation('walk_shield_up', true);
             }
 
-            this.setVelocity(vec);
+            this.setVelocity(this.movement);
         },
         //on collision
         onCollision: function(ent) {
             LttpEntity.prototype.onCollision.call(this, ent);
-            console.log('Colliding with', ent);
+            //console.log('Colliding with', ent);
         },
         //use equipted item
         onUseItem: function() {},
