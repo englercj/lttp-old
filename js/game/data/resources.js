@@ -7,7 +7,9 @@ define([], function() {
         },
         {
             name: 'music_lightworld',
-            src: '/assets/audio/music/overworld.lite.ogg'
+            src: [
+                '/assets/audio/music/overworld.lite.ogg'
+            ]
         },
         //Darkworld
         {
@@ -16,7 +18,9 @@ define([], function() {
         },
         {
             name: 'music_darkworld',
-            src: '/assets/audio/music/dark_world.lite.ogg'
+            src: [
+                '/assets/audio/music/dark_world.lite.ogg'
+            ]
         },
         //Misc
         {

@@ -1,9 +1,24 @@
 define([
 ], function() {
+    var HudItem = function(pos, settings) {
+        this.font = null;
+        this.name = '';
+        this.value = 0;
+
+        gf.DisplayObjectContainer.call(this, settings);
+        this.setPosition(pos[0], pos[1]);
+
+        this.sprites = new gf.ObjectPool(gf.Sprite, this);
+    };
+
+    gf.inherits(HudItem, gf.DisplayObjectContainer, {
+        set: function() {}
+    });
+
     var MagicMeter = function(pos, settings) {
         this.textures = gf.assetCache.sprite_hud;
 
-        gf.HudItem.call(this, pos, settings);
+        HudItem.call(this, pos, settings);
 
         //add the background
         this.sprites.create(this.textures['magic_meter.png']);
@@ -15,7 +30,7 @@ define([
         this.set(settings.value);
     };
 
-    gf.inherits(MagicMeter, gf.HudItem, {
+    gf.inherits(MagicMeter, HudItem, {
         set: function(val) {
             this.value = val;
 
@@ -27,7 +42,7 @@ define([
     var LifeMeter = function(pos, settings) {
         this.textures = gf.assetCache.sprite_hud;
 
-        gf.HudItem.call(this, pos, settings);
+        HudItem.call(this, pos, settings);
 
         this.dash1 = this.sprites.create(this.textures['life-dash.png']);
         this.dash1.position.x = this.dash1X = 35;
@@ -44,7 +59,7 @@ define([
         this.set(settings.value);
     };
 
-    gf.inherits(LifeMeter, gf.HudItem, {
+    gf.inherits(LifeMeter, HudItem, {
         set: function(val) {
             this.value = val;
 
@@ -137,13 +152,13 @@ define([
     var EquiptedItem = function(pos, settings) {
         this.textures = gf.assetCache.sprite_hud;
 
-        gf.HudItem.call(this, pos, settings);
+        HudItem.call(this, pos, settings);
 
         //add the frame
         this.sprites.create(this.textures['item-frame.png']);
     };
 
-    gf.inherits(EquiptedItem, gf.HudItem, {
+    gf.inherits(EquiptedItem, HudItem, {
         set: function(val) {
             this.value = val;
 
@@ -162,7 +177,7 @@ define([
     var InventoryCounter = function(pos, settings) {
         this.textures = gf.assetCache.sprite_hud;
 
-        gf.HudItem.call(this, pos, settings);
+        HudItem.call(this, pos, settings);
 
         //add the icon
         this.icon = this.sprites.create(this.textures['indicator-' + this.name + '.png']);
@@ -176,7 +191,7 @@ define([
         this.set(settings.value);
     };
 
-    gf.inherits(InventoryCounter, gf.HudItem, {
+    gf.inherits(InventoryCounter, HudItem, {
         set: function(val) {
             var l = this.name === 'rupees' ? 3 : 2;
             val = val.toString();
@@ -184,7 +199,7 @@ define([
                 val = '0' + val;
             }
 
-            gf.HudItem.prototype.set.call(this, val)
+            HudItem.prototype.set.call(this, val)
         }
     });
 

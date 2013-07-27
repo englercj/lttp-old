@@ -1,7 +1,7 @@
 define([
     'game/data/types'
 ], function(types) {
-    var LttpEntity = function(game, pos, settings) {
+    var LttpEntity = function(spritesheet) {
         //can be lifted by another entity
         this.liftable = false;
 
@@ -38,25 +38,22 @@ define([
         //loot of the entity that is dropped when it dies
         this.loot = [];
 
-        //speed the ent moves at
-        this.speed = 50;
+        //moveSpeed the ent moves at
+        this.moveSpeed = 50;
 
-        settings.width = 16;
-        settings.height = 16;
-
-        gf.Entity.call(this, game, pos, settings);
+        gf.AnimatedSprite.call(this, spritesheet);
     };
 
-    gf.inherits(LttpEntity, gf.Entity, {
-        _addDirectionalFrames: function(type, num, speed) {
+    gf.inherits(LttpEntity, gf.AnimatedSprite, {
+        _addDirectionalFrames: function(type, num, speed, loop) {
             this._addFrames([
                 type + '_left',
                 type + '_right',
                 type + '_down',
                 type + '_up'
-            ], num, speed);
+            ], num, speed, loop);
         },
-        _addFrames: function(types, num, speed) {
+        _addFrames: function(types, num, speed, loop) {
             if(!(types instanceof Array))
                 types = [types];
 
@@ -67,36 +64,32 @@ define([
                 for(var f = 1; f <= num; ++f) {
                     frames.push(type + '/' + type + '_' + f + '.png');
                 }
-                this.addAnimation(type, frames, speed);
+                this.addAnimation(type, frames, speed, loop);
             }
         }
     });
 
-    var Enemy = function(game, pos, settings) {
-        settings = settings || {};
+    var Enemy = function(texture) {
+        LttpEntity.call(this, texture);
 
         //enemy type
-        settings.type = gf.Entity.TYPE.ENEMY;
-
-        LttpEntity.call(this, game, pos, settings);
+        this.type = gf.Sprite.TYPE.ENEMY;
     };
 
     gf.inherits(Enemy, LttpEntity);
 
-    var Link = function(game, pos, settings) {
-        settings = settings || {};
+    var Link = function(texture) {
+        LttpEntity.call(this, texture);
 
         //player type
-        settings.type = gf.Entity.TYPE.PLAYER;
+        this.type = gf.Sprite.TYPE.PLAYER;
 
         //set name of Link
-        settings.name = 'link';
+        this.name = 'link';
 
         //size
-        settings.width = 16;
-        settings.height = 22;
-
-        LttpEntity.call(this, game, pos, settings);
+        //this.width = 16;
+        //this.height = 22;
 
         this.movement = new gf.Vector();
 
@@ -111,27 +104,27 @@ define([
     gf.inherits(Link, LttpEntity, {
         bindKeys: function() {
             //bind the keyboard
-            this.game.input.keyboard.bind(gf.input.KEY.W, 'walk_up', this.onWalk.bind(this, 'up'));
-            this.game.input.keyboard.bind(gf.input.KEY.A, 'walk_left', this.onWalk.bind(this, 'left'));
-            this.game.input.keyboard.bind(gf.input.KEY.S, 'walk_down', this.onWalk.bind(this, 'down'));
-            this.game.input.keyboard.bind(gf.input.KEY.D, 'walk_right', this.onWalk.bind(this, 'right'));
+            lttp.game.input.keyboard.on(gf.input.KEY.W, this.onWalk.bind(this, 'up'));
+            lttp.game.input.keyboard.on(gf.input.KEY.A, this.onWalk.bind(this, 'left'));
+            lttp.game.input.keyboard.on(gf.input.KEY.S, this.onWalk.bind(this, 'down'));
+            lttp.game.input.keyboard.on(gf.input.KEY.D, this.onWalk.bind(this, 'right'));
 
-            this.game.input.keyboard.bind(gf.input.KEY.E, 'use_item', this.onUseItem.bind(this));
-            this.game.input.keyboard.bind(gf.input.KEY.SPACE, 'attack', this.onAttack.bind(this));
+            lttp.game.input.keyboard.on(gf.input.KEY.E, this.onUseItem.bind(this));
+            lttp.game.input.keyboard.on(gf.input.KEY.SPACE, this.onAttack.bind(this));
         },
         bindGamepad: function() {
             //bind the gamepad
-            this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, true, 'walk_left', this.onWalk.bind(this, 'left'));
-            this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, false, 'walk_right', this.onWalk.bind(this, 'right'));
-            this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, true, 'walk_up', this.onWalk.bind(this, 'up'));
-            this.game.input.gamepad.bindStick(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, false, 'walk_down', this.onWalk.bind(this, 'down'));
+            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this.onWalk.bind(this, 'left'));
+            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this.onWalk.bind(this, 'right'));
+            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this.onWalk.bind(this, 'up'));
+            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this.onWalk.bind(this, 'down'));
 
-            this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_1, 'use_item', this.onUseItem.bind(this));
-            this.game.input.gamepad.bindButton(gf.input.GP_BUTTON.FACE_2, 'attack', this.onAttack.bind(this));
+            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, this.onUseItem.bind(this));
+            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, this.onAttack.bind(this));
         },
         addAnimations: function() {
             //add walking animations
-            this._addDirectionalFrames('walk', 8, 0.23);
+            this._addDirectionalFrames('walk', 8, 0.23, true);
 
             //add idle animations
             this.addAnimation('idle_left', ['walk_shield_left/walk_shield_left_1.png']);
@@ -166,40 +159,89 @@ define([
             this._addDirectionalFrames('pull', 5, 0.23);
 
             //add walking-attacking animations
-            this._addFrames(['walk_attack_left', 'walk_attack_right'], 3, 0.23);
-            this._addFrames(['walk_attack_down', 'walk_attack_up'], 6, 0.23);
+            this._addFrames(['walk_attack_left', 'walk_attack_right'], 3, 0.23, true);
+            this._addFrames(['walk_attack_down', 'walk_attack_up'], 6, 0.23, true);
 
             //add walking with shield animations
-            this._addDirectionalFrames('walk_shield', 8, 0.23);
+            this._addDirectionalFrames('walk_shield', 8, 0.23, true);
 
             //set active
-            this.setActiveAnimation('idle_down');
+            this.gotoAndPlay('idle_down');
         },
         onWalk: function(dir, action, kpress) {
-            if(this.freeze) return;
+            //gamepad input
+            if(dir === 'horz')
+                dir = status.negative ? 'left' : 'right';
+            else if(dir === 'vert')
+                dir = status.negative ? 'down' : 'up';
 
-            var p = (dir === 'left' || dir === 'right' ? 'x' : 'y'),
-                amt = (dir === 'right' || dir === 'down' ? this.speed : -this.speed);
+            var p = dir === 'left' || dir === 'right' ? 'x' : 'y',
+                amt = dir === 'right' || dir === 'down' ? this.moveSpeed : -this.moveSpeed;
 
-            if(kpress) {
-                this.setActiveAnimation('walk_shield_' + dir, true);
+            // .down is keypressed down, .value means the gp
+            // axis is non-center
+            if(status.down || status.value) {
                 this.movement[p] = amt;
             } else {
-                this.setActiveAnimation('idle_' + dir);
                 this.movement[p] = 0;
-
-                //this fixes an issue if you hold more than one at once and release one
-                if(this.game.input.isActionActive('walk_left')) 
-                    this.setActiveAnimation('walk_shield_left', true);
-                else if(this.game.input.isActionActive('walk_right'))
-                    this.setActiveAnimation('walk_shield_right', true);
-                else if(this.game.input.isActionActive('walk_down'))
-                    this.setActiveAnimation('walk_shield_down', true);
-                else if(this.game.input.isActionActive('walk_up'))
-                    this.setActiveAnimation('walk_shield_up', true);
             }
 
+            if(this.frozen) return;
+
+            //this should be based on specified scale number
+            if(p === 'x' && amt < 0) {
+                //this.sprite.scale.x = -1;
+                //this.anchor.x = 1;
+            }
+            else if(p === 'x' && amt > 0) {
+                //this.sprite.scale.x = 1;
+                //this.anchor.x = 0;
+            }
+
+            this._setMoveAnimation();
             this.setVelocity(this.movement);
+        },
+        _setMoveAnimation: function() {
+            //set movement animations
+            if(this.movement.x || this.movement.y) {
+                if(this.inventory.sword && this.inventory.shield) {
+                    if(this.currentAnimation.indexOf('walk_shield') !== -1) {
+                        this._setDirAnimation('walk_shield');
+                    }
+                }
+                else if(this.inventory.sword) {
+                    if(this.currentAnimation.indexOf('walk_sword') !== -1) {
+                        this._setDirAnimation('walk_sword');
+                    }
+                }
+                else {
+                    if(this.currentAnimation.indexOf('walk') !== -1) {
+                        this._setDirAnimation('walk');
+                    }
+                }
+            }
+            //set idle animations
+            else {
+                if(this.currentAnimation.indexOf('idle') !== -1) {
+                    this._setDirAnimation('idle');
+                }
+            }
+        },
+        _setDirAnimation: function(anim) {
+            if(this.movement.x) {
+                if(this.movement.x > 0) {
+                    this.gotoAndPlay(anim + '_right');
+                } else {
+                    this.gotoAndPlay(anim + '_left');
+                }
+            }
+            else if(this.movement.y) {
+                if(this.movement.y > 0) {
+                    this.gotoAndPlay(anim + '_down');
+                } else {
+                    this.gotoAndPlay(anim + '_up');
+                }
+            }
         },
         //on collision
         onCollision: function(ent) {
@@ -222,8 +264,8 @@ define([
             this.freeze = true;
             this.attacking = true;
 
-            this.setActiveAnimation('attack_' + dir, function() {
-                self.setActiveAnimation(name);
+            this.gotoAndPlay('attack_' + dir, function() {
+                self.gotoAndPlay(name);
                 self.velocity.copy(oldVel);
                 self.freeze = false;
             });
