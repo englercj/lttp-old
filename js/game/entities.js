@@ -39,7 +39,7 @@ define([
         this.loot = [];
 
         //moveSpeed the ent moves at
-        this.moveSpeed = 50;
+        this.moveSpeed = 75;
 
         this.spritesheet = spritesheet;
 
@@ -98,6 +98,10 @@ define([
         //this.height = 22;
 
         this.movement = new gf.Vector();
+        this.actions = {
+            move: {},
+            attack: false
+        };
 
         this.bindKeys();
         this.bindGamepad();
@@ -132,12 +136,16 @@ define([
             //add walking animations
             this._addDirectionalFrames('walk', 8, 0.23, true);
 
-            //add idle animations
-            //this.addAnimation('idle_left', ['walk_shield_left/walk_shield_left_1.png']);
-            //this.addAnimation('idle_right', ['walk_shield_right/walk_shield_right_1.png']);
-            //this.addAnimation('idle_down', ['walk_shield_down/walk_shield_down_1.png']);
-            //this.addAnimation('idle_up', ['walk_shield_up/walk_shield_up_1.png']);
-            this._addDirectionalFrames('idle', 1);
+            //add idle shield animations
+            this.addAnimation('idle_shield_left', [this.spritesheet['walk_shield_left/walk_shield_left_1.png'].frames[0]]);
+            this.addAnimation('idle_shield_right', [this.spritesheet['walk_shield_right/walk_shield_right_1.png'].frames[0]]);
+            this.addAnimation('idle_shield_down', [this.spritesheet['walk_shield_down/walk_shield_down_1.png'].frames[0]]);
+            this.addAnimation('idle_shield_up', [this.spritesheet['walk_shield_up/walk_shield_up_1.png'].frames[0]]);
+
+            this.addAnimation('idle_left', [this.spritesheet['walk_left/walk_left_1.png'].frames[0]]);
+            this.addAnimation('idle_right', [this.spritesheet['walk_right/walk_right_1.png'].frames[0]]);
+            this.addAnimation('idle_down', [this.spritesheet['walk_down/walk_down_1.png'].frames[0]]);
+            this.addAnimation('idle_up', [this.spritesheet['walk_up/walk_up_1.png'].frames[0]]);
 
             //add attack animations
             this._addDirectionalFrames('attack', 9, 0.6);
@@ -181,72 +189,73 @@ define([
             else if(dir === 'vert')
                 dir = status.negative ? 'down' : 'up';
 
-            var p = dir === 'left' || dir === 'right' ? 'x' : 'y',
-                amt = dir === 'right' || dir === 'down' ? this.moveSpeed : -this.moveSpeed;
-
-            // .down is keypressed down, .value means the gp
-            // axis is non-center
+            // .down is keypressed down, .value means the gp axis is non-center
             if(status.down || status.value) {
-                this.movement[p] = amt;
+                if(this.actions.move[dir]) return; //skip repeats (holding a key down)
+
+                this.actions.move[dir] = true;
             } else {
-                this.movement[p] = 0;
+                if(!this.actions.move[dir]) return; //skip repeats (holding a key down)
+
+                this.actions.move[dir] = false;
             }
 
             if(this.frozen) return;
 
-            //this should be based on specified scale number
-            if(p === 'x' && amt < 0) {
-                //this.sprite.scale.x = -1;
-                //this.anchor.x = 1;
-            }
-            else if(p === 'x' && amt > 0) {
-                //this.sprite.scale.x = 1;
-                //this.anchor.x = 0;
-            }
+            //doing this in an action status based way means that pressing two opposing
+            //keys at once and release one will still work (like pressing left & right, then releasing right)
+            if(this.actions.move.left && this.actions.move.right)
+                this.movement.x = 0;
+            else if(this.actions.move.left)
+                this.movement.x = -this.moveSpeed;
+            else if(this.actions.move.right)
+                this.movement.x = this.moveSpeed;
+            else
+                this.movement.x = 0;
+
+            if(this.actions.move.up && this.actions.move.down)
+                this.movement.y = 0;
+            else if(this.actions.move.up)
+                this.movement.y = -this.moveSpeed;
+            else if(this.actions.move.down)
+                this.movement.y = this.moveSpeed;
+            else
+                this.movement.y = 0;
 
             this._setMoveAnimation();
             this.setVelocity(this.movement);
         },
         _setMoveAnimation: function() {
-            //set movement animations
-            if(this.movement.x || this.movement.y) {
-                if(this.inventory.sword && this.inventory.shield) {
-                    if(this.currentAnimation.indexOf('walk_shield') === -1) {
-                        this._setDirAnimation('walk_shield');
-                    }
-                }
-                else if(this.inventory.sword) {
-                    if(this.currentAnimation.indexOf('walk_sword') === -1) {
-                        this._setDirAnimation('walk_sword');
-                    }
-                }
-                else {
-                    if(this.currentAnimation.indexOf('walk') === -1) {
-                        this._setDirAnimation('walk');
-                    }
-                }
+            var anim = (this.movement.x || this.movement.y) ? 'walk' : 'idle';
+
+            if(this.inventory.shield) {
+                this._setDirAnimation(anim + '_shield');
             }
-            //set idle animations
             else {
-                if(this.currentAnimation.indexOf('idle') !== -1) {
-                    this._setDirAnimation('idle');
-                }
+                this._setDirAnimation(anim);
             }
         },
         _setDirAnimation: function(anim) {
             if(this.movement.x) {
                 if(this.movement.x > 0) {
+                    this.lastDir = 'right';
                     this.gotoAndPlay(anim + '_right');
                 } else {
+                    this.lastDir = 'left';
                     this.gotoAndPlay(anim + '_left');
                 }
             }
             else if(this.movement.y) {
                 if(this.movement.y > 0) {
+                    this.lastDir = 'down';
                     this.gotoAndPlay(anim + '_down');
                 } else {
+                    this.lastDir = 'up';
                     this.gotoAndPlay(anim + '_up');
                 }
+            }
+            else {
+                this.gotoAndStop(anim + '_' + this.lastDir);
             }
         },
         //on collision

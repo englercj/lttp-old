@@ -1,7 +1,6 @@
 define([
 ], function() {
     var HudItem = function(pos, settings) {
-        this.font = null;
         this.name = '';
         this.value = 0;
 
@@ -12,7 +11,6 @@ define([
     };
 
     gf.inherits(HudItem, gf.DisplayObjectContainer, {
-        set: function() {}
     });
 
     var MagicMeter = function(pos, settings) {
@@ -71,8 +69,6 @@ define([
                     this.sprites.free(child);
                 }
             }
-
-            this.font.visible = true;
 
             this.dash1 = this.sprites.create(this.textures['life-dash.png']);
             this.dash1.setTexture(this.textures['life-dash.png']);
@@ -175,6 +171,7 @@ define([
     });
 
     var InventoryCounter = function(pos, settings) {
+        this.font = null;
         this.textures = gf.assetCache.sprite_hud;
 
         HudItem.call(this, pos, settings);
@@ -187,7 +184,11 @@ define([
         else if(this.name === 'bombs')
             this.icon.position.x += 5;
 
-        this.font.position.y = 20;
+        if(this.font) {
+            this.addChild(this.font);
+            this.font.position.y = 20;
+        }
+
         this.set(settings.value);
     };
 
@@ -199,7 +200,10 @@ define([
                 val = '0' + val;
             }
 
-            HudItem.prototype.set.call(this, val)
+            this.value = val;
+
+            if(this.font)
+                this.font.setText(val);
         }
     });
 
