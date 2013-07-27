@@ -34,6 +34,7 @@
 
                     },
                  "type":"zone",
+                 "visible":true,
                  "width":1040,
                  "x":0,
                  "y":0
@@ -47,6 +48,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":544,
                  "y":368
@@ -60,6 +62,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":528,
                  "y":368
@@ -73,6 +76,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":560,
                  "y":336
@@ -86,6 +90,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":832,
                  "y":96
@@ -99,6 +104,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":832,
                  "y":112
@@ -112,6 +118,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":848,
                  "y":96
@@ -125,6 +132,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":848,
                  "y":112
@@ -138,6 +146,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":896,
                  "y":160
@@ -151,6 +160,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":928,
                  "y":176
@@ -164,6 +174,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":960,
                  "y":176
@@ -177,6 +188,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":944,
                  "y":176
@@ -190,6 +202,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":912,
                  "y":160
@@ -203,6 +216,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":928,
                  "y":160
@@ -216,6 +230,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":944,
                  "y":160
@@ -229,6 +244,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":912,
                  "y":176
@@ -242,6 +258,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":896,
                  "y":176
@@ -255,6 +272,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":448,
                  "y":96
@@ -268,6 +286,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":464,
                  "y":96
@@ -281,6 +300,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":464,
                  "y":112
@@ -294,6 +314,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":448,
                  "y":112
@@ -307,6 +328,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":784,
                  "y":512
@@ -320,6 +342,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":768,
                  "y":512
@@ -333,6 +356,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":784,
                  "y":528
@@ -346,6 +370,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":752,
                  "y":512
@@ -359,6 +384,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":784,
                  "y":544
@@ -372,6 +398,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":768,
                  "y":544
@@ -385,6 +412,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":752,
                  "y":544
@@ -398,6 +426,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":752,
                  "y":528
@@ -411,6 +440,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":864,
                  "y":912
@@ -424,6 +454,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":640,
                  "y":848
@@ -437,6 +468,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":624,
                  "y":880
@@ -450,6 +482,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":608,
                  "y":880
@@ -463,6 +496,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":352,
                  "y":960
@@ -476,6 +510,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":240,
                  "y":896
@@ -489,6 +524,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":160,
                  "y":800
@@ -502,6 +538,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":112,
                  "y":592
@@ -515,6 +552,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":112,
                  "y":576
@@ -528,6 +566,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":96,
                  "y":576
@@ -541,6 +580,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":96,
                  "y":592
@@ -554,6 +594,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":448,
                  "y":752
@@ -566,6 +607,7 @@
                      "isGatherable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":912,
                  "y":336
@@ -578,6 +620,7 @@
                      "isGatherable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":640,
                  "y":96
@@ -590,6 +633,7 @@
                      "isGatherable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":112,
                  "y":288
@@ -602,6 +646,7 @@
                      "isGatherable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":592,
                  "y":848
@@ -615,6 +660,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":768,
                  "y":528
@@ -638,6 +684,7 @@
 
                     },
                  "type":"zone",
+                 "visible":true,
                  "width":1008,
                  "x":1552,
                  "y":2560
@@ -651,6 +698,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1824,
                  "y":2656
@@ -664,6 +712,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1808,
                  "y":2656
@@ -677,6 +726,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1792,
                  "y":2656
@@ -690,6 +740,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1776,
                  "y":2656
@@ -703,6 +754,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1760,
                  "y":2656
@@ -716,6 +768,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1648,
                  "y":2944
@@ -729,6 +782,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1664,
                  "y":2944
@@ -742,6 +796,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1680,
                  "y":2944
@@ -755,6 +810,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1680,
                  "y":2960
@@ -768,6 +824,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1664,
                  "y":2960
@@ -781,6 +838,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1648,
                  "y":2960
@@ -794,6 +852,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1712,
                  "y":2944
@@ -807,6 +866,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1712,
                  "y":2960
@@ -820,6 +880,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1728,
                  "y":2944
@@ -833,6 +894,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1728,
                  "y":2960
@@ -846,6 +908,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1744,
                  "y":2944
@@ -859,6 +922,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":1744,
                  "y":2960
@@ -872,6 +936,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2080,
                  "y":2832
@@ -885,6 +950,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2080,
                  "y":2848
@@ -898,6 +964,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2096,
                  "y":2832
@@ -911,6 +978,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2096,
                  "y":2848
@@ -924,6 +992,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2096,
                  "y":2864
@@ -937,6 +1006,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2080,
                  "y":2864
@@ -950,6 +1020,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2160,
                  "y":2832
@@ -963,6 +1034,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2176,
                  "y":2832
@@ -976,6 +1048,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2192,
                  "y":2832
@@ -989,6 +1062,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2192,
                  "y":2848
@@ -1002,6 +1076,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2176,
                  "y":2848
@@ -1015,6 +1090,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2160,
                  "y":2848
@@ -1028,6 +1104,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2272,
                  "y":2832
@@ -1041,6 +1118,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2288,
                  "y":2832
@@ -1054,6 +1132,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2288,
                  "y":2848
@@ -1067,6 +1146,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2272,
                  "y":2848
@@ -1080,6 +1160,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2464,
                  "y":2896
@@ -1093,6 +1174,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2464,
                  "y":2912
@@ -1106,6 +1188,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2480,
                  "y":2912
@@ -1119,6 +1202,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2480,
                  "y":2928
@@ -1132,6 +1216,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2496,
                  "y":2928
@@ -1145,6 +1230,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2352,
                  "y":2624
@@ -1158,6 +1244,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2320,
                  "y":2608
@@ -1171,6 +1258,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2224,
                  "y":2608
@@ -1184,6 +1272,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2208,
                  "y":2624
@@ -1196,6 +1285,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2288,
                  "y":2880
@@ -1208,6 +1298,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2272,
                  "y":2880
@@ -1220,6 +1311,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2256,
                  "y":2880
@@ -1232,6 +1324,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2192,
                  "y":2880
@@ -1244,6 +1337,7 @@
                      "isLiftable":"true"
                     },
                  "type":"neutral",
+                 "visible":true,
                  "width":16,
                  "x":2176,
                  "y":2880
@@ -1267,9 +1361,10 @@
                      "texture":"sprite_link"
                     },
                  "type":"player",
+                 "visible":true,
                  "width":16,
-                 "x":2240,
-                 "y":2832
+                 "x":2224,
+                 "y":2864
                 }],
          "opacity":1,
          "type":"objectgroup",

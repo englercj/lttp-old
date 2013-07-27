@@ -45,6 +45,9 @@ define([
 
         gf.AnimatedSprite.call(this, spritesheet);
 
+        this.anchor.x = 0.5;
+        this.anchor.y = 0.5;
+
         this.inertia = Infinity;
         this.friction = 0;
         this.enablePhysics(lttp.game.physics);
