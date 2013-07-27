@@ -41,7 +41,13 @@ define([
         //moveSpeed the ent moves at
         this.moveSpeed = 50;
 
+        this.spritesheet = spritesheet;
+
         gf.AnimatedSprite.call(this, spritesheet);
+
+        this.inertia = Infinity;
+        this.friction = 0;
+        this.enablePhysics(lttp.game.physics);
     };
 
     gf.inherits(LttpEntity, gf.AnimatedSprite, {
@@ -62,15 +68,15 @@ define([
                     type = types[t];
 
                 for(var f = 1; f <= num; ++f) {
-                    frames.push(type + '/' + type + '_' + f + '.png');
+                    frames.push(this.spritesheet[type + '/' + type + '_' + f + '.png'].frames[0]);
                 }
                 this.addAnimation(type, frames, speed, loop);
             }
         }
     });
 
-    var Enemy = function(texture) {
-        LttpEntity.call(this, texture);
+    var Enemy = function(spritesheet) {
+        LttpEntity.call(this, spritesheet);
 
         //enemy type
         this.type = gf.Sprite.TYPE.ENEMY;
@@ -78,8 +84,8 @@ define([
 
     gf.inherits(Enemy, LttpEntity);
 
-    var Link = function(texture) {
-        LttpEntity.call(this, texture);
+    var Link = function(spritesheet) {
+        LttpEntity.call(this, spritesheet);
 
         //player type
         this.type = gf.Sprite.TYPE.PLAYER;
@@ -127,11 +133,11 @@ define([
             this._addDirectionalFrames('walk', 8, 0.23, true);
 
             //add idle animations
-            this.addAnimation('idle_left', ['walk_shield_left/walk_shield_left_1.png']);
-            this.addAnimation('idle_right', ['walk_shield_right/walk_shield_right_1.png']);
-            this.addAnimation('idle_down', ['walk_shield_down/walk_shield_down_1.png']);
-            this.addAnimation('idle_up', ['walk_shield_up/walk_shield_up_1.png']);
-            //this._addDirectionalFrames('idle', 1);
+            //this.addAnimation('idle_left', ['walk_shield_left/walk_shield_left_1.png']);
+            //this.addAnimation('idle_right', ['walk_shield_right/walk_shield_right_1.png']);
+            //this.addAnimation('idle_down', ['walk_shield_down/walk_shield_down_1.png']);
+            //this.addAnimation('idle_up', ['walk_shield_up/walk_shield_up_1.png']);
+            this._addDirectionalFrames('idle', 1);
 
             //add attack animations
             this._addDirectionalFrames('attack', 9, 0.6);
@@ -168,7 +174,7 @@ define([
             //set active
             this.gotoAndPlay('idle_down');
         },
-        onWalk: function(dir, action, kpress) {
+        onWalk: function(dir, status) {
             //gamepad input
             if(dir === 'horz')
                 dir = status.negative ? 'left' : 'right';
@@ -205,17 +211,17 @@ define([
             //set movement animations
             if(this.movement.x || this.movement.y) {
                 if(this.inventory.sword && this.inventory.shield) {
-                    if(this.currentAnimation.indexOf('walk_shield') !== -1) {
+                    if(this.currentAnimation.indexOf('walk_shield') === -1) {
                         this._setDirAnimation('walk_shield');
                     }
                 }
                 else if(this.inventory.sword) {
-                    if(this.currentAnimation.indexOf('walk_sword') !== -1) {
+                    if(this.currentAnimation.indexOf('walk_sword') === -1) {
                         this._setDirAnimation('walk_sword');
                     }
                 }
                 else {
-                    if(this.currentAnimation.indexOf('walk') !== -1) {
+                    if(this.currentAnimation.indexOf('walk') === -1) {
                         this._setDirAnimation('walk');
                     }
                 }

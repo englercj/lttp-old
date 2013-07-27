@@ -3,7 +3,7 @@ require([
     'game/entities',
     'game/huditems'
 ], function(data, entities, huditems) {
-    var $game, game, hud;
+    var $game, game, hud, rszTimeout;
 
     window.lttp = {};
 
@@ -96,7 +96,7 @@ require([
         gf.audio.pauseAll();
     }
 
-    function onWindowResize()
+    function doResize()
     {
         var w = $(window).width(),
             h = $(window).height();
@@ -107,5 +107,10 @@ require([
         }
 
         game.resize(w, h);
+    }
+
+    function onWindowResize() {
+        clearTimeout(rszTimeout);
+        rszTimeout = setTimeout(doResize, 250);
     }
 });
