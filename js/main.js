@@ -29,10 +29,15 @@ require([
             //initialize world and track link with camera
             game.loadWorld('world_lightworld');
 
-            lttp.playerLayer = game.world.findLayer('player');
-            lttp.playerLayer.spawnObjects();
+            lttp.layers = {};
 
-            game.camera.follow(lttp.link = lttp.playerLayer.children[0]);
+            lttp.layers.zones = game.world.findLayer('zones');
+            lttp.layers.player = game.world.findLayer('player');
+
+            lttp.layers.zones.spawn();
+            lttp.layers.player.spawn();
+
+            game.camera.follow(lttp.link = lttp.layers.player.children[0]);
 
             //bind some game related keys
             game.input.keyboard.on(gf.input.KEY.I, onToggleInventory);
@@ -117,11 +122,22 @@ require([
             lttp.activeLayer.despawn();
         }
 
+        console.log('load zone:', zone.name);
+
         //transfer the zone stuff
         lttp.activeZone = zone;
-        lttp.activeLayer = game.world.findLayer(zone.name);
+        lttp.activeLayer = lttp.layers[zone.name] || game.world.findLayer(zone.name);
         lttp.activeLayer.spawn();
 
         //pan the camera
+
+        //set camera bounds
+        if(!zone.bounds) {
+            zone.bounds = zone.hitArea.clone();
+            zone.bounds.x += zone.position.x;
+            zone.bounds.y += zone.position.y;
+        }
+        game.camera.constrain(zone.bounds.clone());
+        console.log('setting camera bounds to:', zone.bounds);
     }
 });

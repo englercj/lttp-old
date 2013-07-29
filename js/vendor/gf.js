@@ -180,11 +180,11 @@ PIXI.Rectangle.prototype.contains = function(x, y)
         return false;
 
 	var x1 = this.x;
-	if(x > x1 && x < x1 + this.width)
+	if(x >= x1 && x <= x1 + this.width)
 	{
 		var y1 = this.y;
 		
-		if(y > y1 && y < y1 + this.height)
+		if(y >= y1 && y <= y1 + this.height)
 		{
 			return true;
 		}
@@ -18179,6 +18179,8 @@ gf.PhysicsSystem = function(options) {
         null, //postSolve
         null //separate
     );
+
+    this.actionQueue = [];
 };
 
 gf.inherits(gf.PhysicsSystem, Object, {
@@ -18192,9 +18194,9 @@ gf.inherits(gf.PhysicsSystem, Object, {
             //inifinite mass means it is static, so make it static
             //and do not add it to the world (no need to simulate it)
             body.nodeIdleTime = Infinity;
-        } else {
-            this.space.addBody(body);
-        }
+        }// else {
+            //this.space.addBody(body);
+        //}
 
         return body;
     },
@@ -18250,7 +18252,7 @@ gf.inherits(gf.PhysicsSystem, Object, {
             shape = new cp.BoxShape2(body, new cp.BB(0, -spr.height, spr.width, 0));
         }
 
-        this.space.addShape(shape);
+        //this.space.addShape(shape);
 
         shape.width = spr.width;
         shape.height = spr.height;
@@ -18263,7 +18265,13 @@ gf.inherits(gf.PhysicsSystem, Object, {
         return shape;
     },
     invalidCollisions: function() {
-        this.space.reindexStatic();
+        this.actionQueue.push(['reindexStatic']);
+
+        if(this.space.locked) {
+            this.space.addPostStepCallback(this.onPostStep.bind(this));
+        } else {
+            this.onPostStep();
+        }
     },
     getCollisionType: function(spr) {
         if(spr instanceof gf.Tile) {
@@ -18273,24 +18281,19 @@ gf.inherits(gf.PhysicsSystem, Object, {
         }
     },
     add: function(spr) {
-        if(!spr._phys)
-            spr._phys = {};
-
         //already in system
-        if(spr._phys.body)
+        if(spr._phys && spr._phys.body)
             return;
 
         var body = this._createBody(spr),
-            shape = this._createShape(spr, body);
-
-        spr._phys.body = body;
-        spr._phys.shape = shape;
+            shape = this._createShape(spr, body),
+            control;
 
         //add control body and constraints
-        if(body.m !== Infinity) {
+        if(!body.isStatic()) {
             var cbody = new cp.Body(Infinity, Infinity), //control body
-                cpivot = this.space.addConstraint(new cp.PivotJoint(cbody, body, cp.vzero, cp.vzero)),
-                cgear = this.space.addConstraint(new cp.GearJoint(cbody, body, 0, 1));
+                cpivot = new cp.PivotJoint(cbody, body, cp.vzero, cp.vzero),
+                cgear = new cp.GearJoint(cbody, body, 0, 1);
 
             cpivot.maxBias = 0; //disable join correction
             cpivot.maxForce = 10000; //emulate linear friction
@@ -18299,29 +18302,36 @@ gf.inherits(gf.PhysicsSystem, Object, {
             cgear.maxBias = 1.2; //but limit the angular correction
             cgear.maxForce = 50000; //emulate angular friction
 
-            if(!spr._phys.control)
-                spr._phys.control = {};
+            control = {};
+            control.body = cbody;
+            control.pivot = cpivot;
+            control.gear = cgear;
+        }
 
-            spr._phys.control.body = cbody;
-            spr._phys.control.pivot = cpivot;
-            spr._phys.control.gear = cgear;
+        this.actionQueue.push(['add', {
+            spr: spr,
+            body: body,
+            shape: shape,
+            control: control
+        }]);
+
+        if(this.space.locked) {
+            this.space.addPostStepCallback(this.onPostStep.bind(this));
+        } else {
+            this.onPostStep();
         }
     },
     remove: function(spr) {
         if(!spr || !spr._phys || !spr._phys.body || !spr._phys.shape)
             return;
 
-        if(spr._phys.body.space)
-            this.space.removeBody(spr._phys.body);
+        this.actionQueue.push(['remove', spr._phys]);
 
-        if(spr._phys.shape.space)
-            this.space.removeShape(spr._phys.shape);
-
-        spr._phys.shape.sprite = null;
-
-        //remove references
-        spr._phys.body = null;
-        spr._phys.shape = null;
+        if(this.space.locked) {
+            this.space.addPostStepCallback(this.onPostStep.bind(this));
+        } else {
+            this.onPostStep();
+        }
     },
     setMass: function(spr, mass) {
         if(spr && spr._phys && spr._phys.body)
@@ -18383,6 +18393,54 @@ gf.inherits(gf.PhysicsSystem, Object, {
 
         //maintain the colliding state
         return true;
+    },
+    onPostStep: function() {
+        //remove items
+        while(this.actionQueue.length) {
+            var a = this.actionQueue.pop(),
+                act = a[0],
+                data = a[1];
+
+            switch(act) {
+                case 'add':
+                    data.body.setPos(data.spr.position);
+                    if(!data.body.isStatic()) {
+                        this.space.addBody(data.body);
+                    }
+
+                    this.space.addShape(data.shape);
+
+                    if(data.control) {
+                        data.control.body.setPos(data.spr.position);
+                        this.space.addConstraint(data.control.pivot);
+                        this.space.addConstraint(data.control.gear);
+                    }
+
+                    data.spr._phys = data;
+
+                    if(data.spr._showHit) {
+                        data.spr.showPhysics();
+                    }
+                    break;
+
+                case 'remove':
+                    if(data.body.space)
+                        this.space.removeBody(data.body);
+
+                    if(data.shape.space)
+                        this.space.removeShape(data.shape);
+
+                    //remove references
+                    data.body = null;
+                    data.shape.sprite = null;
+                    data.shape = null;
+                    break;
+
+                case 'reindex':
+                    this.space.reindexStatic();
+                    break;
+            }
+        }
     }
 });
 
@@ -20767,20 +20825,16 @@ gf.inherits(gf.Camera, gf.DisplayObjectContainer, {
 
         if(!dx && !dy) return;
 
-        var newX = this.game.world.position.x - dx,
-            newY = this.game.world.position.y - dy;
+        var pos = this.game.world.position,
+            newX = pos.x - dx,
+            newY = pos.y - dy;
 
-        //move only the difference that puts us at 0
-        if(newX > 0)
-            dx = 0 + this.game.world.position.x;
-        //move only the difference that puts us at max (remember that position is negative)
-        else if(newX < -this._bounds.maxPanX)
-            dx = this._bounds.maxPanX + this.game.world.position.x;
-
-        if(newY > 0)
-            dy = 0 - Math.abs(this.game.world.position.y);
-        else if(newY < -this._bounds.maxPanY)
-            dy = this._bounds.maxPanY + this.game.world.position.y;
+        if(this._bounds) {
+            if(this._outsideBounds(-newX, -pos.y))
+                dx = 0;
+            if(this._outsideBounds(-pos.x, -newY))
+                dy = 0;
+        }
 
         if(dx || dy) {
             //if we move a lot, then just force a re render (less expensive then panning all the way there)
@@ -20795,6 +20849,14 @@ gf.inherits(gf.Camera, gf.DisplayObjectContainer, {
         }
 
         return this;
+    },
+    _outsideBounds: function(x, y) {
+        return (
+            !this._bounds.contains(x, y) || //top left
+            !this._bounds.contains(x, y + this.size.y) || //bottom left
+            !this._bounds.contains(x + this.size.x, y) || //top right
+            !this._bounds.contains(x + this.size.x, y + this.size.y) //bottom right
+        );
     },
     /**
      * Resizes the viewing area, this is called internally by your game instance
@@ -20819,26 +20881,37 @@ gf.inherits(gf.Camera, gf.DisplayObjectContainer, {
      * Sets the bounds the camera is allowed to go. Usually this is the world's
      * min and max, and is set for you.
      *
-     * @method setBounds
-     * @param x {Number} The minimum x coord (usually 0)
-     * @param y {Number} The minimum y coord (usually 0)
-     * @param width {Number} The maximum x coord (usually map width)
-     * @param height {Number} The maximum y coord (usually map height)
+     * @method constrain
+     * @param shape {Rectangle|Polygon|Circle|Ellipse} The shape to constrain the camera into
      * @return {Camera} Returns iteself for chainability
      */
-    setBounds: function(x, y, width, height) {
-        this._bounds.x = x;
-        this._bounds.y = y;
-        this._bounds.width = width;
-        this._bounds.height = height;
+    constrain: function(shape, scaled) {
+        this._bounds = shape;
 
-        this._bounds.maxX = this._bounds.x + this._bounds.width;
-        this._bounds.maxY = this._bounds.y + this._bounds.height;
+        //scale the points
+        if(!scaled) {
+            if(shape instanceof gf.Rectangle) {
+                shape.x *= this.game.world.scale.x;
+                shape.y *= this.game.world.scale.y;
+                shape.width *= this.game.world.scale.x;
+                shape.height *= this.game.world.scale.y;
+            } else if(shape instanceof gf.Polygon) {
+                for(var i = 0; i < shape.points.length; ++i) {
+                    var p = shape.points[i];
 
-        this._bounds.maxPanX = width - this.size.x;
-        this._bounds.maxPanY = height - this.size.y;
+                    p.x *= this.game.world.scale.x;
+                    p.y *= this.game.world.scale.y;
+                }
+            } else {
+                shape.x *= this.game.world.scale.x;
+                shape.y *= this.game.world.scale.y;
+            }
+        }
 
         return this;
+    },
+    unconstrain: function() {
+        this._bounds = null;
     },
     /**
      * Called internally every frame. Updates all effects and the follow
@@ -21758,7 +21831,7 @@ gf.inherits(gf.GameState, gf.DisplayObjectContainer, {
 
         this.world.resize(this._game.renderer.width, this._game.renderer.height);
 
-        this.camera.setBounds(0, 0, this.world.realSize.x, this.world.realSize.y);
+        this.camera.constrain(new gf.Rectangle(0, 0, this.world.realSize.x, this.world.realSize.y), true);
 
         /* TODO: Autoplay music
         if(this.world.properties.music) {
@@ -23783,16 +23856,16 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
         tile.hitArea = hitArea;
         tile.interactive = interactive;
 
-        if(props.mass) {
-            this.hasPhysics = true;
-            tile.enablePhysics(this.parent.parent.physics); //this.TiledMap.GameState.physics
-        }
-
         tile.setTexture(texture);
         tile.setPosition(position[0], position[1]);
 
-        if(props.mass && this.parent._showPhysics)
-            tile.showPhysics();
+        if(props.mass) {
+            this.hasPhysics = true;
+            tile.enablePhysics(this.parent.parent.physics); //this.TiledMap.GameState.physics
+
+            if(this.parent._showPhysics)
+                tile.showPhysics();
+        }
 
         //pass through all events
         if(interactive) {
@@ -24262,9 +24335,11 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
                 obj.hitArea = props.hitArea;
                 obj.rotation = o.rotation;
                 obj.sensor = true;
+                obj.setPosition(o.x, o.y);
 
-                game.physics.add(obj);
-                game.physics.setPosition(obj, new gf.Point(o.x, o.y));
+                obj.enablePhysics(game.physics);
+                if(this.parent._showPhysics)
+                    obj.showPhysics();
             } else {
                 //some variable for the user if they want them
                 //these will be passed through to a custom sprite if wanted
@@ -24284,9 +24359,14 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
                 obj.sensor = props.sensor || props.tileprops.sensor;
                 obj.anchor.y = 1;
                 obj.anchor.x = this.parent.orientation === 'isometric' ? 0.5 : 0;
+                obj.setPosition(o.x, o.y);
 
-                if(props.mass || props.tileprops.mass)
+                if(props.mass || props.tileprops.mass) {
                     obj.enablePhysics(game.physics);
+
+                    if(this.parent._showPhysics)
+                        obj.showPhysics();
+                }
 
                 //set some more stuffz
                 if(typeof o.rotation === 'number')
@@ -24320,7 +24400,6 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
                 obj.mouseupoutside = this.onObjectEvent.bind(this, 'mouseupoutside', obj);
             }
 
-            obj.setPosition(o.x, o.y);
             this.addChild(obj);
         }
 
@@ -24367,8 +24446,13 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
      */
     despawn: function() {
         //remove each sprite from the game
-        for(var i = this.children.length; i > -1; --i) {
-            this.removeChild(this.children[i]);
+        for(var i = this.children.length - 1; i > -1; --i) {
+            var c = this.children[i];
+
+            if(c.destroy)
+                c.destroy();
+            else
+                this.removeChild(c);
         }
 
         return this;

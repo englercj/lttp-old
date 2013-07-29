@@ -266,7 +266,6 @@ define([
         _collide: function(obj) {
             if(obj.type === 'zone') {
                 lttp.loadZone(obj);
-                console.log('Colliding with', obj.type, obj.name, obj.sensor);
             }
         },
         //use equipted item
