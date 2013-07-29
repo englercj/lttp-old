@@ -2,56 +2,47 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>TLOZ: ALTTP</title>
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+        <title>TLOZ: ALTTP</title>
 
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <link rel="shortcut icon" href="favicon.ico">
 
         <!-- HTML5 Boilerplate normalize -->
         <link rel="stylesheet" href="css/normalize.css">
 
-        <!-- jQuery UI Theme -->
-        <link rel="stylesheet" href="css/jquery-ui-1.8.16.custom.css">
-
         <!-- main application styles -->
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/style.css">
+
+        <!-- Zynga Viewporter lib, sets up mobile device browsers properly -->
+        <script src="js/vendor/zynga/viewporter.js"></script>
+        <script src="js/vendor/zynga/viewporter.native.js"></script>
     </head>
     <body>
         <!-- Main Content Section -->
         <section id="game-container">
-            <!--<div id="startup">
-                <div id="progTotal" class="progressbar"><span class="ui-progressbar-text"></span></div>
-                <div id="progPart" class="progressbar"><span class="ui-progressbar-text"></span></div>
-                <button id="btnDownload" class="ui-button-primary">Download Resources</button>
-                <button id="btnStart" class="ui-button-success">Launch Game</button>
-            </div>-->
             <div id="game"></div>
         </section>
 
-        <!--<div id="paused" class="modal">
-            <div class="overlay"></div>
-
-            <div class="vert-center">
-                <div class="modal-content">
-                    The game has been paused. You can press "Pause/Break" or "End" on your keyboard; or select Unpause below:
-                    <br/>
-                    <button id="btnUnpause">Unpause</button>
-                </div>
-            </div>
-        </div>-->
-
         <!-- jQuery -->
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery/jquery.min.js"><\/script>')</script>
 
-        <!-- jQuery UI -->
-        <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
-        <script>window.jQuery.ui || document.write('<script src="js/vendor/jquery/jquery-ui.min.js"><\/script>')</script>
+        <!-- TweenLite -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.9.7/TweenLite.min.js"></script>
+        <script>window.TweenLite || document.write('<script src="js/vendor/tween/TweenLite.min.js"><\/script>')</script>
 
-        <script src="lib/gf.js"></script>
+        <!-- TweenLite EasePack -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/gsap/1.9.7/easing/EasePack.min.js"></script>
+        <script>window.Elastic || document.write('<script src="js/vendor/tween/EasePack.min.js"><\/script>')</script>
+
+        <!-- Grapefruit -->
+        <script src="js/vendor/gf.js"></script>
 
         <!-- main js modules -->
         <script src="js/vendor/require.js" data-main="js/main"></script>

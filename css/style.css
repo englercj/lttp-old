@@ -19,16 +19,19 @@ p, .rog, #dialog, #hud {
     font-family: ReturnOfGanon,Consolas,'Lucida Console','DejaVu Sans Mono',monospace;
 }
 
-#btnStart { display:none; }
-
 #game-container {
     display: block;
     position: absolute;
-    height: 100%;
-    width: 100%;
+    width: 768px;
+    height: 672px;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+
+    left: 50%;
+    top: 50%;
+    margin-left: -384px;
+    margin-top: -336px;
 }
 
 #game {
@@ -63,5 +66,3 @@ p, .rog, #dialog, #hud {
 
 #game-container:-moz-full-screen #fullscreen {
 }*/
-
-#gl-error { margin: 0.5em; }

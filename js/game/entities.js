@@ -45,12 +45,10 @@ define([
 
         gf.AnimatedSprite.call(this, spritesheet);
 
-        this.anchor.x = 0.5;
-        this.anchor.y = 0.5;
-
         this.inertia = Infinity;
         this.friction = 0;
-        this.enablePhysics(lttp.game.physics);
+
+        this.on('collision', this._collide.bind(this));
     };
 
     gf.inherits(LttpEntity, gf.AnimatedSprite, {
@@ -75,6 +73,9 @@ define([
                 }
                 this.addAnimation(type, frames, speed, loop);
             }
+        },
+        _collide: function(obj) {
+
         }
     });
 
@@ -137,7 +138,7 @@ define([
         },
         addAnimations: function() {
             //add walking animations
-            this._addDirectionalFrames('walk', 8, 0.23, true);
+            this._addDirectionalFrames('walk', 8, 0.4, true);
 
             //add idle shield animations
             this.addAnimation('idle_shield_left', [this.spritesheet['walk_shield_left/walk_shield_left_1.png'].frames[0]]);
@@ -183,7 +184,7 @@ define([
             this._addDirectionalFrames('walk_shield', 8, 0.23, true);
 
             //set active
-            this.gotoAndPlay('idle_down');
+            this.gotoAndStop('idle_down');
         },
         onWalk: function(dir, status) {
             //gamepad input
@@ -262,9 +263,11 @@ define([
             }
         },
         //on collision
-        onCollision: function(ent) {
-            LttpEntity.prototype.onCollision.call(this, ent);
-            //console.log('Colliding with', ent);
+        _collide: function(obj) {
+            if(obj.type === 'zone') {
+                lttp.loadZone(obj);
+                console.log('Colliding with', obj.type, obj.name, obj.sensor);
+            }
         },
         //use equipted item
         onUseItem: function() {},
