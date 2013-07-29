@@ -129,7 +129,8 @@ require([
         lttp.activeLayer = lttp.layers[zone.name] || game.world.findLayer(zone.name);
         lttp.activeLayer.spawn();
 
-        //pan the camera
+        //TODO: pan the camera based on where next zone is...
+        //TweenLite.to(game.world.position, 1, { y: '-='+(game.camera.size.y) });
 
         //set camera bounds
         if(!zone.bounds) {
