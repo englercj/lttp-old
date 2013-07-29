@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-07-28
+ * Compiled: 2013-07-29
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -18166,7 +18166,7 @@ gf.PhysicsSystem = function(options) {
         gf.PhysicsSystem.COLLISION_TYPE.SPRITE,
         this.onCollisionBegin.bind(this), //begin
         null, //preSolve
-        null, //postSolve
+        this.onCollisionPostSolve.bind(this), //postSolve
         null //separate
     );
 
@@ -18176,7 +18176,7 @@ gf.PhysicsSystem = function(options) {
         gf.PhysicsSystem.COLLISION_TYPE.TILE,
         this.onCollisionBegin.bind(this), //begin
         null, //preSolve
-        null, //postSolve
+        this.onCollisionPostSolve.bind(this), //postSolve
         null //separate
     );
 
@@ -18388,8 +18388,24 @@ gf.inherits(gf.PhysicsSystem, Object, {
             spr1 = shapes[0].sprite,
             spr2 = shapes[1].sprite;
 
-        spr1.onCollision(spr2);
-        spr2.onCollision(spr1);
+        //only call the sensor collisions here
+        if(arbiter.isFirstContact() && (shapes[0].sensor || shapes[1].sensor)) {
+            spr1.onCollision(spr2, arbiter.getNormal(0));
+            spr2.onCollision(spr1, arbiter.getNormal(0));
+        }
+
+        //maintain the colliding state
+        return true;
+    },
+    onCollisionPostSolve: function(arbiter) {//, space) {
+        var shapes = arbiter.getShapes(),
+            spr1 = shapes[0].sprite,
+            spr2 = shapes[1].sprite;
+
+        if(arbiter.isFirstContact()) {
+            spr1.onCollision(spr2, arbiter.totalImpulse());
+            spr2.onCollision(spr1, arbiter.totalImpulse());
+        }
 
         //maintain the colliding state
         return true;
@@ -18600,11 +18616,11 @@ gf.PhysicsSystem.COLLISION_TYPE = {
      * @method onCollision
      * @param obj {Sprite} Colliding sprite
      */
-    this.onCollision = function(obj) {
+    this.onCollision = function(obj, vec) {
         if(obj.type === gf.Sprite.TYPE.COLLECTABLE)
             obj.destroy();
 
-        this.emit('collision', obj);
+        this.emit('collision', obj, vec);
     };
 
 

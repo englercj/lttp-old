@@ -3,7 +3,8 @@ require([
     'game/entities',
     'game/huditems'
 ], function(data, entities, huditems) {
-    var $game, game, hud, rszTimeout;
+    var $game, game, hud, rszTimeout,
+        firstZone = true;
 
     window.lttp = {};
 
@@ -117,28 +118,69 @@ require([
         rszTimeout = setTimeout(doResize, 250);
     }
 
-    lttp.loadZone = function(zone) {
+    lttp.loadZone = function(zone, vec) {
         if(lttp.activeLayer) {
             lttp.activeLayer.despawn();
         }
 
-        console.log('load zone:', zone.name);
+        console.log('load zone:', zone.name, '('+vec.x+','+vec.y+')');
 
         //transfer the zone stuff
         lttp.activeZone = zone;
         lttp.activeLayer = lttp.layers[zone.name] || game.world.findLayer(zone.name);
         lttp.activeLayer.spawn();
 
-        //TODO: pan the camera based on where next zone is...
-        //TweenLite.to(game.world.position, 1, { y: '-='+(game.camera.size.y) });
+        game.camera.unfollow();
+        game.camera.unconstrain();
+        if(!firstZone) {
+            var p = vec.x ? 'x' : 'y',
+                last = 0;
+
+            $({v:0}).animate({v:game.camera.size[p] + 10}, {
+                duration: 500,
+                easing: 'swing',
+                step: function(now, tween) {
+                    var n = now - last;
+
+                    game.camera.pan(
+                        n * vec.x,
+                        n * vec.y
+                    );
+
+                    last = now;
+                },
+                done: loadZoneDone
+            });
+        } else {
+            loadZoneDone();
+        }
+    }
+
+    function loadZoneDone() {
+        var zone = lttp.activeZone;
+
+        firstZone = false;
 
         //set camera bounds
         if(!zone.bounds) {
             zone.bounds = zone.hitArea.clone();
-            zone.bounds.x += zone.position.x;
-            zone.bounds.y += zone.position.y;
+
+            //all except polygon
+            if(zone.bounds.x !== undefined) {
+                zone.bounds.x += zone.position.x;
+                zone.bounds.y += zone.position.y;
+            }
+            //polygon
+            else {
+                for(var i = 0; i < zone.bounds.points.length; ++i) {
+                    var p = zone.bounds.points[i];
+
+                    p.x += zone.position.x;
+                    p.y += zone.position.y;
+                }
+            }
         }
         game.camera.constrain(zone.bounds.clone());
-        console.log('setting camera bounds to:', zone.bounds);
+        game.camera.follow(lttp.link);
     }
 });

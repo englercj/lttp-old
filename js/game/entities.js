@@ -263,9 +263,9 @@ define([
             }
         },
         //on collision
-        _collide: function(obj) {
+        _collide: function(obj, vec) {
             if(obj.type === 'zone') {
-                lttp.loadZone(obj);
+                lttp.loadZone(obj, vec);
             }
         },
         //use equipted item
