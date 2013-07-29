@@ -119,14 +119,14 @@ require([
     }
 
     lttp.loadZone = function(zone, vec) {
-        if(lttp.activeLayer) {
-            lttp.activeLayer.despawn();
-        }
+        if(zone === lttp.activeZone)
+            return;
 
         console.log('load zone:', zone.name, '('+vec.x+','+vec.y+')');
 
         //transfer the zone stuff
         lttp.activeZone = zone;
+        lttp.oldLayer = lttp.activeLayer;
         lttp.activeLayer = lttp.layers[zone.name] || game.world.findLayer(zone.name);
         lttp.activeLayer.spawn();
 
@@ -136,7 +136,7 @@ require([
             var p = vec.x ? 'x' : 'y',
                 last = 0;
 
-            $({v:0}).animate({v:game.camera.size[p] + 10}, {
+            $({v:0}).animate({v:game.camera.size[p]}, {
                 duration: 500,
                 easing: 'swing',
                 step: function(now, tween) {
@@ -157,6 +157,9 @@ require([
     }
 
     function loadZoneDone() {
+        if(lttp.oldLayer)
+            lttp.oldLayer.despawn();
+
         var zone = lttp.activeZone;
 
         firstZone = false;
