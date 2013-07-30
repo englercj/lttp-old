@@ -1,8 +1,8 @@
 require([
     'game/data/data',
-    'game/entities',
-    'game/huditems'
-], function(data, entities, huditems) {
+    'game/huditems',
+    'game/entities/Link'
+], function(data, huditems, Link) {
     var $game, game, hud, rszTimeout,
         firstZone = true;
 
@@ -20,13 +20,12 @@ require([
             height: $game.height()
         });
 
+        game.spritepool.add('link', Link);
+
         game.loader.on('progress', function(e) {
         });
 
         game.loader.on('complete', function() {
-            game.spritepool.add('enemy', entities.Enemy);
-            game.spritepool.add('link', entities.Link);
-
             //initialize world and track link with camera
             game.loadWorld('world_lightworld');
 
@@ -38,7 +37,9 @@ require([
             lttp.layers.zones.spawn();
             lttp.layers.player.spawn();
 
-            game.camera.follow(lttp.link = lttp.layers.player.children[0]);
+            lttp.link = lttp.layers.player.children[0]
+            lttp.link.addAttackSensor(game.physics);
+            game.camera.follow(lttp.link);
 
             //bind some game related keys
             game.input.keyboard.on(gf.input.KEY.I, onToggleInventory);
@@ -136,7 +137,7 @@ require([
             var p = vec.x ? 'x' : 'y',
                 last = 0;
 
-            $({v:0}).animate({v:game.camera.size[p]}, {
+            $({v:0}).animate({v:game.camera.size[p]+5}, {
                 duration: 500,
                 easing: 'swing',
                 step: function(now, tween) {

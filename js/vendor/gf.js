@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-07-29
+ * Compiled: 2013-07-30
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -18167,7 +18167,7 @@ gf.PhysicsSystem = function(options) {
         this.onCollisionBegin.bind(this), //begin
         null, //preSolve
         this.onCollisionPostSolve.bind(this), //postSolve
-        null //separate
+        this.onCollisionEnd.bind(this) //separate
     );
 
     //sprite - tile collisions
@@ -18177,7 +18177,7 @@ gf.PhysicsSystem = function(options) {
         this.onCollisionBegin.bind(this), //begin
         null, //preSolve
         this.onCollisionPostSolve.bind(this), //postSolve
-        null //separate
+        this.onCollisionEnd.bind(this) //separate
     );
 
     this.actionQueue = [];
@@ -18200,9 +18200,13 @@ gf.inherits(gf.PhysicsSystem, Object, {
 
         return body;
     },
-    _createShape: function(spr, body) {
+    _createShape: function(spr, body, poly) {
         var shape,
-            hit = spr.hitArea;
+            hit = poly || spr.hitArea,
+            ax = spr.anchor ? spr.anchor.x : 0,
+            ay = spr.anchor ? spr.anchor.y : 0,
+            aw = spr.width * ax,
+            ah = spr.height * ay;
 
         //specified shape
         if(hit) {
@@ -18212,20 +18216,21 @@ gf.inherits(gf.PhysicsSystem, Object, {
                 var l = hit.x,
                     r = hit.x + hit.width,
                     b = hit.y - spr.height,
-                    t = b + hit.height,
-                    a = spr.anchor ? spr.anchor.y : 0,
-                    bias = hit.height - (hit.height * a);
+                    t = b + hit.height;
 
-                b += bias;
-                t += bias;
+                l -= aw;
+                r -= aw;
+
+                b += spr.height - ah;
+                t += spr.height - ah;
 
                 shape = new cp.BoxShape2(body, new cp.BB(l, b, r, t));
             }
             else if(hit instanceof gf.Circle) {
                 //the offset needs to move the circle to the sprite center based on the sprite's anchor (bottom-left)
                 var offset = new gf.Vector(
-                    spr.width / 4,
-                    -spr.height / 4
+                    ((spr.width / 2) - aw) + hit.x,
+                    ((spr.height / 2) - ah) + hit.y
                 );
 
                 shape = new cp.CircleShape(body, hit.radius, offset);
@@ -18234,13 +18239,13 @@ gf.inherits(gf.PhysicsSystem, Object, {
                 //cp shapes anchors are 0.5,0.5, but a polygon uses 0,0 as the topleft
                 //of the bounding rect so we have to convert
                 var points = [],
-                    ps = hit.points;//.slice().reverse();
+                    ps = hit.points;
 
                 for(var i = 0; i < ps.length; ++i) {
                     var p = ps[i];
 
-                    points.push(p.x);
-                    points.push(p.y - spr.height);
+                    points.push(p.x - aw);
+                    points.push(p.y - ah);
                 }
 
                 shape = new cp.PolyShape(body, cp.convexHull(points, null, 0), cp.vzero);
@@ -18260,18 +18265,13 @@ gf.inherits(gf.PhysicsSystem, Object, {
         shape.setElasticity(0);
         shape.setSensor(spr.sensor);
         shape.setCollisionType(this.getCollisionType(spr));
-        shape.setFriction(spr.friction !== undefined ? spr.friction : 0.1);
+        shape.setFriction(spr.friction || 0);
 
         return shape;
     },
     invalidCollisions: function() {
         this.actionQueue.push(['reindexStatic']);
-
-        if(this.space.locked) {
-            this.space.addPostStepCallback(this.onPostStep.bind(this));
-        } else {
-            this.onPostStep();
-        }
+        this.act();
     },
     getCollisionType: function(spr) {
         if(spr instanceof gf.Tile) {
@@ -18314,23 +18314,32 @@ gf.inherits(gf.PhysicsSystem, Object, {
             shape: shape,
             control: control
         }]);
-
-        if(this.space.locked) {
-            this.space.addPostStepCallback(this.onPostStep.bind(this));
-        } else {
-            this.onPostStep();
-        }
+        this.act();
     },
     remove: function(spr) {
         if(!spr || !spr._phys || !spr._phys.body || !spr._phys.shape)
             return;
 
         this.actionQueue.push(['remove', spr._phys]);
+        this.act();
+    },
+    addCustomShape: function(spr, poly, sensor) {
+        if(spr && spr._phys && spr._phys.body) {
+            var s = this._createShape(spr, spr._phys.body, poly);
 
-        if(this.space.locked) {
-            this.space.addPostStepCallback(this.onPostStep.bind(this));
-        } else {
-            this.onPostStep();
+            s.setSensor(sensor);
+            s.width = spr.width;
+            s.height = spr.height;
+            s.sprite = spr;
+            s.setElasticity(0);
+            s.setSensor(sensor !== undefined ? sensor : spr.sensor);
+            s.setCollisionType(this.getCollisionType(spr));
+            s.setFriction(spr.friction || 0);
+
+            this.actionQueue.push(['addCustomShape', { spr: spr, shape: s }]);
+            this.act();
+
+            return s;
         }
     },
     setMass: function(spr, mass) {
@@ -18389,9 +18398,9 @@ gf.inherits(gf.PhysicsSystem, Object, {
             spr2 = shapes[1].sprite;
 
         //only call the sensor collisions here
-        if(arbiter.isFirstContact() && (shapes[0].sensor || shapes[1].sensor)) {
-            spr1.onCollision(spr2, arbiter.getNormal(0));
-            spr2.onCollision(spr1, arbiter.getNormal(0));
+        if(shapes[0].sensor || shapes[1].sensor) {
+            spr1.onCollision(spr2, arbiter.getNormal(0), shapes[1], shapes[0]);
+            spr2.onCollision(spr1, arbiter.getNormal(0), shapes[0], shapes[1]);
         }
 
         //maintain the colliding state
@@ -18403,12 +18412,30 @@ gf.inherits(gf.PhysicsSystem, Object, {
             spr2 = shapes[1].sprite;
 
         if(arbiter.isFirstContact()) {
-            spr1.onCollision(spr2, arbiter.totalImpulse());
-            spr2.onCollision(spr1, arbiter.totalImpulse());
+            spr1.onCollision(spr2, arbiter.totalImpulse(), shapes[1], shapes[0]);
+            spr2.onCollision(spr1, arbiter.totalImpulse(), shapes[0], shapes[1]);
         }
 
         //maintain the colliding state
         return true;
+    },
+    onCollisionEnd: function(arbiter) {//, space) {
+        var shapes = arbiter.getShapes(),
+            spr1 = shapes[0].sprite,
+            spr2 = shapes[1].sprite;
+
+        spr1.onSeparate(spr2, shapes[1], shapes[0]);
+        spr2.onSeparate(spr1, shapes[0], shapes[1]);
+
+        //maintain the colliding state
+        return true;
+    },
+    act: function() {
+        if(this.space.locked) {
+            this.space.addPostStepCallback(this.onPostStep.bind(this));
+        } else {
+            this.onPostStep();
+        }
     },
     onPostStep: function() {
         //remove items
@@ -18455,6 +18482,15 @@ gf.inherits(gf.PhysicsSystem, Object, {
                 case 'reindex':
                     this.space.reindexStatic();
                     break;
+
+                case 'addCustomShape':
+                    if(!data.spr._phys.customShapes)
+                        data.spr._phys.customShapes = [];
+
+                    data.spr._phys.customShapes.push(data.shape);
+                    this.space.addShape(data.shape);
+                    break;
+
             }
         }
     }
@@ -18615,14 +18651,32 @@ gf.PhysicsSystem.COLLISION_TYPE = {
      *
      * @method onCollision
      * @param obj {Sprite} Colliding sprite
+     * @param vec {Vector} Collision vector (for sensors this is normalized)
+     * @param colShape {cp.Shape} The colliding physics shape
+     * @param myShape {Sprite} Your physics shape that caused the collision
      */
-    this.onCollision = function(obj, vec) {
+    this.onCollision = function(obj, vec, colShape, myShape) {
         if(obj.type === gf.Sprite.TYPE.COLLECTABLE)
             obj.destroy();
 
-        this.emit('collision', obj, vec);
+        this.emit('collision', obj, vec, colShape, myShape);
     };
 
+    /**
+     * On Seperate Event
+     *      called when this sprite collides into another, or is being collided into by another.
+     *      By default if something collides with a collectable sprite we destroy the collectable
+     *      and if we collide with a solid tile we kill our velocity. This method will emit a
+     *      'collision' event that you can listen for
+     *
+     * @method onCollision
+     * @param obj {Sprite} Colliding sprite
+     * @param colShape {cp.Shape} The colliding physics shape
+     * @param myShape {Sprite} Your physics shape that caused the collision
+     */
+    this.onSeparate = function(obj, colShape, myShape) {
+        this.emit('separate', obj, colShape, myShape);
+    };
 
     /**
      * Shows the physics body for the sprite
@@ -18654,17 +18708,35 @@ gf.PhysicsSystem.COLLISION_TYPE = {
             this.parent.addChild(this._hit);
         }
 
-        var shape = this._phys.shape,
-            p = this._phys.body.p,
-            g = this._hit;
+        var p = this._phys.body.p,
+            g = this._hit,
+            c = this._phys.customShapes;
+
+        if(!this._hit.lastPos)
+            this._hit.lastPos = new gf.Point();
+        else if(this._hit.lastPos.x === p.x && this._hit.lastPos.y === p.y)
+            return;
+
+        this._hit.lastPos.x = p.x;
+        this._hit.lastPos.y = p.y;
 
         g.clear();
+        this._drawPhysicsShape(this._phys.shape, g, p);
+
+        if(c) {
+            for(var i = 0; i < c.length; ++i) {
+                this._drawPhysicsShape(c[i], g, p);
+            }
+        }
+    };
+
+    this._drawPhysicsShape = function(shape, g, p) {
         g.lineStyle(g.style.size, g.style.color, g.style.alpha);
 
         //circle
         if(shape.type === 'circle') {
-            var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2) + shape.c.x,
-                cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2) + shape.c.y;
+            var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
+                cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
 
             g.drawCircle(cx, cy, shape.r);
         }
@@ -20138,8 +20210,7 @@ gf.inherits(gf.Sprite, PIXI.Sprite, {
      * @method destroy
      */
     destroy: function() {
-        if(this.physics)
-            this.disablePhysics();
+        this.disablePhysics();
 
         if(this.parent)
             this.parent.removeChild(this);
@@ -20270,17 +20341,22 @@ gf.Sprite.TYPE = {
  * @param [start] {String} The animation to start with, defaults to the first found key otherwise
  */
 gf.AnimatedSprite = function(anims, speed, start) {
-    //massage animations into full format
-    for(var a in anims) {
-        if(start === undefined)
-            start = a;
+    if(anims instanceof Array) {
+        anims = { _default: { frames: [anims] } };
+        start = '_default';
+    } else {
+        //massage animations into full format
+        for(var a in anims) {
+            if(start === undefined)
+                start = a;
 
-        var anim = anims[a];
+            var anim = anims[a];
 
-        if(anim instanceof Array)
-            anims[a] = { frames: anim };
-        else if(anim instanceof gf.Texture)
-            anims[a] = { frames: [anim] };
+            if(anim instanceof Array)
+                anims[a] = { frames: anim };
+            else if(anim instanceof gf.Texture)
+                anims[a] = { frames: [anim] };
+        }
     }
 
     gf.Sprite.call(this, anims[start].frames[0]);
@@ -20375,10 +20451,13 @@ gf.inherits(gf.AnimatedSprite, gf.Sprite, {
             this.currentFrame = anim;
         } else {
             this.currentFrame = frame || 0;
+            this.lastRound = gf.math.round(frame || 0);
             this.currentAnimation = anim;
         }
-
         this.playing = true;
+
+        this.setTexture(this.animations[this.currentAnimation].frames[this.currentFrame]);
+        this.emit('frame', this.currentAnimation, this.lastRound);
     },
     /**
      * Goes to a frame and stops playing the animation
@@ -20392,11 +20471,13 @@ gf.inherits(gf.AnimatedSprite, gf.Sprite, {
             this.currentFrame = anim;
         } else {
             this.currentFrame = frame || 0;
+            this.lastRound = gf.math.round(frame || 0);
             this.currentAnimation = anim;
         }
+        this.playing = false;
 
         this.setTexture(this.animations[this.currentAnimation].frames[this.currentFrame]);
-        this.playing = false;
+        this.emit('frame', this.currentAnimation, this.lastRound);
     },
     /**
      * Starts playing the currently active animation
@@ -20433,7 +20514,11 @@ gf.inherits(gf.AnimatedSprite, gf.Sprite, {
         round = gf.math.round(this.currentFrame);
 
         if(round < anim.frames.length) {
-            this.setTexture(anim.frames[round]);
+            if(round !== this.lastRound) {
+                this.lastRound = round;
+                this.setTexture(anim.frames[round]);
+                this.emit('frame', this.currentAnimation, round);
+            }
         }
         else {
             if(loop) {
@@ -21447,6 +21532,17 @@ gf.Game = function(contId, settings) {
     this.activeState = null;
     this._defaultState = new gf.GameState('_default');
 
+    /**
+     * Holds timing data for the previous loop
+     *
+     * @property timings
+     * @type Object
+     * @readOnly
+     */
+    this.timings = {
+        _timer: window.performance && window.performance.now ? window.performance : Date
+    };
+
     //append the renderer view only if the user didn't pass their own
     if(!settings.view)
         this.container.appendChild(this.renderer.view);
@@ -21681,10 +21777,14 @@ gf.inherits(gf.Game, Object, {
         window.requestAnimFrame(this._tick.bind(this));
 
         //update this game state
+        this.timings.stateStart = this.timings._timer.now();
         this.activeState.update(this.clock.getDelta());
+        this.timings.stateEnd = this.timings._timer.now();
 
         //render scene
+        this.timings.renderStart = this.timings._timer.now();
         this.renderer.render(this.stage);
+        this.timings.renderEnd = this.timings._timer.now();
         this.emit('aftertick');
     }
 });
@@ -21880,13 +21980,19 @@ gf.inherits(gf.GameState, gf.DisplayObjectContainer, {
      */
     update: function(dt) {
         //gather input from user
+        this.game.timings.inputStart = this.game.timings._timer.now();
         this.input.update(dt);
+        this.game.timings.inputEnd = this.game.timings._timer.now();
 
         //update any camera effects
+        this.game.timings.cameraStart = this.game.timings._timer.now();
         this.camera.update(dt);
+        this.game.timings.cameraEnd = this.game.timings._timer.now();
 
         //simulate physics and detect/resolve collisions
+        this.game.timings.physicsStart = this.game.timings._timer.now();
         this.physics.update(dt);
+        this.game.timings.physicsEnd = this.game.timings._timer.now();
     }
 });
 /**
@@ -24351,8 +24457,9 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
                 obj.hitArea = props.hitArea;
                 obj.rotation = o.rotation;
                 obj.sensor = true;
-                obj.setPosition(o.x, o.y);
 
+                //these are treated as sensor bodies, so always enable physics
+                obj.setPosition(o.x, o.y);
                 obj.enablePhysics(game.physics);
                 if(this.parent._showPhysics)
                     obj.showPhysics();
@@ -24373,9 +24480,11 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
                 obj.inertia = props.inertia || props.tileprops.inertia;
                 obj.friction = props.friction || props.tileprops.friction;
                 obj.sensor = props.sensor || props.tileprops.sensor;
-                obj.anchor.y = 1;
-                obj.anchor.x = this.parent.orientation === 'isometric' ? 0.5 : 0;
                 obj.setPosition(o.x, o.y);
+
+                var a = props.anchor || props.tileprops.anchor;
+                obj.anchor.y = a ? a[1] : 1;
+                obj.anchor.x = a ? a[0] : (this.parent.orientation === 'isometric' ? 0.5 : 0);
 
                 if(props.mass || props.tileprops.mass) {
                     obj.enablePhysics(game.physics);
@@ -24415,6 +24524,14 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
                 obj.mouseover = this.onObjectEvent.bind(this, 'mouseover', obj);
                 obj.mouseupoutside = this.onObjectEvent.bind(this, 'mouseupoutside', obj);
             }
+
+            //set custom properties
+            obj.properties = {};
+            for(var t in props.tileprops)
+                obj.properties[t] = props.tileprops[t];
+            for(var k in props)
+                if(k !== 'tileprops')
+                    obj.properties[k] = props[k];
 
             this.addChild(obj);
         }

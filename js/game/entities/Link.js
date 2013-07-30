@@ -1,30 +1,18 @@
+var ATTACK_CONE = 0.5;
+
 define([
-    'game/data/types'
-], function(types) {
-    var LttpEntity = function(spritesheet) {
-        //can be lifted by another entity
-        this.liftable = false;
+    'game/data/types',
+    'game/entities/Entity',
+    'game/entities/misc/Smash'
+], function(types, Entity, Smash) {
+    var Link = function(spritesheet) {
+        Entity.call(this, spritesheet);
 
-        //can be effected by bombs
-        this.explodable = true;
+        //player type
+        this.type = gf.Sprite.TYPE.PLAYER;
 
-        //is cutable by a sword
-        this.cutable = false;
-
-        //is this sprite attacking?
-        this.attacking = false;
-
-        //is this sprite able to move?
-        this.freeze = false;
-
-        //will break the sprint of an entity that hits this one
-        this.breakSprint = false;
-
-        //maximum health of this entity
-        this.maxHealth = 3;
-
-        //current health of this entity
-        this.health = 3;
+        //set name of Link
+        this.name = 'link';
 
         //maximum maxMagic of this entity
         this.maxMagic = 10;
@@ -35,67 +23,11 @@ define([
         //current inventory of the entity
         this.inventory = {};
 
-        //loot of the entity that is dropped when it dies
-        this.loot = [];
+        //objects currently within attack range
+        this.inAttackRange = [];
 
-        //moveSpeed the ent moves at
-        this.moveSpeed = 75;
-
-        this.spritesheet = spritesheet;
-
-        gf.AnimatedSprite.call(this, spritesheet);
-
-        this.inertia = Infinity;
-        this.friction = 0;
-
-        this.on('collision', this._collide.bind(this));
-    };
-
-    gf.inherits(LttpEntity, gf.AnimatedSprite, {
-        _addDirectionalFrames: function(type, num, speed, loop) {
-            this._addFrames([
-                type + '_left',
-                type + '_right',
-                type + '_down',
-                type + '_up'
-            ], num, speed, loop);
-        },
-        _addFrames: function(types, num, speed, loop) {
-            if(!(types instanceof Array))
-                types = [types];
-
-            for(var t = 0, tl = types.length; t < tl; ++t) {
-                var frames = [],
-                    type = types[t];
-
-                for(var f = 1; f <= num; ++f) {
-                    frames.push(this.spritesheet[type + '/' + type + '_' + f + '.png'].frames[0]);
-                }
-                this.addAnimation(type, frames, speed, loop);
-            }
-        },
-        _collide: function(obj) {
-
-        }
-    });
-
-    var Enemy = function(spritesheet) {
-        LttpEntity.call(this, spritesheet);
-
-        //enemy type
-        this.type = gf.Sprite.TYPE.ENEMY;
-    };
-
-    gf.inherits(Enemy, LttpEntity);
-
-    var Link = function(spritesheet) {
-        LttpEntity.call(this, spritesheet);
-
-        //player type
-        this.type = gf.Sprite.TYPE.PLAYER;
-
-        //set name of Link
-        this.name = 'link';
+        //a pool of sprite to do smashing animations
+        this.smashPool = new gf.ObjectPool(Smash, lttp.game);
 
         //size
         //this.width = 16;
@@ -111,11 +43,13 @@ define([
         this.bindGamepad();
         this.addAnimations();
 
+        this.anchor.x = this.anchor.y = 0.5;
+
         //make the camera track this entity
         window.link = this;
     };
 
-    gf.inherits(Link, LttpEntity, {
+    gf.inherits(Link, Entity, {
         bindKeys: function() {
             //bind the keyboard
             lttp.game.input.keyboard.on(gf.input.KEY.W, this.onWalk.bind(this, 'up'));
@@ -185,6 +119,7 @@ define([
 
             //set active
             this.gotoAndStop('idle_down');
+            this.lastDir = 'down';
         },
         onWalk: function(dir, status) {
             //gamepad input
@@ -203,8 +138,6 @@ define([
 
                 this.actions.move[dir] = false;
             }
-
-            if(this.frozen) return;
 
             //doing this in an action status based way means that pressing two opposing
             //keys at once and release one will still work (like pressing left & right, then releasing right)
@@ -226,20 +159,100 @@ define([
             else
                 this.movement.y = 0;
 
+            if(this.locked) return;
+
             this._setMoveAnimation();
             this.setVelocity(this.movement);
+        },
+        //use equipted item
+        onUseItem: function() {},
+        //when attack key is pressed
+        onAttack: function(status) {
+            if(this.locked) return;
+
+            if(status.down) {
+                if(status.originalEvent)
+                    status.input.preventDefault(status.originalEvent);
+
+                this.lock();
+                this.actions.attack = true;
+                this._setAttackAnimation();
+                this._checkAttack();
+            }
+        },
+        lock: function() {
+            this.setVelocity([0, 0]);
+            this.locked = true;
+        },
+        unlock: function() {
+            this._setMoveAnimation();
+            this.setVelocity(this.movement);
+            this.locked = false;
+        },
+        addAttackSensor: function(phys) {
+            if(this.atkSensor) return;
+
+            this.atkSensor = phys.addCustomShape(this, new gf.Circle(0, 0, 16), true);
+        },
+        _checkAttack: function() {
+            for(var i = this.inAttackRange.length - 1; i > -1; --i) {
+                var e = this.inAttackRange[i],
+                    t = e.properties.type,
+                    hit = false,
+                    vec = new gf.Vector(
+                        e.position.x - this.position.x,
+                        e.position.y - this.position.y
+                    );
+
+                vec.normalize();
+
+                if(t.indexOf('grass') === -1)
+                    continue;
+
+                //check if 'e' is withing a conic area in the direction we face
+                switch(this.lastDir) {
+                    case 'left':
+                        hit = vec.x < 0 && vec.y > -ATTACK_CONE && vec.y < ATTACK_CONE;
+                        break;
+                    case 'right':
+                        hit = vec.x > 0 && vec.y > -ATTACK_CONE && vec.y < ATTACK_CONE;
+                        break;
+                    case 'up':
+                        hit = vec.y < 0 && vec.x > -ATTACK_CONE && vec.x < ATTACK_CONE;
+                        break;
+                    case 'down':
+                        hit = vec.y > 0 && vec.x > -ATTACK_CONE && vec.x < ATTACK_CONE;
+                        break;
+                }
+
+                if(hit) {
+                    if(e.takeDamage) {
+                        e.takeDamage(this.damage)
+                    } else if(t.indexOf('grass') !== -1) {
+                        var spr = this.smashPool.create();
+                        spr.gotoAndPlay(t);
+                        spr.visible = true;
+                        spr.anchor.x = e.anchor.x;
+                        spr.anchor.y = e.anchor.y;
+                        spr.setPosition(e.position.x, e.position.y);
+
+                        //TODO: drops?
+                        e.destroy();
+                    }
+                }
+            }
         },
         _setMoveAnimation: function() {
             var anim = (this.movement.x || this.movement.y) ? 'walk' : 'idle';
 
             if(this.inventory.shield) {
-                this._setDirAnimation(anim + '_shield');
+                this._setMoveDirAnimation(anim + '_shield');
             }
             else {
-                this._setDirAnimation(anim);
+                this._setMoveDirAnimation(anim);
             }
         },
-        _setDirAnimation: function(anim) {
+        _setMoveDirAnimation: function(anim) {
             if(this.movement.x) {
                 if(this.movement.x > 0) {
                     this.lastDir = 'right';
@@ -252,7 +265,7 @@ define([
             else if(this.movement.y) {
                 if(this.movement.y > 0) {
                     this.lastDir = 'down';
-                    this.gotoAndPlay(anim + '_down');
+                    this.gotoAndPlay(anim + '_down'); 
                 } else {
                     this.lastDir = 'up';
                     this.gotoAndPlay(anim + '_up');
@@ -262,39 +275,90 @@ define([
                 this.gotoAndStop(anim + '_' + this.lastDir);
             }
         },
+        _setAttackAnimation: function() {
+            if(!this._attackAnchorMap) {
+                this._attackAnchorMap = {
+                    up: {
+                        0: [0, 1],
+                        1: [-0.05, 1],
+                        2: [0.05, 1],
+                        3: [0, 1],
+                        6: [0.2, 1],
+                        7: [0.3, 1],
+                        8: [0.4, 1]
+                    },
+                    down: {
+                        0: [0.2, 1],
+                        2: [0.2, 0.95],
+                        3: [0.2, 0.79],
+                        4: [0.1, 0.75],
+                        5: [0.1, 0.75],
+                        6: [0.1, 0.75],
+                        7: [0.1, 0.75],
+                        8: [0.1, 0.8],
+                        9: [0.1, 0.75]
+                    },
+                    right: {
+                        0: [0, 1],
+                        7: [0, 0.75],
+                        8: [0, 0.7]
+                    },
+                    left: {
+                        0: [0.5, 1],
+                        7: [0.5, 0.8]
+                    }
+                }
+            }
+
+            var ax = this.anchor.x,
+                ay = this.anchor.y,
+                dir = this.lastDir,
+                mp = this._attackAnchorMap[dir],
+                self = this,
+                frame = function(anim, fr) {
+                    if(mp && mp[fr]) {
+                        self.anchor.x = mp[fr][0];
+                        self.anchor.y = mp[fr][1];
+                    }
+                };
+
+            this.on('frame', frame);
+            this.once('complete', function() {
+                self.anchor.x = ax;
+                self.anchor.y = ay;
+                self.actions.attack = false;
+                self.off('frame', frame);
+                self.unlock();
+            });
+            this.gotoAndPlay('attack_' + dir);
+        },
         //on collision
-        _collide: function(obj, vec) {
-            if(obj.type === 'zone') {
+        _collide: function(obj, vec, colShape, myShape) {
+            //we got into range of something to attack
+            if(myShape === this.atkSensor) {
+                if(obj.type === types.ENTITY.ENEMY || !obj.type) {
+                    this.inAttackRange.push(obj);
+
+                    //something new walked in while we were attacking
+                    if(this.actions.attack)
+                        this._checkAttack();
+                }
+            }
+            //colliding with a new zone
+            else if(obj.type === 'zone') {
                 lttp.loadZone(obj, vec);
             }
         },
-        //use equipted item
-        onUseItem: function() {},
-        //when attack key is pressed
-        onAttack: function(action, kpress) {
-            if(!kpress || this.currentAnim.name.indexOf('attack') !== -1)
-                return;
+        _separate: function(obj, colShape, myShape) {
+            if(myShape === this.atkSensor) {
+                var i = this.inAttackRange.indexOf(obj);
 
-            var name = this.currentAnim.name,
-                oldVel = this.velocity.clone(),
-                dir = name.split('_').pop(),
-                self = this;
-
-            this.velocity.set(0, 0);
-            this.freeze = true;
-            this.attacking = true;
-
-            this.gotoAndPlay('attack_' + dir, function() {
-                self.gotoAndPlay(name);
-                self.velocity.copy(oldVel);
-                self.freeze = false;
-            });
+                if(i >= 0) {
+                    this.inAttackRange.splice(i, 1);
+                }
+            }
         }
     });
 
-    return {
-        LttpEntity: LttpEntity,
-        Enemy: Enemy,
-        Link: Link
-    };
+    return Link;
 });

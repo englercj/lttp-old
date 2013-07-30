@@ -12,7 +12,7 @@ define([], function() {
             ]
         },
         //Darkworld
-        {
+        /*{
             name: 'world_darkworld',
             src: '/assets/worlds/darkworld/darkworld.json'
         },
@@ -21,12 +21,18 @@ define([], function() {
             src: [
                 '/assets/audio/music/dark_world.lite.ogg'
             ]
-        },
-        //Misc
+        },*/
+        //Link
         {
             name: 'sprite_link',
             src: '/assets/sprites/entities/link.json'
         },
+        //Misc
+        {
+            name: 'sprite_smash',
+            src: '/assets/sprites/misc/smash.json'
+        },
+        //HUD
         {
             name: 'sprite_hud',
             src: '/assets/sprites/ui/hud.json'
