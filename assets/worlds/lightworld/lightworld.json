@@ -25,7 +25,7 @@
         {
          "draworder":"topdown",
          "height":256,
-         "name":"Swamp",
+         "name":"Great Swamp",
          "objects":[
                 {
                  "gid":5632,
@@ -1235,41 +1235,8 @@
                  "y":2560
                 }, 
                 {
-                 "height":0,
-                 "name":"Swamp",
-                 "polygon":[
-                        {
-                         "x":-16,
-                         "y":0
-                        }, 
-                        {
-                         "x":800,
-                         "y":0
-                        }, 
-                        {
-                         "x":800,
-                         "y":1040
-                        }, 
-                        {
-                         "x":-224,
-                         "y":1040
-                        }, 
-                        {
-                         "x":-224,
-                         "y":528
-                        }, 
-                        {
-                         "x":-128,
-                         "y":528
-                        }, 
-                        {
-                         "x":-128,
-                         "y":384
-                        }, 
-                        {
-                         "x":-16,
-                         "y":384
-                        }],
+                 "height":1040,
+                 "name":"Lake Hylia",
                  "properties":
                     {
 
@@ -1277,9 +1244,485 @@
                  "rotation":0,
                  "type":"zone",
                  "visible":true,
+                 "width":1008,
+                 "x":2576,
+                 "y":3072
+                }, 
+                {
+                 "height":512,
+                 "name":"Lake Hylia - Corner",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":3584,
+                 "y":3584
+                }, 
+                {
+                 "height":512,
+                 "name":"Lake Hylia - Cave",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":3584,
+                 "y":3072
+                }, 
+                {
+                 "height":512,
+                 "name":"Eastern Palace - Fairy Pond",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":3584,
+                 "y":2560
+                }, 
+                {
+                 "height":512,
+                 "name":"Eastern Palace - Entrance",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":3072,
+                 "y":2560
+                }, 
+                {
+                 "height":1024,
+                 "name":"Eastern Palace",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":1024,
+                 "x":3072,
+                 "y":1536
+                }, 
+                {
+                 "height":512,
+                 "name":"Bridge",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":2560,
+                 "y":2560
+                }, 
+                {
+                 "height":512,
+                 "name":"Stones",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":2560,
+                 "y":2048
+                }, 
+                {
+                 "height":512,
+                 "name":"Wood Bridge",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":2560,
+                 "y":1536
+                }, 
+                {
+                 "height":512,
+                 "name":"Magic Shop - West",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":2560,
+                 "y":1024
+                }, 
+                {
+                 "height":512,
+                 "name":"Magic Shop",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":3072,
+                 "y":1024
+                }, 
+                {
+                 "height":512,
+                 "name":"Zora Falls - South",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":3584,
+                 "y":1024
+                }, 
+                {
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
                  "width":0,
-                 "x":1776,
+                 "x":3792,
+                 "y":736
+                }, 
+                {
+                 "height":512,
+                 "name":"Zora Falls",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":3584,
+                 "y":512
+                }, 
+                {
+                 "height":512,
+                 "name":"Cemetery",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":2048,
+                 "y":1024
+                }, 
+                {
+                 "height":512,
+                 "name":"Sanctuary",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":1536,
+                 "y":1024
+                }, 
+                {
+                 "height":1024,
+                 "name":"Hyrule Castle",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":1024,
+                 "x":1536,
+                 "y":1536
+                }, 
+                {
+                 "height":512,
+                 "name":"Hyrule Grove",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":496,
+                 "x":1040,
+                 "y":1536
+                }, 
+                {
+                 "height":512,
+                 "name":"Forge House",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":1024,
+                 "y":2048
+                }, 
+                {
+                 "height":512,
+                 "name":"Haunted Grove",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":528,
+                 "x":1024,
+                 "y":2560
+                }, 
+                {
+                 "height":512,
+                 "name":"Kakariko Path",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":1024,
+                 "y":3072
+                }, 
+                {
+                 "height":1040,
+                 "name":"Great Swamp",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":1040,
+                 "x":1536,
                  "y":3056
+                }, 
+                {
+                 "height":528,
+                 "name":"Desert Path",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":1024,
+                 "y":3584
+                }, 
+                {
+                 "height":1040,
+                 "name":"Desert of Mystery",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":1024,
+                 "x":0,
+                 "y":3072
+                }, 
+                {
+                 "height":512,
+                 "name":"Kakariko Contest",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":0,
+                 "y":2560
+                }, 
+                {
+                 "height":512,
+                 "name":"Kakariko South",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":512,
+                 "y":2560
+                }, 
+                {
+                 "height":1024,
+                 "name":"Kakariko Village",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":1024,
+                 "x":0,
+                 "y":1536
+                }, 
+                {
+                 "height":512,
+                 "name":"Lost Woods - South Entrance",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":0,
+                 "y":1024
+                }, 
+                {
+                 "height":512,
+                 "name":"Fortune Teller",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":512,
+                 "y":1024
+                }, 
+                {
+                 "height":512,
+                 "name":"Hyrule Pond",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":1024,
+                 "y":1024
+                }, 
+                {
+                 "height":512,
+                 "name":"Lumber Jack - Entrance",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":496,
+                 "x":1040,
+                 "y":512
+                }, 
+                {
+                 "height":512,
+                 "name":"Lumber Jack",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":496,
+                 "x":1040,
+                 "y":0
+                }, 
+                {
+                 "height":1024,
+                 "name":"Death Mountain",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":1024,
+                 "x":1536,
+                 "y":0
+                }, 
+                {
+                 "height":1024,
+                 "name":"Death Mountain - East",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":1024,
+                 "x":2560,
+                 "y":0
+                }, 
+                {
+                 "height":512,
+                 "name":"Death Mountain - Platform",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"zone",
+                 "visible":true,
+                 "width":512,
+                 "x":3584,
+                 "y":0
                 }],
          "opacity":1,
          "type":"objectgroup",
