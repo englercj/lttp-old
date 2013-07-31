@@ -22633,7 +22633,8 @@ gf.input.getGpButtonName = function(i) {
     //setup default objects for each axis
     for(var bt in gf.input.GP_BUTTON) {
         this.buttons[gf.input.GP_BUTTON[bt]] = {
-            code: bt,
+            code: gf.input.GP_BUTTON[bt],
+            name: bt,
             down: false,
             value: 0
         };
@@ -22697,7 +22698,7 @@ gf.input.getGpAxisName = function(i) {
     gf.input.Input.call(this);
 
     /**
-     * The threshold at which we consider a stick "moved"
+     * The threshold at which we consider a stick moved from center
      *
      * @property threshold
      * @type Number
@@ -22717,8 +22718,8 @@ gf.input.getGpAxisName = function(i) {
     //setup default objects for each axis
     for(var ax in gf.input.GP_AXIS) {
         this.axes[gf.input.GP_AXIS[ax]] = {
-            code: ax,
-            negative: false,
+            code: gf.input.GP_AXIS[ax],
+            name: ax,
             value: 0
         };
     }
@@ -22734,19 +22735,18 @@ gf.inherits(gf.input.GamepadSticks, gf.input.Input, {
     pollStatus: function(pad) {
         for(var a = 0, al = pad.axes.length; a < al; ++a) {
             var ax = pad.axes[a],
-                neg = (ax < 0),
                 status = this.axes[a];
 
-            //if the difference between the last value and the new one is greater
-            //than the threashold set, call the event for that axis.
-            //We also always emit 0 because if your threshold is too high, it will
-            //never reset to 0
-            if(Math.abs(status.value - ax) >= this.threshold || (status.value !== 0 && ax === 0)) {
-                status.negative = neg;
+            //if we have moved off center by threshold, update the value
+            if(Math.abs(ax) >= this.threshold) {
                 status.value = ax;
-
-                this.emit(a, status);
             }
+            //otherwise, set it back to zero
+            else {
+                status.value = 0;
+            }
+
+            this.emit(a, status);
         }
     }
 });

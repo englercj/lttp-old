@@ -3,14 +3,12 @@ require([
     'game/huditems',
     'game/entities/Link'
 ], function(data, huditems, Link) {
-    var $game, game, hud, rszTimeout,
+    var $game, game, hud,
         firstZone = true;
 
     window.lttp = {};
 
     $(function() {
-        //$(window).on('resize', onWindowResize);
-
         $game = $('#game');
 
         lttp.game = game = new gf.Game('game', {
@@ -29,6 +27,7 @@ require([
             //initialize world and track link with camera
             game.loadWorld('world_lightworld');
 
+            //setup the necessary layers
             lttp.layers = {};
 
             lttp.layers.zones = game.world.findLayer('zones');
@@ -37,14 +36,21 @@ require([
             lttp.layers.zones.spawn();
             lttp.layers.player.spawn();
 
+            //setup the player
             lttp.link = lttp.layers.player.children[0]
             lttp.link.addAttackSensor(game.physics);
             game.camera.follow(lttp.link);
 
             //bind some game related keys
-            game.input.keyboard.on(gf.input.KEY.I, onToggleInventory);
+            game.input.keyboard.on(gf.input.KEY.B, onToggleSaveMenu);
             game.input.keyboard.on(gf.input.KEY.M, onToggleMap);
+            game.input.keyboard.on(gf.input.KEY.I, onToggleInventory);
             game.input.keyboard.on(gf.input.KEY.P, onToggleAudio);
+
+            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.SELECT, onToggleSaveMenu);
+            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_3, onToggleMap);
+            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, onToggleInventory);
+            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_SHOULDER, onToggleAudio);
 
             //initialize HUD objects
             game.addChild(initHud());
@@ -93,31 +99,13 @@ require([
         return gui;
     }
 
-    function onToggleInventory() {}
+    function onToggleSaveMenu() {}
 
     function onToggleMap() {}
 
-    function onToggleAudio() {
-        gf.audio.pauseAll();
-    }
+    function onToggleInventory() {}
 
-    function doResize()
-    {
-        var w = $(window).width(),
-            h = $(window).height();
-
-        if(hud) {
-            hud.items.life.position.x = game.camera.size.x - (175); //160 is 10 hearts + 15 pad
-            hud.items.life.position.y = 15;
-        }
-
-        game.resize(w, h);
-    }
-
-    function onWindowResize() {
-        clearTimeout(rszTimeout);
-        rszTimeout = setTimeout(doResize, 250);
-    }
+    function onToggleAudio() {}
 
     lttp.loadZone = function(zone, vec) {
         if(zone === lttp.activeZone)

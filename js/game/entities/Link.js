@@ -53,22 +53,27 @@ define([
         bindKeys: function() {
             //bind the keyboard
             lttp.game.input.keyboard.on(gf.input.KEY.W, this.onWalk.bind(this, 'up'));
-            lttp.game.input.keyboard.on(gf.input.KEY.A, this.onWalk.bind(this, 'left'));
             lttp.game.input.keyboard.on(gf.input.KEY.S, this.onWalk.bind(this, 'down'));
+            lttp.game.input.keyboard.on(gf.input.KEY.A, this.onWalk.bind(this, 'left'));
             lttp.game.input.keyboard.on(gf.input.KEY.D, this.onWalk.bind(this, 'right'));
 
-            lttp.game.input.keyboard.on(gf.input.KEY.E, this.onUseItem.bind(this));
+            lttp.game.input.keyboard.on(gf.input.KEY.E, this.onUse.bind(this));
             lttp.game.input.keyboard.on(gf.input.KEY.SPACE, this.onAttack.bind(this));
         },
         bindGamepad: function() {
             //bind the gamepad
-            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this.onWalk.bind(this, 'left'));
-            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this.onWalk.bind(this, 'right'));
-            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this.onWalk.bind(this, 'up'));
-            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this.onWalk.bind(this, 'down'));
+            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this.onGpWalk.bind(this));
+            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this.onGpWalk.bind(this));
+            lttp.game.input.gamepad.sticks.threshold = 0.35;
 
-            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, this.onUseItem.bind(this));
+            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_TOP, this.onWalk.bind(this, 'up'));
+            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_BOTTOM, this.onWalk.bind(this, 'down'));
+            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_LEFT, this.onWalk.bind(this, 'left'));
+            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_RIGHT, this.onWalk.bind(this, 'right'));
+
+            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, this.onUse.bind(this));
             lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, this.onAttack.bind(this));
+            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_4, this.onUseItem.bind(this));
         },
         addAnimations: function() {
             //add walking animations
@@ -121,48 +126,70 @@ define([
             this.gotoAndStop('idle_down');
             this.lastDir = 'down';
         },
-        onWalk: function(dir, status) {
-            //gamepad input
-            if(dir === 'horz')
-                dir = status.negative ? 'left' : 'right';
-            else if(dir === 'vert')
-                dir = status.negative ? 'down' : 'up';
+        //Talk, run, Lift/Throw/Push/Pull
+        onUse: function() {
 
-            // .down is keypressed down, .value means the gp axis is non-center
-            if(status.down || status.value) {
+        },
+        //Uses the currently equipted item
+        onUseItem: function() {
+
+        },
+        onWalk: function(dir, status) {
+            // .down is keypressed down
+            if(status.down) {
                 if(this.actions.move[dir]) return; //skip repeats (holding a key down)
 
                 this.actions.move[dir] = true;
             } else {
-                if(!this.actions.move[dir]) return; //skip repeats (holding a key down)
-
                 this.actions.move[dir] = false;
             }
 
-            //doing this in an action status based way means that pressing two opposing
-            //keys at once and release one will still work (like pressing left & right, then releasing right)
-            if(this.actions.move.left && this.actions.move.right)
-                this.movement.x = 0;
-            else if(this.actions.move.left)
-                this.movement.x = -this.moveSpeed;
-            else if(this.actions.move.right)
-                this.movement.x = this.moveSpeed;
-            else
-                this.movement.x = 0;
+            this._checkMovement();
+        },
+        onGpWalk: function(status) {
+            var dir;
+            if(status.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR) {
+                if(status.value === 0) {
+                    if(!this._lastHorzGpValue)
+                        return;
 
-            if(this.actions.move.up && this.actions.move.down)
-                this.movement.y = 0;
-            else if(this.actions.move.up)
-                this.movement.y = -this.moveSpeed;
-            else if(this.actions.move.down)
-                this.movement.y = this.moveSpeed;
-            else
-                this.movement.y = 0;
+                    this.actions.move.left = false;
+                    this.actions.move.right = false;
+                } else if(status.value > 0) {
+                    if(this.actions.move.right)
+                        return;
 
-            if(this.locked) return;
+                    this.actions.move.right = true;
+                } else {
+                    if(this.actions.move.left)
+                        return;
 
-            this._setMoveAnimation();
-            this.setVelocity(this.movement);
+                    this.actions.move.left = true;
+                }
+                this._lastHorzGpValue = status.value;
+            }
+            else {
+                if(status.value === 0) {
+                    if(!this._lastVertGpValue)
+                        return;
+
+                    this.actions.move.down = false;
+                    this.actions.move.up = false;
+                } else if(status.value > 0) {
+                    if(this.actions.move.down)
+                        return;
+
+                    this.actions.move.down = true;
+                } else {
+                    if(this.actions.move.up)
+                        return;
+
+                    this.actions.move.up = true;
+                }
+                this._lastVertGpValue = status.value;
+            }
+
+            this._checkMovement();
         },
         //use equipted item
         onUseItem: function() {},
@@ -241,6 +268,32 @@ define([
                     }
                 }
             }
+        },
+        _checkMovement: function() {
+            //doing this in an action status based way means that pressing two opposing
+            //keys at once and release one will still work (like pressing left & right, then releasing right)
+            if(this.actions.move.left && this.actions.move.right)
+                this.movement.x = 0;
+            else if(this.actions.move.left)
+                this.movement.x = -this.moveSpeed;
+            else if(this.actions.move.right)
+                this.movement.x = this.moveSpeed;
+            else
+                this.movement.x = 0;
+
+            if(this.actions.move.up && this.actions.move.down)
+                this.movement.y = 0;
+            else if(this.actions.move.up)
+                this.movement.y = -this.moveSpeed;
+            else if(this.actions.move.down)
+                this.movement.y = this.moveSpeed;
+            else
+                this.movement.y = 0;
+
+            if(this.locked) return;
+
+            this._setMoveAnimation();
+            this.setVelocity(this.movement);
         },
         _setMoveAnimation: function() {
             var anim = (this.movement.x || this.movement.y) ? 'walk' : 'idle';
