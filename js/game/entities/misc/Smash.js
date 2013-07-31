@@ -6,6 +6,8 @@ define([
         Entity.call(this, gf.assetCache['sprite_smash'], 0.2);
 
         this._addAnimations();
+        this._cutsound = gf.assetCache['effect_grass_cut'];
+        this._cutsound.volume = 0.05;
         this.on('complete', this._done.bind(this));
     };
 
@@ -33,6 +35,12 @@ define([
             }
 
             this.addAnimation(dir, frames);
+        },
+        gotoAndPlay: function(anim) {
+            if(typeof anim === 'string' && anim.indexOf('grass') !== -1)
+                this._cutsound.play();
+
+            Entity.prototype.gotoAndPlay.apply(this, arguments);
         },
         _done: function() {
             this.visible = false;

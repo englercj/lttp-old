@@ -36,7 +36,8 @@ define([
         this.movement = new gf.Vector();
         this.actions = {
             move: {},
-            attack: false
+            attack: false,
+            holdAttack: false
         };
 
         this.bindKeys();
@@ -134,9 +135,12 @@ define([
         onUseItem: function() {
 
         },
-        onWalk: function(dir, status) {
+        onWalk: function(dir, e) {
+            if(e.originalEvent)
+                e.input.preventDefault(e.originalEvent);
+
             // .down is keypressed down
-            if(status.down) {
+            if(e.down) {
                 if(this.actions.move[dir]) return; //skip repeats (holding a key down)
 
                 this.actions.move[dir] = true;
@@ -146,16 +150,16 @@ define([
 
             this._checkMovement();
         },
-        onGpWalk: function(status) {
+        onGpWalk: function(e) {
             var dir;
-            if(status.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR) {
-                if(status.value === 0) {
+            if(e.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR) {
+                if(e.value === 0) {
                     if(!this._lastHorzGpValue)
                         return;
 
                     this.actions.move.left = false;
                     this.actions.move.right = false;
-                } else if(status.value > 0) {
+                } else if(e.value > 0) {
                     if(this.actions.move.right)
                         return;
 
@@ -166,16 +170,16 @@ define([
 
                     this.actions.move.left = true;
                 }
-                this._lastHorzGpValue = status.value;
+                this._lastHorzGpValue = e.value;
             }
             else {
-                if(status.value === 0) {
+                if(e.value === 0) {
                     if(!this._lastVertGpValue)
                         return;
 
                     this.actions.move.down = false;
                     this.actions.move.up = false;
-                } else if(status.value > 0) {
+                } else if(e.value > 0) {
                     if(this.actions.move.down)
                         return;
 
@@ -186,7 +190,7 @@ define([
 
                     this.actions.move.up = true;
                 }
-                this._lastVertGpValue = status.value;
+                this._lastVertGpValue = e.value;
             }
 
             this._checkMovement();
@@ -194,17 +198,21 @@ define([
         //use equipted item
         onUseItem: function() {},
         //when attack key is pressed
-        onAttack: function(status) {
-            if(this.locked) return;
+        onAttack: function(e) {
+            if(e.originalEvent)
+                e.input.preventDefault(e.originalEvent);
 
-            if(status.down) {
-                if(status.originalEvent)
-                    status.input.preventDefault(status.originalEvent);
+            if(e.down) {
+                if(this.locked || this.actions.holdAttack)
+                    return;
 
                 this.lock();
                 this.actions.attack = true;
+                this.actions.holdAttack = true;
                 this._setAttackAnimation();
                 this._checkAttack();
+            } else {
+                this.actions.holdAttack = false;
             }
         },
         lock: function() {

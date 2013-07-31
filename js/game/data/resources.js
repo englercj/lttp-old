@@ -32,6 +32,12 @@ define([], function() {
             name: 'sprite_smash',
             src: '/assets/sprites/misc/smash.json'
         },
+        {
+            name: 'effect_grass_cut',
+            src: [
+                '/assets/audio/effects/LTTP_Grass_Cut.lite.ogg'
+            ]
+        },
         //HUD
         {
             name: 'sprite_hud',

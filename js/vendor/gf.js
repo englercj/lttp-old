@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-07-30
+ * Compiled: 2013-07-31
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -21608,6 +21608,20 @@ gf.Game = function(contId, settings) {
      * @type Map
      * @readOnly
      */
+
+     //pixi does some prevent default on mousedown, so we need to
+     //make sure mousedown will focus the canvas or keyboard events break
+
+
+    //ensure that key events will work
+    var view = this.renderer.view;
+    if(!view.getAttribute('tabindex'))
+        view.setAttribute('tabindex','1');
+
+    view.focus();
+    view.addEventListener('click', function() {
+        view.focus();
+    }, false);
 };
 
 gf.inherits(gf.Game, Object, {
@@ -22170,20 +22184,26 @@ gf.input.Input = function(view) {
 
 gf.inherits(gf.input.Input, Object, {
     /**
-     * Prevents the default action of an event, and prevents it from bubbling up
-     * the DOM.
+     * Prevents the default action of an event
      *
      * @method preventDefault
      * @param event {DOMEvent} The event to prevent default actions for
      */
     preventDefault: function(e) {
-        if(e.stopPropagation) e.stopPropagation();
-        else e.cancelBubble = true;
-
         if(e.preventDefault) e.preventDefault();
         else e.returnValue = false;
 
         return false;
+    },
+    /**
+     * Prevents an event from bubbling up the DOM.
+     *
+     * @method stopPropogation
+     * @param event {DOMEvent} The event to prevent bubbling for
+     */
+    stopPropogation: function(e) {
+        if(e.stopPropagation) e.stopPropagation();
+        else e.cancelBubble = true;
     }
 });
 
@@ -22313,8 +22333,8 @@ gf.input.Keyboard = function(view) {
      */
     this._clearSq = null;
 
-    document.addEventListener('keydown', this.onKeyDown.bind(this), false);
-    document.addEventListener('keyup', this.onKeyUp.bind(this), false);
+    view.addEventListener('keydown', this.onKeyDown.bind(this), false);
+    view.addEventListener('keyup', this.onKeyUp.bind(this), false);
 };
 
 gf.inherits(gf.input.Keyboard, gf.input.Input, {
