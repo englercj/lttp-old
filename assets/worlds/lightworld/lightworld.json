@@ -15701,35 +15701,6 @@
          "width":256,
          "x":0,
          "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "height":256,
-         "name":"player",
-         "objects":[
-                {
-                 "height":16,
-                 "name":"link",
-                 "properties":
-                    {
-                     "hitArea":"[7,8,9,8,16,14,16,16,9,22,7,22,0,16,0,14]",
-                     "inertia":"Infinity",
-                     "mass":"1",
-                     "texture":"sprite_link"
-                    },
-                 "rotation":0,
-                 "type":"player",
-                 "visible":true,
-                 "width":16,
-                 "x":2224,
-                 "y":2864
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "width":256,
-         "x":0,
-         "y":0
         }],
  "orientation":"orthogonal",
  "properties":
