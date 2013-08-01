@@ -18683,29 +18683,24 @@ gf.PhysicsSystem.COLLISION_TYPE = {
      *
      * @method showPhysics
      */
-    this.showPhysics = function(size, color, alpha) {
+    this.showPhysics = function(style) {
         this._showHit = true;
         if(!this._phys || !this._phys.body || !this._phys.shape)
             return;
 
-        if(size === undefined)
-            size = 1;
-
-        if(color === undefined)
-            color = 0xFF00FF;
-
-        if(alpha === undefined)
-            alpha = 1;
-
+        //no graphics object created yet
         if(!this._hit) {
             this._hit = new PIXI.Graphics();
-            this._hit.style = {
-                size: size,
-                color: color,
-                alpha: alpha
-            };
 
             this.parent.addChild(this._hit);
+        }
+
+        //pass a new style, or haven't defined one yet
+        if(style || !this._hit.style) {
+            style = this._setStyleDefaults(style);
+            style.sensor = this._setStyleDefaults(style.sensor);
+
+            this._hit.style = style;
         }
 
         var p = this._phys.body.p,
@@ -18730,8 +18725,22 @@ gf.PhysicsSystem.COLLISION_TYPE = {
         }
     };
 
+    this._setStyleDefaults = function(style) {
+        style = style || {};
+        style.size = style.size || 1;
+        style.color = style.color || 0xff00ff;
+        style.alpha = style.alpha || 1;
+
+        return style;
+    };
+
     this._drawPhysicsShape = function(shape, g, p) {
-        g.lineStyle(g.style.size, g.style.color, g.style.alpha);
+        var style = g.style;
+
+        if(shape.sensor)
+            style = style.sensor;
+
+        g.lineStyle(style.size, style.color, style.alpha);
 
         //circle
         if(shape.type === 'circle') {
@@ -18765,8 +18774,9 @@ gf.PhysicsSystem.COLLISION_TYPE = {
      */
     this.hidePhysics = function() {
         this._showHit = false;
-        if(this._hit)
+        if(this._hit) {
             this._hit.visible = false;
+        }
     };
 };
 //you can only have 1 audio context on a page, so we store one for use in each manager
@@ -21786,7 +21796,8 @@ gf.inherits(gf.Game, Object, {
      * @private
      */
     _tick: function() {
-        this.emit('beforetick');
+        this.timings.tickStart = this.timings._timer.now();
+
         //start render loop
         window.requestAnimFrame(this._tick.bind(this));
 
@@ -21799,7 +21810,9 @@ gf.inherits(gf.Game, Object, {
         this.timings.renderStart = this.timings._timer.now();
         this.renderer.render(this.stage);
         this.timings.renderEnd = this.timings._timer.now();
-        this.emit('aftertick');
+
+        this.timings.tickEnd =  this.timings._timer.now();
+        this.emit('tick');
     }
 });
 

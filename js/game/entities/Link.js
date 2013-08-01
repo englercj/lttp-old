@@ -1,4 +1,5 @@
-var ATTACK_CONE = 0.5;
+var ATTACK_CONE = 0.4,
+    ATTACK_SENSOR_RADIUS = 18;
 
 define([
     'game/data/types',
@@ -227,7 +228,7 @@ define([
         addAttackSensor: function(phys) {
             if(this.atkSensor) return;
 
-            this.atkSensor = phys.addCustomShape(this, new gf.Circle(0, 0, 16), true);
+            this.atkSensor = phys.addCustomShape(this, new gf.Circle(0, 0, ATTACK_SENSOR_RADIUS), true);
         },
         _checkAttack: function() {
             for(var i = this.inAttackRange.length - 1; i > -1; --i) {

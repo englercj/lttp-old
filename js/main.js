@@ -52,6 +52,8 @@ require([
             game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, onToggleInventory);
             game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_SHOULDER, onToggleAudio);
 
+            game.input.keyboard.once(gf.input.KEY.TILDE, onToggleDebug);
+
             //initialize HUD objects
             game.addChild(initHud());
 
@@ -107,6 +109,10 @@ require([
 
     function onToggleAudio() {}
 
+    function onToggleDebug() {
+        gf.debug.show(game);
+    }
+
     lttp.loadZone = function(zone, vec) {
         if(zone === lttp.activeZone)
             return;
@@ -125,7 +131,7 @@ require([
             var p = vec.x ? 'x' : 'y',
                 last = 0;
 
-            $({v:0}).animate({v:game.camera.size[p]+5}, {
+            $({v:0}).animate({v:game.camera.size[p]+10}, {
                 duration: 500,
                 easing: 'swing',
                 step: function(now, tween) {
