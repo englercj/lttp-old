@@ -1,7 +1,8 @@
 var ATTACK_CONE = 0.4,
     ATTACK_SENSOR_RADIUS = 18,
     USE_CONE = 0.3,
-    THROW_DISTANCE = 50;
+    THROW_DISTANCE_X = 75;
+    THROW_DISTANCE_Y = 50;
 
 define([
     'game/data/types',
@@ -239,8 +240,8 @@ define([
                 this.carrying = null;
 
                 TweenLite.to(item.position, 0.25, {
-                    x: '+=' + (THROW_DISTANCE * v.x),
-                    y: '+=' + ((THROW_DISTANCE * v.y) + ((v.y^1) * (this.height / 2))),
+                    x: '+=' + (THROW_DISTANCE_X * v.x),
+                    y: '+=' + ((THROW_DISTANCE_Y * v.y) + ((v.y^1) * (this.height / 2))),
                     ease: Linear.easeNone,
                     onCompleteParams: [item],
                     onComplete: function(obj) {
@@ -277,7 +278,7 @@ define([
                     //do link animation
 
                     var self = this;
-                    TweenLite.to(e.position, 0.25, {
+                    TweenLite.to(e.position, 0.15, {
                         x: this.position.x,
                         y: this.position.y - this.height,
                         ease: Linear.easeNone,
@@ -501,7 +502,7 @@ define([
             //collide with an exit
             else if(obj.type === 'exit') {
                 lttp.loadWorld(obj, vec);
-            } else {
+            } else if(!obj.sensor) {
                 this.colliding.push(obj);
             }
         },
@@ -512,7 +513,7 @@ define([
                 if(i >= 0) {
                     this.inAttackRange.splice(i, 1);
                 }
-            } else {
+            } else if(!obj.sensor) {
                 var i = this.colliding.indexOf(obj);
 
                 if(i >= 0) {
