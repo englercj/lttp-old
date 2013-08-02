@@ -11,6 +11,10 @@ define([], function() {
                 '/assets/audio/music/overworld.lite.ogg'
             ]
         },
+        {
+            name: 'world_linkshouse',
+            src: '/assets/worlds/linkshouse/linkshouse.json'
+        },
         //Darkworld
         /*{
             name: 'world_darkworld',

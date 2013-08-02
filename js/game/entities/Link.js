@@ -10,7 +10,7 @@ define([
         Entity.call(this, spritesheet);
 
         //player type
-        this.type = gf.Sprite.TYPE.PLAYER;
+        this.type = types.ENTITY.PLAYER;
 
         //set name of Link
         this.name = 'link';
@@ -409,6 +409,10 @@ define([
             //colliding with a new zone
             else if(obj.type === 'zone') {
                 lttp.loadZone(obj, vec);
+            }
+            //collide with an exit
+            else if(obj.type === 'exit') {
+                lttp.loadWorld(obj, vec);
             }
         },
         _separate: function(obj, colShape, myShape) {

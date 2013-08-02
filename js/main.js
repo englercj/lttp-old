@@ -18,28 +18,11 @@ require([
             height: $game.height()
         });
 
-        game.spritepool.add('link', Link);
-
         game.loader.on('progress', function(e) {
         });
 
         game.loader.on('complete', function() {
-            //initialize world and track link with camera
-            game.loadWorld('world_lightworld');
-
-            //setup the necessary layers
-            lttp.layers = {};
-
-            lttp.layers.zones = game.world.findLayer('zones');
-            lttp.layers.player = game.world.findLayer('player');
-
-            lttp.layers.zones.spawn();
-            lttp.layers.player.spawn();
-
-            //setup the player
-            lttp.link = lttp.layers.player.children[0]
-            lttp.link.addAttackSensor(game.physics);
-            game.camera.follow(lttp.link);
+            lttp.loadWorld('world_linkshouse');
 
             //bind some game related keys
             game.input.keyboard.on(gf.input.KEY.B, onToggleSaveMenu);
@@ -113,12 +96,49 @@ require([
         gf.debug.show(game);
     }
 
+    //setup the necessary layers
+    lttp.layers = {};
+    lttp.loadWorld = function(exit, vec) {
+        if(typeof exit === 'string')
+            exit = { name: exit };
+
+        //remove the player so he isn't destroyed by the world
+        if(lttp.link)
+            game.world.removeChild(lttp.link);
+        else
+            lttp.link = createLink();
+
+        //destroy the current world
+        if(game.world)
+            game.world.destroy();
+
+        //set link position
+        lttp.link.setPosition(
+            exit.properties ? exit.properties.loc[0] : 128,// 2231, //in front of links house
+            exit.properties ? exit.properties.loc[1] : 128//2849;
+        );
+
+        //load the new world into the game
+        game.loadWorld(exit.name);
+        game.addChild(lttp.link);
+        firstZone = true;
+
+        //spawn zones
+        lttp.layers.zones = game.world.findLayer('zones');
+        if(lttp.layers.zones) lttp.layers.zones.spawn();
+
+        //spawn exits
+        lttp.layers.exits = game.world.findLayer('exits');
+        if(lttp.layers.exits) lttp.layers.exits.spawn();
+
+        game.camera.follow(lttp.link);
+    };
+
     lttp.loadZone = function(zone, vec) {
         if(zone === lttp.activeZone)
             return;
 
-        console.log('load zone:', zone.name, '('+vec.x+','+vec.y+')');
-
+        console.log(zone.name);
         //transfer the zone stuff
         lttp.activeZone = zone;
         lttp.oldLayer = lttp.activeLayer;
@@ -149,7 +169,7 @@ require([
         } else {
             loadZoneDone();
         }
-    }
+    };
 
     function loadZoneDone() {
         if(lttp.oldLayer)
@@ -179,6 +199,35 @@ require([
             }
         }
         game.camera.constrain(zone.bounds.clone());
-        game.camera.follow(lttp.link);
+        game.camera.follow(lttp.link, gf.Camera.FOLLOW.LOCKON);
+    }
+
+    function createLink(saveData) {
+        if(lttp.link)
+            return lttp.link;
+
+        var l = new Link(gf.assetCache['sprite_link']);
+
+        l.mass = 1;
+        l.inertia = Infinity;
+        l.friction = 0;
+        l.hitArea = new gf.Polygon([
+            7,8, //x,y relative to links top-left
+            9,8,
+            16,14,
+            16,16,
+            9,22,
+            7,22,
+            0,16,
+            0,14
+        ]);
+
+        l.anchor.x = 0;
+        l.anchor.y = 1;
+
+        l.enablePhysics(game.physics);
+        l.addAttackSensor(game.physics);
+
+        return l;
     }
 });

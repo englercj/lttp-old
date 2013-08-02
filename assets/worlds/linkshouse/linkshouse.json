@@ -5,6 +5,10 @@
          "height":11,
          "name":"Ground",
          "opacity":1,
+         "properties":
+            {
+             "prerender":"true"
+            },
          "type":"tilelayer",
          "visible":true,
          "width":14,
@@ -25,8 +29,23 @@
         {
          "draworder":"topdown",
          "height":11,
-         "name":"pots",
+         "name":"inside",
          "objects":[
+                {
+                 "gid":317,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":176,
+                 "y":128
+                }, 
                 {
                  "gid":266,
                  "height":0,
@@ -82,22 +101,21 @@
         {
          "draworder":"topdown",
          "height":11,
-         "name":"chests",
+         "name":"zones",
          "objects":[
                 {
-                 "gid":317,
-                 "height":0,
-                 "name":"",
+                 "height":176,
+                 "name":"inside",
                  "properties":
                     {
 
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"zone",
                  "visible":true,
-                 "width":0,
-                 "x":176,
-                 "y":128
+                 "width":224,
+                 "x":0,
+                 "y":0
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -116,7 +134,7 @@
                  "name":"world_lightworld",
                  "properties":
                     {
-                     "loc":"[2231,2849]"
+                     "loc":"[2225,2875]"
                     },
                  "rotation":0,
                  "type":"exit",
