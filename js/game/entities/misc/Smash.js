@@ -13,10 +13,10 @@ define([
 
     gf.inherits(Smash, Entity, {
         _addAnimations: function() {
-            this._addSlices('rock', 0, 0, 0, 7);
+            this._addSlices('rock_white', 0, 0, 0, 7);
             this._addSlices('grass', 0, 8, 1, 5);
             this._addSlices('grass_pink', 1, 6, 2, 3);
-            this._addSlices('rock_green', 2, 4, 3, 1);
+            this._addSlices('rock', 2, 4, 3, 1);
             this._addSlices('grass_white', 3, 2, 3, 9);
             this._addSlices('grass_brown', 4, 0, 4, 7);
             this._addSlices('grass_dark', 4, 8, 5, 6);

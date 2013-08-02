@@ -22,7 +22,7 @@ require([
         });
 
         game.loader.on('complete', function() {
-            lttp.loadWorld('world_linkshouse');
+            lttp.loadWorld('world_lightworld');
 
             //bind some game related keys
             game.input.keyboard.on(gf.input.KEY.B, onToggleSaveMenu);
@@ -114,8 +114,8 @@ require([
 
         //set link position
         lttp.link.setPosition(
-            exit.properties ? exit.properties.loc[0] : 128,// 2231, //in front of links house
-            exit.properties ? exit.properties.loc[1] : 128//2849;
+            exit.properties ? exit.properties.loc[0] : 2231, //in front of links house
+            exit.properties ? exit.properties.loc[1] : 2849
         );
 
         //load the new world into the game

@@ -1,5 +1,7 @@
 var ATTACK_CONE = 0.4,
-    ATTACK_SENSOR_RADIUS = 18;
+    ATTACK_SENSOR_RADIUS = 18,
+    USE_CONE = 0.3,
+    THROW_DISTANCE = 50;
 
 define([
     'game/data/types',
@@ -26,6 +28,7 @@ define([
 
         //objects currently within attack range
         this.inAttackRange = [];
+        this.colliding = [];
 
         //a pool of sprite to do smashing animations
         this.smashPool = new gf.ObjectPool(Smash, lttp.game);
@@ -46,6 +49,8 @@ define([
         this.addAnimations();
 
         this.anchor.x = this.anchor.y = 0.5;
+
+        this.on('physUpdate', this._physUpdate.bind(this));
 
         //make the camera track this entity
         window.link = this;
@@ -128,14 +133,6 @@ define([
             this.gotoAndStop('idle_down');
             this.lastDir = 'down';
         },
-        //Talk, run, Lift/Throw/Push/Pull
-        onUse: function() {
-
-        },
-        //Uses the currently equipted item
-        onUseItem: function() {
-
-        },
         onWalk: function(dir, e) {
             if(e.originalEvent)
                 e.input.preventDefault(e.originalEvent);
@@ -196,8 +193,6 @@ define([
 
             this._checkMovement();
         },
-        //use equipted item
-        onUseItem: function() {},
         //when attack key is pressed
         onAttack: function(e) {
             if(e.originalEvent)
@@ -230,52 +225,145 @@ define([
 
             this.atkSensor = phys.addCustomShape(this, new gf.Circle(0, 0, ATTACK_SENSOR_RADIUS), true);
         },
+        //Talk, run, Lift/Throw/Push/Pull
+        onUse: function(status) {
+            if(!status.down || this.locked)
+                return;
+
+            //throws
+            if(this.carrying) {
+                var item = this.carrying,
+                    v = this._getDirVector(),
+                    self = this;
+
+                this.carrying = null;
+
+                TweenLite.to(item.position, 0.25, {
+                    x: '+=' + (THROW_DISTANCE * v.x),
+                    y: '+=' + ((THROW_DISTANCE * v.y) + ((v.y^1) * (this.height / 2))),
+                    ease: Linear.easeNone,
+                    onCompleteParams: [item],
+                    onComplete: function(obj) {
+                        self._destroyObject(obj);
+                    }
+                })
+
+                return;
+            }
+
+            for(var i = 0; i < this.colliding.length; ++i) {
+                var e = this.colliding[i],
+                    t;
+
+                if(!e.properties)
+                    continue;
+
+                t = e.properties.type;
+
+                if(t !== 'grass' && t !== 'rock' && t !== 'sign')
+                    continue;
+
+                if(this._inCone(e, USE_CONE)) {
+                    this.lock();
+
+                    //change physics to sensor
+                    e.disablePhysics();
+                    e.sensor = true;
+                    e.enablePhysics();
+
+                    //make it on top
+                    e.parent.removeChild(e);
+                    lttp.game.world.addChild(e);
+                    //do link animation
+
+                    var self = this;
+                    TweenLite.to(e.position, 0.25, {
+                        x: this.position.x,
+                        y: this.position.y - this.height,
+                        ease: Linear.easeNone,
+                        onCompleteParams: [e],
+                        onComplete: function(obj) {
+                            //set that we are carrying it
+                            self.carrying = obj;
+                            self.unlock();
+                        }
+                    });
+
+                    break;
+                }
+            }
+        },
+        //Uses the currently equipted item
+        onUseItem: function() {
+
+        },
+        _destroyObject: function(o) {
+            var t = o.properties.type,
+                spr = this.smashPool.create();
+
+            spr.gotoAndPlay(t);
+            spr.visible = true;
+            spr.anchor.x = o.anchor.x;
+            spr.anchor.y = o.anchor.y;
+            spr.setPosition(o.position.x, o.position.y);
+
+            //TODO: drops?
+            o.destroy();
+        },
+        _physUpdate: function() {
+            if(this.carrying) {
+                this.carrying.position.x = this.position.x;
+                this.carrying.position.y = this.position.y - this.height;
+            }
+        },
         _checkAttack: function() {
             for(var i = this.inAttackRange.length - 1; i > -1; --i) {
                 var e = this.inAttackRange[i],
-                    t = e.properties.type,
-                    hit = false,
-                    vec = new gf.Vector(
-                        e.position.x - this.position.x,
-                        e.position.y - this.position.y
-                    );
-
-                vec.normalize();
+                    t = e.properties.type;
 
                 if(t.indexOf('grass') === -1)
                     continue;
 
-                //check if 'e' is withing a conic area in the direction we face
-                switch(this.lastDir) {
-                    case 'left':
-                        hit = vec.x < 0 && vec.y > -ATTACK_CONE && vec.y < ATTACK_CONE;
-                        break;
-                    case 'right':
-                        hit = vec.x > 0 && vec.y > -ATTACK_CONE && vec.y < ATTACK_CONE;
-                        break;
-                    case 'up':
-                        hit = vec.y < 0 && vec.x > -ATTACK_CONE && vec.x < ATTACK_CONE;
-                        break;
-                    case 'down':
-                        hit = vec.y > 0 && vec.x > -ATTACK_CONE && vec.x < ATTACK_CONE;
-                        break;
-                }
-
-                if(hit) {
+                if(this._inCone(e, ATTACK_CONE)) {
                     if(e.takeDamage) {
                         e.takeDamage(this.damage)
                     } else if(t.indexOf('grass') !== -1) {
-                        var spr = this.smashPool.create();
-                        spr.gotoAndPlay(t);
-                        spr.visible = true;
-                        spr.anchor.x = e.anchor.x;
-                        spr.anchor.y = e.anchor.y;
-                        spr.setPosition(e.position.x, e.position.y);
-
-                        //TODO: drops?
-                        e.destroy();
+                        this._destroyObject();
                     }
                 }
+            }
+        },
+        _inCone: function(obj, cone) {
+            var vec = new gf.Vector(
+                obj.position.x - this.position.x,
+                obj.position.y - this.position.y
+            );
+
+            vec.normalize();
+
+            //check if 'e' is withing a conic area in the direction we face
+            switch(this.lastDir) {
+                case 'left':
+                    return (vec.x < 0 && vec.y > -cone && vec.y < cone);
+                case 'right':
+                    return (vec.x > 0 && vec.y > -cone && vec.y < cone);
+                case 'up':
+                    return (vec.y < 0 && vec.x > -cone && vec.x < cone);
+                case 'down':
+                    return (vec.y > 0 && vec.x > -cone && vec.x < cone);
+            }
+        },
+        _getDirVector: function() {
+            //check if 'e' is withing a conic area in the direction we face
+            switch(this.lastDir) {
+                case 'left':
+                    return new gf.Vector(-1, 0);
+                case 'right':
+                    return new gf.Vector(1, 0);
+                case 'up':
+                    return new gf.Vector(0, -1);
+                case 'down':
+                    return new gf.Vector(0, 1);
             }
         },
         _checkMovement: function() {
@@ -413,6 +501,8 @@ define([
             //collide with an exit
             else if(obj.type === 'exit') {
                 lttp.loadWorld(obj, vec);
+            } else {
+                this.colliding.push(obj);
             }
         },
         _separate: function(obj, colShape, myShape) {
@@ -421,6 +511,12 @@ define([
 
                 if(i >= 0) {
                     this.inAttackRange.splice(i, 1);
+                }
+            } else {
+                var i = this.colliding.indexOf(obj);
+
+                if(i >= 0) {
+                    this.colliding.splice(i, 1);
                 }
             }
         }
