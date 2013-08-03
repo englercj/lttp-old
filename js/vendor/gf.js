@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-08-02
+ * Compiled: 2013-08-03
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -17223,7 +17223,8 @@ gf.plugin = {
         return ha;
     },
     parseTiledProperties: function(obj) {
-        if(!obj) return;
+        if(!obj || obj.__tiledparsed)
+            return obj;
 
         for(var k in obj) {
             var v = obj[k];
@@ -17254,6 +17255,8 @@ gf.plugin = {
             obj.mass = Infinity;
             obj.inertia = Infinity;
         }
+
+        obj.__tiledparsed = true;
 
         return obj;
     }
@@ -18181,6 +18184,8 @@ gf.PhysicsSystem = function(options) {
     );
 
     this.actionQueue = [];
+    this.tickCallbacks = [];
+    this._skip = 0;
 };
 
 gf.inherits(gf.PhysicsSystem, Object, {
@@ -18269,7 +18274,10 @@ gf.inherits(gf.PhysicsSystem, Object, {
 
         return shape;
     },
-    invalidCollisions: function() {
+    nextTick: function(fn) {
+        this.tickCallbacks.push(fn);
+    },
+    reindexStatic: function() {
         this.actionQueue.push(['reindexStatic']);
         this.act();
     },
@@ -18321,6 +18329,13 @@ gf.inherits(gf.PhysicsSystem, Object, {
             return;
 
         this.actionQueue.push(['remove', spr._phys]);
+        this.act();
+    },
+    reindex: function(spr) {
+        if(!spr || !spr._phys || !spr._phys.shape)
+            return;
+
+        this.actionQueue.push(['reindex', spr._phys.shape]);
         this.act();
     },
     addCustomShape: function(spr, poly, sensor) {
@@ -18375,7 +18390,14 @@ gf.inherits(gf.PhysicsSystem, Object, {
 
     },
     update: function(dt) {
-        if(this._paused) return;
+        if(this._paused)
+            return;
+
+        while(this.tickCallbacks.length)
+            (this.tickCallbacks.shift()).call(this);
+
+        if(this._skip)
+            return this._skip--;
 
         //execute the physics step
         this.space.step(dt);
@@ -18444,13 +18466,19 @@ gf.inherits(gf.PhysicsSystem, Object, {
     pause: function() {
         this._paused = true;
     },
-    unpause: function() {
+    resume: function() {
         this._paused = false;
+    },
+    skip: function(num) {
+        this._skip = num;
+    },
+    skipNext: function() {
+        this.skip(1);
     },
     onPostStep: function() {
         //remove items
         while(this.actionQueue.length) {
-            var a = this.actionQueue.pop(),
+            var a = this.actionQueue.shift(),
                 act = a[0],
                 data = a[1];
 
@@ -18497,6 +18525,10 @@ gf.inherits(gf.PhysicsSystem, Object, {
                     break;
 
                 case 'reindex':
+                    this.space.reindexShape(data);
+                    break;
+
+                case 'reindexStatic':
                     this.space.reindexStatic();
                     break;
 
@@ -18596,12 +18628,18 @@ gf.PhysicsSystem.COLLISION_TYPE = {
     this.disablePhysics = function() {
         if(this._psystem) {
             this._psystem.remove(this);
+        }
+    };
 
-            if(this._hit) {
-                this._showHit = false;
-                this.parent.removeChild(this._hit);
-                this._hit = null;
-            }
+    /**
+     * Reindexes the collisions for this sprite, useful when moving the sprite a great deal
+     * (like to a new world)
+     *
+     * @method disablePhysics
+     */
+    this.reindex = function() {
+        if(this._psystem) {
+            this._psystem.reindex(this);
         }
     };
 
@@ -18693,107 +18731,6 @@ gf.PhysicsSystem.COLLISION_TYPE = {
      */
     this.onSeparate = function(obj, colShape, myShape) {
         this.emit('separate', obj, colShape, myShape);
-    };
-
-    /**
-     * Shows the physics body for the sprite
-     *
-     * @method showPhysics
-     */
-    this.showPhysics = function(style) {
-        this._showHit = true;
-        if(!this._phys || !this._phys.body || !this._phys.shape)
-            return;
-
-        //no graphics object created yet
-        if(!this._hit) {
-            this._hit = new PIXI.Graphics();
-
-            this.parent.addChild(this._hit);
-        }
-
-        //pass a new style, or haven't defined one yet
-        if(style || !this._hit.style) {
-            style = this._setStyleDefaults(style);
-            style.sensor = this._setStyleDefaults(style.sensor);
-
-            this._hit.style = style;
-        }
-
-        var p = this._phys.body.p,
-            g = this._hit,
-            c = this._phys.customShapes;
-
-        if(!this._hit.lastPos)
-            this._hit.lastPos = new gf.Point();
-        else if(this._hit.lastPos.x === p.x && this._hit.lastPos.y === p.y)
-            return;
-
-        this._hit.lastPos.x = p.x;
-        this._hit.lastPos.y = p.y;
-
-        g.clear();
-        this._drawPhysicsShape(this._phys.shape, g, p);
-
-        if(c) {
-            for(var i = 0; i < c.length; ++i) {
-                this._drawPhysicsShape(c[i], g, p);
-            }
-        }
-    };
-
-    this._setStyleDefaults = function(style) {
-        style = style || {};
-        style.size = style.size || 1;
-        style.color = style.color || 0xff00ff;
-        style.alpha = style.alpha || 1;
-
-        return style;
-    };
-
-    this._drawPhysicsShape = function(shape, g, p) {
-        var style = g.style;
-
-        if(shape.sensor)
-            style = style.sensor;
-
-        g.lineStyle(style.size, style.color, style.alpha);
-
-        //circle
-        if(shape.type === 'circle') {
-            var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
-                cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
-
-            g.drawCircle(cx, cy, shape.r);
-        }
-        //polygon
-        else {
-            var sx = shape.verts[0],
-                sy = shape.verts[1];
-
-            g.moveTo(p.x + sx, p.y + sy);
-
-            for(var i = 2; i < shape.verts.length; i+=2) {
-                g.lineTo(
-                    p.x + shape.verts[i],
-                    p.y + shape.verts[i + 1]
-                );
-            }
-
-            g.lineTo(p.x + sx, p.y + sy);
-        }
-    };
-
-    /**
-     * Hides the physics body for the sprite
-     *
-     * @method hidePhysics
-     */
-    this.hidePhysics = function() {
-        this._showHit = false;
-        if(this._hit) {
-            this._hit.visible = false;
-        }
     };
 };
 //you can only have 1 audio context on a page, so we store one for use in each manager
@@ -20099,8 +20036,7 @@ gf.inherits(gf.DisplayObjectContainer, PIXI.DisplayObjectContainer, {
      * @method destroy
      */
     destroy: function() {
-        if(this.physics)
-            this.disablePhysics();
+        this.disablePhysics();
 
         if(this.parent)
             this.parent.removeChild(this);
@@ -23890,7 +23826,8 @@ gf.inherits(gf.TiledMap, gf.Map, {
         for(var i = this.children.length - 1; i > -1; --i) {
             var o = this.children[i];
 
-            o.destroy();
+            if(o.destroy)
+                o.destroy();
         }
     },
     /**
@@ -23971,7 +23908,7 @@ gf.TiledLayer = function(layer) {
      * @property tiles
      * @type Object
      */
-    this.tiles = {};
+    this.tiles = [];
 
     /**
      * The user-defined properties of this group. Usually defined in the TiledEditor
@@ -23988,8 +23925,12 @@ gf.TiledLayer = function(layer) {
     this.alpha = layer.opacity;
     this.visible = layer.visible;
 
-    this.prerender = this.properties.prerender;
-    this.sprite = null; //the pre-rendered layer sprite
+    this.preRender = this.properties.preRender;
+    this.chunkSize = new gf.Vector(
+        this.properties.chunkSizeX || this.properties.chunkSize || 512,
+        this.properties.chunkSizeY || this.properties.chunkSize || 512
+    );
+    this._preRendered = false;
 
     this._tilePool = [];
     this._buffered = { left: false, right: false, top: false, bottom: false };
@@ -24006,12 +23947,15 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
      * @param height {Number} The number of tiles in the Y direction to render
      */
     resize: function(width, height) {
-        if(this.prerender) {
-            if(!this.sprite)
-                this._prerender();
+        if(this.preRender) {
+            if(!this._preRendered)
+                this._preRender();
 
             return;
         }
+
+        if(!this.tileSize)
+            this.tileSize = this.parent.tileSize;
 
         //clear all the visual tiles
         this.clearTiles();
@@ -24035,59 +23979,89 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
 
         this._updateRenderSq();
         if(this.hasPhysics) {
-            this.parent.parent.physics.invalidCollisions();
+            this.parent.parent.physics.reindexStatic();
         }
     },
-    //render the map onto a canvas once to use as a prerendered texture
-    _prerender: function() {
+    //render the map onto a canvas once to use as a preRendered texture
+    _preRender: function() {
         if(!this.visible)
             return;
 
-        var canvas = this.canvas = document.createElement('canvas'),
-            world = this.parent,
+        this._preRendered = true;
+        this.tileSize = this.chunkSize.clone();
+
+        var world = this.parent,
+            width = world.size.x * world.tileSize.x,
+            height = world.size.y * world.tileSize.y,
+            xChunks = Math.ceil(width / this.chunkSize.x),
+            yChunks = Math.ceil(height / this.chunkSize.y);
+
+        //for each chunk
+        for(var x = 0; x < xChunks; ++x) {
+            for(var y = 0; y < yChunks; ++y) {
+                var cw = (x === xChunks - 1) ? width - (x * this.chunkSize.x) : this.chunkSize.x,
+                    ch = (y === yChunks - 1) ? height - (y * this.chunkSize.y) : this.chunkSize.y;
+
+                this._preRenderChunk(x, y, cw, ch);
+            }
+        }
+    },
+    _preRenderChunk: function(cx, cy, w, h) {
+        var world = this.parent,
+            tsx = world.tileSize.x,
+            tsy = world.tileSize.y,
+            xTiles = w / tsx,
+            yTiles = h / tsy,
+            nx = (cx * this.chunkSize.x) % tsx,
+            ny = (cy * this.chunkSize.y) % tsy,
+            tx = Math.floor(cx * this.chunkSize.x / tsx),
+            ty = Math.floor(cy * this.chunkSize.y / tsy),
             sx = world.size.x,
             sy = world.size.y,
-            tsx = world.tileSize.x,
-            tsy = world.tileSize.y;
+            canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d');
 
-        canvas.width = sx * tsx;
-        canvas.height = sy * tsy;
-        this.ctx = canvas.getContext('2d');
+        canvas.width = w;
+        canvas.height = h;
 
-        //draw all the tiles to the canvas
-        for(var x = 0; x < sx; ++x) {
-            for(var y = 0; y < sy; ++y) {
-                var id = (x + (y * sx)),
-                    tid = this.tileIds[id],
-                    set = world.getTileset(tid),
-                    tx;
+        //draw all the tiles in this chunk to the canvas
+        for(var x = 0; x < xTiles; ++x) {
+            for(var y = 0; y < yTiles; ++y) {
+                if(x + tx < sx && y + ty < sy) {
+                    var id = ((x + tx) + ((y + ty) * sx)),
+                        tid = this.tileIds[id],
+                        set = world.getTileset(tid),
+                        tex, frame;
 
-                if(set) {
-                    tx = set.getTileTexture(tid);
-                    this._prerenderTile(tx, x * tsx, y * tsy);
+                    if(set) {
+                        tex = set.getTileTexture(tid);
+                        frame = tex.frame;
+
+                        ctx.drawImage(
+                            tex.baseTexture.source,
+                            frame.x,
+                            frame.y,
+                            frame.width,
+                            frame.height,
+                            (x * tsx) - nx + set.tileoffset.x,
+                            (y * tsy) - ny + set.tileoffset.y,
+                            frame.width,
+                            frame.height
+                        );
+                    }
                 }
             }
         }
 
-        //use the canvas as a texture for a sprite to display
-        this.sprite = new gf.Sprite(gf.Texture.fromCanvas(canvas));
+        //use the canvas as a texture for a tile to display
+        var tile = new gf.Tile(gf.Texture.fromCanvas(canvas));
+        tile.setPosition(cx * this.chunkSize.x, cy * this.chunkSize.y);
 
-        this.addChild(this.sprite);
-    },
-    _prerenderTile: function(tx, x, y) {
-        var frame = tx.frame;
+        if(!this.tiles[cx])
+            this.tiles[cx] = {};
 
-        this.ctx.drawImage(
-            tx.baseTexture.source,
-            frame.x,
-            frame.y,
-            frame.width,
-            frame.height,
-            x,
-            y,
-            frame.width,
-            frame.height
-        );
+        this.addChild(tile);
+        this.tiles[cx][cy] = tile;
     },
     _renderOrthoTiles: function(sx, sy, sw, sh) {
         //convert to tile coords
@@ -24110,7 +24084,7 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
 
         for(var x = sx; x < endX; ++x) {
             for(var y = sy; y < endY; ++y) {
-                this.moveTileSprite(x, y, x, y);
+                this.moveTileSprite(-1, -1, x, y);
             }
         }
 
@@ -24206,20 +24180,9 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
     },
     _freeTile: function(tx, ty) {
         if(this.tiles[tx] && this.tiles[tx][ty]) {
-            var t = this.tiles[tx][ty];
-
-            if(t) {
-                t.visible = false;
-                t.disablePhysics();
-                this._tilePool.push(t);
-                this.tiles[tx][ty] = null;
-                this.removeChild(t);
-            }
+            this.clearTile(this.tiles[tx][ty]);
+            this.tiles[tx][ty] = null;
         }
-
-        // make this first-in-first-out instead of a stack
-        // see: http://jsperf.com/queue-push-unshift-vs-shift-pop/3
-        //this._tilePool.reverse();
     },
     _isoToI: function(x, y) {
         // converts world isometric coordinates into the i position of the 2D-Array
@@ -24230,7 +24193,7 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
         return ((y - x) / 2);
     },
     destroy: function() {
-        this.clearTiles();
+        this.clearTiles(true);
         gf.Layer.prototype.destroy.call(this);
     },
     /**
@@ -24238,13 +24201,21 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
      *
      * @method clearTiles
      */
-    clearTiles: function() {
-        //hide/free each tile and remove from the memory map
-        for(var x in this.tiles) {
-            for(var y in this.tiles[x]) {
-                this._freeTile(x, y);
-            }
+    clearTiles: function(remove) {
+        for(var c = this.children.length - 1; c > -1; --c) {
+            this.clearTile(this.children[c], remove);
         }
+
+        this.tiles.length = 0;
+    },
+    clearTile: function(tile, remove) {
+        tile.visible = false;
+        tile.disablePhysics();
+
+        if(remove)
+            this.removeChild(tile);
+        else
+            this._tilePool.push(tile);
     },
     /**
      * Moves a tile sprite from one position to another, and creates a new tile
@@ -24302,7 +24273,6 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
         if(this.tiles[fromTileX] && this.tiles[fromTileX][fromTileY]) {
             tile = this.tiles[fromTileX][fromTileY];
             this.tiles[fromTileX][fromTileY] = null;
-
             tile.disablePhysics();
         }
         //otherwise grab a new tile from the pool
@@ -24317,8 +24287,8 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
             tile.mass = props.mass;
             tile.inertia = props.inertia;
             tile.anchor.y = 1;
+            this.addChild(tile);
         }
-        this.addChild(tile);
 
         tile.collisionType = props.type;
         tile.visible = true;
@@ -24331,9 +24301,6 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
         if(props.mass) {
             this.hasPhysics = true;
             tile.enablePhysics(this.parent.parent.physics); //this.TiledMap.GameState.physics
-
-            if(this.parent._showPhysics)
-                tile.showPhysics();
         }
 
         //pass through all events
@@ -24349,7 +24316,7 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
 
         //update sprite position in the map
         if(!this.tiles[toTileX])
-            this.tiles[toTileX] = {};
+            this.tiles[toTileX] = [];
 
         this.tiles[toTileX][toTileY] = tile;
 
@@ -24374,7 +24341,7 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
      * @return {Layer} Returns itself for chainability
      */
     pan: function(dx, dy) {
-        if(this.prerender)
+        if(this.preRender)
             return;
 
         //isometric pan (just re render everything)
@@ -24426,7 +24393,7 @@ gf.inherits(gf.TiledLayer, gf.Layer, {
         }
 
         if(this.hasPhysics) {
-            this.parent.parent.physics.invalidCollisions();
+            this.parent.parent.physics.reindexStatic();
         }
     },
     _renderLeft: function(forceNew) {
@@ -24935,8 +24902,6 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
 
             if(c.destroy)
                 c.destroy();
-            else
-                this.removeChild(c);
         }
 
         return this;

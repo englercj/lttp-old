@@ -1,12 +1,15 @@
+var MUSIC_VOLUME = 0.25;
+
 require([
     'game/data/data',
     'game/huditems',
     'game/entities/Link'
 ], function(data, huditems, Link) {
-    var $game, game, hud,
-        firstZone = true;
+    var $game, game, hud;
 
-    window.lttp = {};
+    window.lttp = {
+        firstZone: true
+    };
 
     $(function() {
         $game = $('#game');
@@ -22,7 +25,7 @@ require([
         });
 
         game.loader.on('complete', function() {
-            lttp.loadWorld('world_lightworld');
+            lttp.loadWorld('world_linkshouse');
 
             //bind some game related keys
             game.input.keyboard.on(gf.input.KEY.B, onToggleSaveMenu);
@@ -97,41 +100,54 @@ require([
     }
 
     //setup the necessary layers
-    lttp.layers = {};
     lttp.loadWorld = function(exit, vec) {
         if(typeof exit === 'string')
             exit = { name: exit };
 
         //remove the player so he isn't destroyed by the world
-        if(lttp.link)
+        if(lttp.link) {
+            console.log('load world', exit);
             game.world.removeChild(lttp.link);
-        else
-            lttp.link = createLink();
-
-        //destroy the current world
-        if(game.world)
+            lttp.oldWorld = game.world;
             game.world.destroy();
+        }
+        else {
+            lttp.link = createLink();
+        }
+        lttp.firstZone = true;
 
-        //set link position
-        lttp.link.setPosition(
-            exit.properties ? exit.properties.loc[0] : 2231, //in front of links house
-            exit.properties ? exit.properties.loc[1] : 2849
-        );
+        game.physics.nextTick(function() {
+            lttp.game.physics.skip(2);
+            //load the new world into the game
+            game.loadWorld(exit.name);
+            game.addChild(lttp.link);
 
-        //load the new world into the game
-        game.loadWorld(exit.name);
-        game.addChild(lttp.link);
-        firstZone = true;
+            if(lttp.music)
+                lttp.music.stop();
 
-        //spawn zones
-        lttp.layers.zones = game.world.findLayer('zones');
-        if(lttp.layers.zones) lttp.layers.zones.spawn();
+            //start music
+            if(game.world.properties.music) {
+                lttp.music = gf.assetCache[game.world.properties.music];
+                lttp.music.volume = MUSIC_VOLUME;
 
-        //spawn exits
-        lttp.layers.exits = game.world.findLayer('exits');
-        if(lttp.layers.exits) lttp.layers.exits.spawn();
+                if(!lttp.music)
+                    console.warn('Music not loaded! "' + game.world.properties.music + '"');
+                else
+                    lttp.music.play();
+            }
 
-        game.camera.follow(lttp.link);
+            //spawn exits & zones
+            game.world.findLayer('exits').spawn();
+            game.world.findLayer('zones').spawn();
+
+            //set link position
+            lttp.link.setPosition(
+                exit.properties ? exit.properties.loc[0] : 128,//2231, //in front of links house
+                exit.properties ? exit.properties.loc[1] : 128//2849
+            );
+            game.camera.follow(lttp.link, gf.Camera.FOLLOW.LOCKON);
+            //lttp.link.reindex();
+        });
     };
 
     lttp.loadZone = function(zone, vec) {
@@ -142,12 +158,12 @@ require([
         //transfer the zone stuff
         lttp.activeZone = zone;
         lttp.oldLayer = lttp.activeLayer;
-        lttp.activeLayer = lttp.layers[zone.name] || game.world.findLayer(zone.name);
+        lttp.activeLayer = game.world.findLayer(zone.name);
         lttp.activeLayer.spawn();
 
         game.camera.unfollow();
         game.camera.unconstrain();
-        if(!firstZone) {
+        if(!lttp.firstZone) {
             var p = vec.x ? 'x' : 'y',
                 last = 0;
 
@@ -177,7 +193,7 @@ require([
 
         var zone = lttp.activeZone;
 
-        firstZone = false;
+        lttp.firstZone = false;
 
         //set camera bounds
         if(!zone.bounds) {

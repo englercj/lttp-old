@@ -4,7 +4,7 @@
  * Copyright (c) 2013, Chad Engler
  * https://github.com/grapefruitjs/gf-debug
  *
- * Compiled: 2013-08-01
+ * Compiled: 2013-08-03
  *
  * GrapeFruit Debug Plugin is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -34,6 +34,7 @@ gf.debug.onTick = function() {
         gf.debug.panels.map.tick();
         gf.debug.panels.performance.tick();
         gf.debug.panels.gamepad.tick();
+        gf.debug.panels.sprites.tick();
     }
 };
 
@@ -62,7 +63,7 @@ gf.debug.show = function(game) {
     //patch the tick method
     gf.plugin.patch(gf.Game, '_tick', this.onTick);
 
-    this.logSpriteCount = false;
+    this.logObjectCountEvent = false;
 
     //add element to the page
     document.body.appendChild(this._createElement());
@@ -139,7 +140,7 @@ gf.debug._createMenuHead = function() {
     var div = document.createElement('div');
 
     this.ui.addClass(div, 'gf_debug_head');
-    this.ui.setText(div, 'Gf Debug:');
+    this.ui.setText(div, 'Gf Debug (' + this.game.renderMethod + '):');
 
     return div;
 };
@@ -150,7 +151,7 @@ gf.debug._createMenuStats = function() {
     var div = document.createElement('div'),
         fps = this._stats.fps = document.createElement('div'),
         ms = this._stats.ms = document.createElement('div'),
-        spr = this._stats.spr = document.createElement('div');
+        obj = this._stats.obj = document.createElement('div');
 
     this.ui.addClass(div, 'gf_debug_stats');
 
@@ -162,9 +163,9 @@ gf.debug._createMenuStats = function() {
     this.ui.setHtml(fps, '<span>0</span> fps');
     div.appendChild(fps);
 
-    this.ui.addClass(spr, 'gf_debug_stats_item spr');
-    this.ui.setHtml(spr, '<span>0</span> sprites');
-    div.appendChild(spr);
+    this.ui.addClass(obj, 'gf_debug_stats_item obj');
+    this.ui.setHtml(obj, '<span>0</span> objects');
+    div.appendChild(obj);
 
     return div;
 };
@@ -183,8 +184,8 @@ gf.debug._statsTick = function() {
 //update the number of sprites every couple seconds (instead of every frame)
 //since it is so expensive
 setInterval(function() {
-    if(gf.debug._stats && gf.debug._stats.spr) {
-        //count sprites in active state
+    if(gf.debug._stats && gf.debug._stats.obj) {
+        //count objects in active state
         var c = 0,
             s = gf.debug.game.activeState,
             wld = s.world,
@@ -200,11 +201,11 @@ setInterval(function() {
             cam = cam._iNext;
         }
 
-        gf.debug.ui.setText(gf.debug._stats.spr.firstElementChild, c);
+        gf.debug.ui.setText(gf.debug._stats.obj.firstElementChild, c);
 
         //log the event to the performance graph
-        if(gf.debug.logSpriteCount)
-            gf.debug.logEvent('debug_count_sprites');
+        if(gf.debug.logObjectCountEvent)
+            gf.debug.logEvent('debug_count_objects');
     }
 }, 2000);
 gf.debug.Panel = function(game) {
@@ -312,6 +313,21 @@ gf.debug.SpritesPanel = function(game) {
 
     this.name = 'sprites';
     this.title = 'Sprites';
+
+    this.gfx = new PIXI.Graphics();
+
+    this.style = {
+        _default: {
+            size: 1,
+            color: 0xff2222,
+            alpha: 1
+        },
+        sensor: {
+            size: 1,
+            color: 0x22ff22,
+            alpha: 1
+        }
+    };
 };
 
 gf.inherits(gf.debug.SpritesPanel, gf.debug.Panel, {
@@ -332,27 +348,59 @@ gf.inherits(gf.debug.SpritesPanel, gf.debug.Panel, {
         return div;
     },
     toggleCollisions: function() {
-        var obj = this.game.stage,
-            style = {
-                color: 0xff2222,
-                sensor: {
-                    color: 0x22ff22
-                }
-            },
-            show = !this.showing;
+        this.showing = !this.showing;
 
-        while(obj) {
-            if(obj.showPhysics) {
-                if(show)
-                    obj.showPhysics(style);
-                else
-                    obj.hidePhysics();
-            }
-
-            obj = obj._iNext;
+        if(this.showing) {
+            this.game.world.addChild(this.gfx);
+            this._drawPhysics();
+        } else {
+            if(this.gfx.parent)
+                this.gfx.parent.removeChild(this.gfx);
         }
+    },
+    tick: function() {
+        if(this.showing) {
+            this._drawPhysics();
+        }
+    },
+    _drawPhysics: function() {
+        var self = this,
+            g = this.gfx;
 
-        this.game.world._showPhysics = this.showing = show;
+        this.gfx.clear();
+        this.game.physics.space.eachShape(function(shape) {
+            if(!shape.body) return;
+
+            var body = shape.body,
+                p = body.p,
+                style = shape.sensor ? self.style.sensor : self.style._default;
+
+            g.lineStyle(style.size, style.color, style.alpha);
+
+            //circle
+            if(shape.type === 'circle') {
+                var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
+                    cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
+
+                g.drawCircle(cx, cy, shape.r);
+            }
+            //polygon
+            else {
+                var sx = shape.verts[0],
+                    sy = shape.verts[1];
+
+                g.moveTo(p.x + sx, p.y + sy);
+
+                for(var i = 2; i < shape.verts.length; i+=2) {
+                    g.lineTo(
+                        p.x + shape.verts[i],
+                        p.y + shape.verts[i + 1]
+                    );
+                }
+
+                g.lineTo(p.x + sx, p.y + sy);
+            }
+        });
     }
 });
 gf.debug.MapPanel = function (game) {

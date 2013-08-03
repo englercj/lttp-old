@@ -1,10 +1,32 @@
 define([], function() {
     return [
-        //Lightworld
+        // Worlds
         {
             name: 'world_lightworld',
             src: '/assets/worlds/lightworld/lightworld.json'
         },
+        {
+            name: 'world_linkshouse',
+            src: '/assets/worlds/linkshouse/linkshouse.json'
+        },
+        {
+            name: 'world_darkworld',
+            src: '/assets/worlds/darkworld/darkworld.json'
+        },
+        // Sprites
+        {
+            name: 'sprite_link',
+            src: '/assets/sprites/entities/link.json'
+        },
+        {
+            name: 'sprite_smash',
+            src: '/assets/sprites/misc/smash.json'
+        },
+        {
+            name: 'sprite_worlditems',
+            src: '/assets/worlds/shared_tiles/overworlditems.json'
+        },
+        // Music
         {
             name: 'music_lightworld',
             src: [
@@ -12,34 +34,46 @@ define([], function() {
             ]
         },
         {
-            name: 'world_linkshouse',
-            src: '/assets/worlds/linkshouse/linkshouse.json'
-        },
-        //Darkworld
-        /*{
-            name: 'world_darkworld',
-            src: '/assets/worlds/darkworld/darkworld.json'
-        },
-        {
             name: 'music_darkworld',
             src: [
                 '/assets/audio/music/dark_world.lite.ogg'
             ]
-        },*/
-        //Link
-        {
-            name: 'sprite_link',
-            src: '/assets/sprites/entities/link.json'
         },
-        //Misc
         {
-            name: 'sprite_smash',
-            src: '/assets/sprites/misc/smash.json'
+            name: 'music_village',
+            src: [
+                '/assets/audio/music/kakariko_village.lite.ogg'
+            ]
         },
+        // Sounds
         {
             name: 'effect_grass_cut',
             src: [
                 '/assets/audio/effects/LTTP_Grass_Cut.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_lift',
+            src: [
+                '/assets/audio/effects/LTTP_Link_Pickup.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_throw',
+            src: [
+                '/assets/audio/effects/LTTP_Link_Throw.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_open_chest',
+            src: [
+                '/assets/audio/effects/LTTP_Chest.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_smash',
+            src: [
+                '/assets/audio/effects/LTTP_Shatter.lite.ogg'
             ]
         },
         //HUD

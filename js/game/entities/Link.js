@@ -1,8 +1,10 @@
 var ATTACK_CONE = 0.4,
     ATTACK_SENSOR_RADIUS = 18,
-    USE_CONE = 0.3,
+    USE_CONE = 0.4,
     THROW_DISTANCE_X = 75;
-    THROW_DISTANCE_Y = 50;
+    THROW_DISTANCE_Y = 50,
+    EFFECT_VOLUME = 0.05,
+    BLOCKED_PUSH_WAIT_TIME = 800;
 
 define([
     'game/data/types',
@@ -25,7 +27,11 @@ define([
         this.magic = 10;
 
         //current inventory of the entity
-        this.inventory = {};
+        this.inventory = {
+            sword: true,
+            shield: true,
+            gloves: false
+        };
 
         //objects currently within attack range
         this.inAttackRange = [];
@@ -33,6 +39,9 @@ define([
 
         //a pool of sprite to do smashing animations
         this.smashPool = new gf.ObjectPool(Smash, lttp.game);
+
+        //moveSpeed the ent moves at
+        this.moveSpeed = 87;
 
         //size
         //this.width = 16;
@@ -44,6 +53,15 @@ define([
             attack: false,
             holdAttack: false
         };
+        this.sounds = {
+            lift: gf.assetCache.effect_lift,
+            throw: gf.assetCache.effect_throw,
+            openChest: gf.assetCache.effect_open_chest
+        };
+
+        for(var s in this.sounds) {
+            this.sounds[s].volume = EFFECT_VOLUME;
+        }
 
         this.bindKeys();
         this.bindGamepad();
@@ -55,6 +73,8 @@ define([
 
         //make the camera track this entity
         window.link = this;
+
+        this.skipExit = false;
     };
 
     gf.inherits(Link, Entity, {
@@ -98,41 +118,47 @@ define([
             this.addAnimation('idle_down', [this.spritesheet['walk_down/walk_down_1.png'].frames[0]]);
             this.addAnimation('idle_up', [this.spritesheet['walk_up/walk_up_1.png'].frames[0]]);
 
+            this.addAnimation('lift_idle_left', [this.spritesheet['lift_walk_left/lift_walk_left_1.png'].frames[0]]);
+            this.addAnimation('lift_idle_right', [this.spritesheet['lift_walk_right/lift_walk_right_1.png'].frames[0]]);
+            this.addAnimation('lift_idle_down', [this.spritesheet['lift_walk_down/lift_walk_down_1.png'].frames[0]]);
+            this.addAnimation('lift_idle_up', [this.spritesheet['lift_walk_up/lift_walk_up_1.png'].frames[0]]);
+
             //add attack animations
             this._addDirectionalFrames('attack', 9, 0.6);
 
             //add bow attack animations
-            this._addDirectionalFrames('attack_bow', 3, 0.23);
+            this._addDirectionalFrames('attack_bow', 3, 0.4);
 
             //add spin attack animations
-            this._addDirectionalFrames('attack_spin', 12, 0.23);
+            this._addDirectionalFrames('attack_spin', 12, 0.4);
 
             //add attack tap animations
-            this._addDirectionalFrames('attack_tap', 3, 0.23);
+            this._addDirectionalFrames('attack_tap', 3, 0.4);
 
             //add fall in hole animations
-            this._addFrames('fall_in_hole', 4, 0.23);
+            this._addFrames('fall_in_hole', 4, 0.4);
 
             //add lifting animations
-            this._addDirectionalFrames('lift', 4, 0.23);
+            this._addDirectionalFrames('lift', 4, 0.4);
 
             //add lifting walking animations
-            this._addFrames(['lift_walk_left', 'lift_walk_right'], 3, 0.23);
-            this._addFrames(['lift_walk_down', 'lift_walk_up'], 6, 0.23);
+            this._addFrames(['lift_walk_left', 'lift_walk_right'], 3, 0.4, true);
+            this._addFrames(['lift_walk_down', 'lift_walk_up'], 6, 0.4, true);
 
             //add pulling animations
-            this._addDirectionalFrames('pull', 5, 0.23);
+            this._addDirectionalFrames('push', 5, 0.1, true);
 
             //add walking-attacking animations
-            this._addFrames(['walk_attack_left', 'walk_attack_right'], 3, 0.23, true);
-            this._addFrames(['walk_attack_down', 'walk_attack_up'], 6, 0.23, true);
+            this._addFrames(['walk_attack_left', 'walk_attack_right'], 3, 0.4, true);
+            this._addFrames(['walk_attack_down', 'walk_attack_up'], 6, 0.4, true);
 
             //add walking with shield animations
-            this._addDirectionalFrames('walk_shield', 8, 0.23, true);
+            this._addDirectionalFrames('walk_shield', 8, 0.4, true);
 
             //set active
-            this.gotoAndStop('idle_down');
             this.lastDir = 'down';
+            this._setMoveAnimation();
+            //this.gotoAndStop('idle_down');
         },
         onWalk: function(dir, e) {
             if(e.originalEvent)
@@ -196,6 +222,9 @@ define([
         },
         //when attack key is pressed
         onAttack: function(e) {
+            if(!this.inventory.sword)
+                return;
+
             if(e.originalEvent)
                 e.input.preventDefault(e.originalEvent);
 
@@ -233,25 +262,10 @@ define([
 
             //throws
             if(this.carrying) {
-                var item = this.carrying,
-                    v = this._getDirVector(),
-                    self = this;
-
-                this.carrying = null;
-
-                TweenLite.to(item.position, 0.25, {
-                    x: '+=' + (THROW_DISTANCE_X * v.x),
-                    y: '+=' + ((THROW_DISTANCE_Y * v.y) + ((v.y^1) * (this.height / 2))),
-                    ease: Linear.easeNone,
-                    onCompleteParams: [item],
-                    onComplete: function(obj) {
-                        self._destroyObject(obj);
-                    }
-                })
-
-                return;
+                return this.throwItem();
             }
 
+            //interacts with stuff
             for(var i = 0; i < this.colliding.length; ++i) {
                 var e = this.colliding[i],
                     t;
@@ -261,35 +275,39 @@ define([
 
                 t = e.properties.type;
 
-                if(t !== 'grass' && t !== 'rock' && t !== 'sign')
+                if(!t)
                     continue;
 
                 if(this._inCone(e, USE_CONE)) {
-                    this.lock();
+                    switch(t) {
+                        case 'chest':
+                            if(this.lastDir === 'up') {
+                                this.openChest(e);
+                            }
+                            break;
 
-                    //change physics to sensor
-                    e.disablePhysics();
-                    e.sensor = true;
-                    e.enablePhysics();
+                        case 'sign':
+                            if(this.lastDir === 'up') {
+                                this.readSign(e);
+                            } else {
+                                this.liftItem(e);
+                            }
+                            break;
 
-                    //make it on top
-                    e.parent.removeChild(e);
-                    lttp.game.world.addChild(e);
-                    //do link animation
+                        case 'rock':
+                            if(this.inventory.gloves) {
+                                this.liftItem(e);
+                            }
+                            break;
 
-                    var self = this;
-                    TweenLite.to(e.position, 0.15, {
-                        x: this.position.x,
-                        y: this.position.y - this.height,
-                        ease: Linear.easeNone,
-                        onCompleteParams: [e],
-                        onComplete: function(obj) {
-                            //set that we are carrying it
-                            self.carrying = obj;
-                            self.unlock();
-                        }
-                    });
+                        case 'grass':
+                        case 'pot':
+                            //TODO: DO DROP
+                            this.liftItem(e);
+                            break;
+                    }
 
+                    //break loop
                     break;
                 }
             }
@@ -297,6 +315,66 @@ define([
         //Uses the currently equipted item
         onUseItem: function() {
 
+        },
+        openChest: function(chest) {
+            var loot = chest.properties.loot;
+
+            chest.setTexture(gf.assetCache.sprite_worlditems['slice25_25.png']);
+            this.sounds.openChest.play();
+
+            //TODO: GIVE LOOT
+        },
+        readSign: function(sign) {
+
+        },
+        liftItem: function(item) {
+            //Do lifting of the object
+            this.lock();
+
+            //change physics to sensor
+            item.disablePhysics();
+            item.sensor = true;
+            item.enablePhysics();
+
+            //make it on top
+            item.parent.removeChild(item);
+            lttp.game.world.addChild(item);
+
+            this.gotoAndPlay('lift_' + this.lastDir);
+            this.sounds.lift.play();
+
+            var self = this;
+            TweenLite.to(item.position, 0.15, {
+                x: self.position.x,
+                y: self.position.y - self.height + 5,
+                ease: Linear.easeNone,
+                onComplete: function() {
+                    //set that we are carrying it
+                    self.carrying = item;
+                    self.unlock();
+                }
+            });
+        },
+        throwItem: function() {
+            var item = this.carrying,
+                v = this._getDirVector(),
+                yf = v.y === -1 ? 0 : 1,
+                self = this;
+
+            this.carrying = null;
+            this.sounds.throw.play();
+
+            TweenLite.to(item.position, 0.25, {
+                x: '+=' + (THROW_DISTANCE_X * v.x),
+                y: '+=' + ((THROW_DISTANCE_Y * v.y) + (yf * this.height)),
+                ease: Linear.easeNone,
+                onCompleteParams: [item],
+                onComplete: function(obj) {
+                    self._destroyObject(obj);
+                }
+            });
+
+            this._setMoveAnimation();
         },
         _destroyObject: function(o) {
             var t = o.properties.type,
@@ -314,7 +392,7 @@ define([
         _physUpdate: function() {
             if(this.carrying) {
                 this.carrying.position.x = this.position.x;
-                this.carrying.position.y = this.position.y - this.height;
+                this.carrying.position.y = this.position.y - this.height + 5;
             }
         },
         _checkAttack: function() {
@@ -329,7 +407,7 @@ define([
                     if(e.takeDamage) {
                         e.takeDamage(this.damage)
                     } else if(t.indexOf('grass') !== -1) {
-                        this._destroyObject();
+                        this._destroyObject(e);
                     }
                 }
             }
@@ -395,13 +473,35 @@ define([
         },
         _setMoveAnimation: function() {
             var anim = (this.movement.x || this.movement.y) ? 'walk' : 'idle';
+            //clearTimeout(this._toBlockedAnim);
 
-            if(this.inventory.shield) {
+            if(this.carrying) {
+                this._setMoveDirAnimation('lift_' + anim)
+            }
+            else if(this.inventory.shield) {
                 this._setMoveDirAnimation(anim + '_shield');
             }
             else {
                 this._setMoveDirAnimation(anim);
             }
+
+            /*console.log(this.colliding.length, this.movement);
+            if(this.colliding.length && (this.movement.x || this.movement.y)) {
+                this._doBlockedAnim();
+            }*/
+        },
+        _doBlockedAnim: function() {
+            var self = this;
+            this._toBlockedAnim = setTimeout(function() {
+                var p = self.currentAnimation.indexOf('push') === -1 && 
+                        (self.movement.x || self.movement.y) &&
+                        Math.abs(self._phys.body.vx) < 0.1 &&
+                        Math.abs(self._phys.body.vy) < 0.1;
+
+                console.log(self._phys.body.vx, self._phys.body.vy);
+
+                if(p) self.gotoAndPlay('push_' + self.lastDir);
+            }, BLOCKED_PUSH_WAIT_TIME);
         },
         _setMoveDirAnimation: function(anim) {
             if(this.movement.x) {
@@ -501,9 +601,13 @@ define([
             }
             //collide with an exit
             else if(obj.type === 'exit') {
-                lttp.loadWorld(obj, vec);
+                if(this.skipExit)
+                    this.skipExit = false;
+                else
+                    lttp.loadWorld(obj, vec);
             } else if(!obj.sensor) {
                 this.colliding.push(obj);
+                //this._doBlockedAnim();
             }
         },
         _separate: function(obj, colShape, myShape) {
@@ -519,6 +623,9 @@ define([
                 if(i >= 0) {
                     this.colliding.splice(i, 1);
                 }
+
+                //if(!this.colliding.length)
+                    //clearTimeout(this._toBlockedAnim);
             }
         }
     });

@@ -40,7 +40,7 @@
   text-align: right;
   border-right: 1px solid #444444;
 }
-.gf_debug .gf_debug_menu .gf_debug_stats .gf_debug_stats_item.spr {
+.gf_debug .gf_debug_menu .gf_debug_stats .gf_debug_stats_item.obj {
   width: 100px;
   border: none;
 }
