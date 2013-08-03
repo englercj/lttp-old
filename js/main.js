@@ -129,6 +129,7 @@ require([
             if(game.world.properties.music) {
                 lttp.music = gf.assetCache[game.world.properties.music];
                 lttp.music.volume = MUSIC_VOLUME;
+                lttp.music.loop = true;
 
                 if(!lttp.music)
                     console.warn('Music not loaded! "' + game.world.properties.music + '"');
