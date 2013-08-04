@@ -1,9 +1,9 @@
 require([
     'game/data/resources',
     'game/states/Title',
-    'game/states/MainMenu',
+    'game/states/Select',
     'game/states/Play'
-], function(resources, TitleState, MainMenuState, PlayState) {
+], function(resources, TitleState, SelectState, PlayState) {
     var $game, game;
 
     window.lttp = {
@@ -32,9 +32,9 @@ require([
             lttp.intro.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, gotoSelect);
             lttp.intro.start();
 
-            //load mainmenu state
-            //lttp.mainmenu = new MainMenuState(game);
-            //lttp.mainmenu.on('select', loadGame);
+            //load select state
+            lttp.select = new SelectState(game);
+            lttp.select.on('select', loadGame);
 
             //load the play state
             lttp.play = new PlayState(game);
@@ -54,12 +54,11 @@ require([
         lttp.intro.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, gotoSelect);
         lttp.intro.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, gotoSelect);
 
-        //lttp.mainmenu.start();
-        loadGame();
+        lttp.select.start();
     }
 
     function loadGame() {
-        //lttp.mainmenu.stop();
+        lttp.select.stop();
         //TODO: load game from storage
         lttp.play.start('world_linkshouse');
     }

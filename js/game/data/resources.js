@@ -30,6 +30,10 @@ define([], function() {
             name: 'sprite_intro',
             src: 'assets/sprites/misc/intro.json'
         },
+        {
+            name: 'sprite_select',
+            src: 'assets/sprites/misc/selectscreen.json'
+        },
         // Music
         {
             name: 'music_lightworld',
@@ -53,6 +57,12 @@ define([], function() {
             name: 'music_title',
             src: [
                 'assets/audio/music/title.lite.ogg'
+            ]
+        },
+        {
+            name: 'music_select',
+            src: [
+                'assets/audio/music/select_screen.lite.ogg'
             ]
         },
         // Sounds
@@ -84,6 +94,24 @@ define([], function() {
             name: 'effect_smash',
             src: [
                 'assets/audio/effects/LTTP_Shatter.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_sword1',
+            src: [
+                'assets/audio/effects/LTTP_Sword1.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_sword2',
+            src: [
+                'assets/audio/effects/LTTP_Sword1.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_menu_select',
+            src: [
+                'assets/audio/effects/LTTP_Menu_Select.lite.ogg'
             ]
         },
         // HUD

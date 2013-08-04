@@ -20305,7 +20305,7 @@ gf.Sprite.TYPE = {
  */
 gf.AnimatedSprite = function(anims, speed, start) {
     if(anims instanceof Array) {
-        anims = { _default: { frames: [anims] } };
+        anims = { _default: { frames: anims } };
         start = '_default';
     } else {
         //massage animations into full format
@@ -20612,14 +20612,15 @@ gf.inherits(gf.Camera, gf.DisplayObjectContainer, {
      * @method flash
      * @param [color=0xffffff] {Number} The color to flash the screen with
      * @param [duration=1000] {Number} The time in milliseconds to fade away
+     * @param [alpha=1] {Number} The max opacity to start at (before fading away)
      * @param [callback] {Function} The callback to call when the flash has completed
      * @return {gf.Camera.fx.Flash} Returns the effect object
      */
-    flash: function(color, duration, cb) {
+    flash: function(color, duration, alpha, cb) {
         var flash = this.fxpools.flash.create(),
             self = this;
 
-        return flash.start(color, duration, function() {
+        return flash.start(color, duration, alpha, function() {
             self.fxpools.flash.free(flash);
             if(typeof cb === 'function')
                 cb();
@@ -20631,14 +20632,15 @@ gf.inherits(gf.Camera, gf.DisplayObjectContainer, {
      * @method fade
      * @param [color=0xffffff] {Number} The color to fade into
      * @param [duration=1000] {Number} The time in milliseconds to take to fade in
+     * @param [alpha=1] {Number} The max opacity to get to
      * @param [callback] {Function} The callback to call when the fade has completed
      * @return {gf.Camera.fx.Fade} Returns the effect object
      */
-    fade: function(color, duration, cb) {
+    fade: function(color, duration, alpha, cb) {
         var fade = this.fxpools.fade.create(),
             self = this;
 
-        return fade.start(color, duration, function() {
+        return fade.start(color, duration, alpha, function() {
             self.fxpools.fade.free(fade);
             if(typeof cb === 'function')
                 cb();
@@ -21108,21 +21110,29 @@ gf.Camera.fx.Fade = function() {
 };
 
 gf.inherits(gf.Camera.fx.Fade, gf.Camera.fx.Effect, {
-    start: function(color, duration, cb) {
+    start: function(color, duration, alpha, cb) {
         gf.Camera.fx.Effect.prototype.start.call(this);
+
+        if(typeof alpha === 'function') {
+            cb = duration;
+            alpha = null;
+        }
 
         if(typeof duration === 'function') {
             cb = duration;
+            alpha = null;
             duration = null;
         }
 
         if(typeof color === 'function') {
             cb = color;
+            alpha = null;
             duration = null;
             color = null;
         }
 
         color = typeof color === 'number' ? color : 0xFFFFFF;
+        this.goal = alpha || 1;
         this.duration = duration && duration > 0 ? duration : 1000;
         this.cb = cb;
 
@@ -21137,16 +21147,16 @@ gf.inherits(gf.Camera.fx.Fade, gf.Camera.fx.Effect, {
     stop: function() {
         gf.Camera.fx.Effect.prototype.stop.call(this);
 
-        this.gfx.alpha = 1;
+        this.gfx.alpha = 0;
         this.gfx.visible = false;
 
         return this;
     },
     update: function(dt) {
-        if(this.gfx.alpha < 1) {
+        if(this.gfx.alpha < this.goal) {
             this.gfx.alpha += (dt * 1000) / this.duration;
 
-            if(this.gfx.alpha >= 1) {
+            if(this.gfx.alpha >= this.goal) {
                 this.stop();
                 this._complete();
             }
@@ -21160,26 +21170,34 @@ gf.Camera.fx.Flash = function() {
 };
 
 gf.inherits(gf.Camera.fx.Flash, gf.Camera.fx.Effect, {
-    start: function(color, duration, cb) {
+    start: function(color, duration, alpha, cb) {
         gf.Camera.fx.Effect.prototype.start.call(this);
+
+        if(typeof alpha === 'function') {
+            cb = duration;
+            alpha = null;
+        }
 
         if(typeof duration === 'function') {
             cb = duration;
+            alpha = null;
             duration = null;
         }
 
         if(typeof color === 'function') {
             cb = color;
+            alpha = null;
             duration = null;
             color = null;
         }
 
+        alpha = alpha || 1;
         color = typeof color === 'number' ? color : 0xFFFFFF;
         this.duration = duration && duration > 0 ? duration : 1000;
         this.cb = cb;
 
         this.gfx.visible = true;
-        this.gfx.alpha = 1;
+        this.gfx.alpha = alpha;
         this.gfx.clear();
         this.gfx.beginFill(color);
         this.gfx.drawRect(0, 0, this.parent.size.x, this.parent.size.y);
@@ -21484,8 +21502,15 @@ gf.inherits(gf.TextureFont, gf.DisplayObjectContainer, {
      * @return Sprite
      */
     _getSprite: function(ch) {
+        var offy = 0;
+
         if(this.map[ch])
             ch = this.map[ch];
+
+        if(typeof ch === 'object') {
+            offy = ch.yoffset || 0;
+            ch = ch.name;
+        }
 
         //skips spaces
         if(ch === '' || ch === ' ')
@@ -21505,6 +21530,10 @@ gf.inherits(gf.TextureFont, gf.DisplayObjectContainer, {
 
         spr.setTexture(texture);
         spr.visible = true;
+
+        spr.anchor.y = 1;
+        spr.position.x = 0;
+        spr.position.y = offy;
 
         return spr;
     },
@@ -21554,8 +21583,8 @@ gf.inherits(gf.TextureFont, gf.DisplayObjectContainer, {
                     spr = this._getSprite(ch);
 
                 if(spr !== null) {
-                    spr.position.x = x;
-                    spr.position.y = y;
+                    spr.position.x += x;
+                    spr.position.y += y;
 
                     if(spr.texture.frame.height > h)
                         h = spr.texture.frame.height;

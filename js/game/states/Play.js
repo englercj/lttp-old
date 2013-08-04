@@ -2,8 +2,10 @@ define([
     'game/data/constants',
     'game/states/State',
     'game/entities/Link',
+    'game/fonts/ReturnOfGanon',
+    'game/fonts/Hud',
     'game/huditems'
-], function(C, State, Link, huditems) {
+], function(C, State, Link, ReturnOfGanonFont, HudFont, huditems) {
     var Play = function(game) {
         State.call(this, 'play', game);
 
@@ -32,22 +34,9 @@ define([
 
         },
         initHud: function() {
-            var mp = {},
-                gui;
-
-            'abcdefghijklmnopqrstuvwxyz'.split('').forEach(function(c) {
-                mp[c] = '_' + c;
-            });
-            mp[':'] = 'colon';
-            mp[','] = 'comma';
-            mp['-'] = 'dash';
-            mp['!'] = 'exclamation';
-            mp['.'] = 'period';
-            mp['?'] = 'question';
-            mp[';'] = 'semicolon';
-
-            var retofganon = new gf.TextureFont('font_retofganon', { ext: '.png', map: mp }),
-                hudfnt = new gf.TextureFont('font_hud', { ext: '.png' });
+            var gui,
+                retofganon = new ReturnOfGanonFont(),
+                hudfnt = new HudFont();
 
             this.gui = gui = new gf.Gui();
             gui.scale.x = gui.scale.y = 1.5;
