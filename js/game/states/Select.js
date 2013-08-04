@@ -1,3 +1,5 @@
+var TEXT_SCALE = 1.5;
+
 define([
     'game/data/constants',
     'game/states/State',
@@ -162,7 +164,7 @@ define([
                 this.char.y = gf.math.clamp(this.char.y, 0, 3);
                 this.char.x = gf.math.clamp(this.char.x, 0, 28);
 
-                this.line.position.y = 408 + (this.char.y * (this.delta.y + 10));
+                this.line.position.y = 403 + (this.char.y * (this.delta.y * TEXT_SCALE));
                 this.characters.position.x = -((this.char.x - 6) * this.delta.x);
             } else if(this.active === 'erase') {
 
@@ -234,16 +236,24 @@ define([
                         this.sounds.select.play();
                         return this.activate('select');
                     }
+                } else if(c.name === 'left') {
+                    this.pnameI = Math.max(0, this.pnameI - 1);
+                    this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
+                    return;
+                } else if(c.name === 'right') {
+                    this.panameI = Math.min((c.text.length / 2), this.pnameI + 1);
+
+                    this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
+                    return;
                 }
 
-                if(n.length === 11) {
+                if(this.pname.text.length === 11) {
                     var i = this.pnameI;
 
                     for(var cnt = i; cnt > 0; --cnt)
                         i++;
 
                     n = n.substr(0, i) + c.text + n.substr(i+1);
-                    this.pnameI = (this.pnameI + 1) % 6;
                 }
                 else {
                     if(n.length)
@@ -251,13 +261,11 @@ define([
 
                     n += c.text;
                 }
+                this.pnameI = (this.pnameI + 1) % 6;
 
                 this.pname.setText(n);
 
-                this.sprites.pointer.position.x += this.pname.monospace * 3;
-
-                if(this.sprites.pointer.position.x > 350)
-                    this.sprites.pointer.position.x = 90;
+                this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
 
                 this.sounds.lowhp.play();
             } else if(this.active === 'erase') {
@@ -305,24 +313,24 @@ define([
                 copy = this.fontpool.create(),
                 erase = this.fontpool.create();
 
-            text.scale.x = text.scale.y = 1.5;
+            text.scale.x = text.scale.y = TEXT_SCALE;
 
             title.setText('PLAYER  SELECT');
             title.position.x = 80;
-            title.position.y = 73;
+            title.position.y = 75;
             text.addChild(title);
 
-            one.setText('1');
+            one.setText('1.');
             one.position.x = 145;
             one.position.y = 170;
             text.addChild(one);
 
-            two.setText('2');
+            two.setText('2.');
             two.position.x = 145;
             two.position.y = 230;
             text.addChild(two);
  
-            three.setText('3');
+            three.setText('3.');
             three.position.x = 145;
             three.position.y = 290;
             text.addChild(three);
@@ -354,14 +362,14 @@ define([
                     'ABCDEFGHIJ  abcdefghij  01234',
                     'KLMNOPQRST  klmnopqrst  56789',
                     'UVWXYZDPC   uvwxyzDPC   EQPP ',
-                    '     LR =        LR =   LR = '
+                    '     <> =+       <> =+  <> =+'
                 ];
 
-            text.scale.x = text.scale.y = 1.5;
+            text.scale.x = text.scale.y = TEXT_SCALE;
 
             title.setText('REGISTER  YOUR  NAME');
             title.position.x = 80;
-            title.position.y = 105;
+            title.position.y = 107;
             text.addChild(title);
 
             this.pname = this.fontpool.create();
@@ -369,13 +377,13 @@ define([
             this.pname.monospace = 15;
             this.pname.lineWidth = 1;
             this.pname.position.x = 65;
-            this.pname.position.y = 220;
+            this.pname.position.y = 218;
             text.addChild(this.pname);
 
             //create all the characters
             this.characters = new gf.DisplayObjectContainer();
             this.chars = [];
-            this.delta = new gf.Point(32, 25);
+            this.delta = new gf.Point(32, 35);
             this.char = new gf.Point(6, 0);
 
             var sx = 65,
@@ -392,6 +400,15 @@ define([
                     if(line[x] === '=') {
                         t.setText('END');
                         t.name = 'end';
+                    } else if(line[x] === '+') {
+                        t.setText(' ');
+                        t.name = 'end';
+                    } else if(line[x] === '<') {
+                        t.setText('<');
+                        t.name = 'left';
+                    } else if(line[x] === '>') {
+                        t.setText('>');
+                        t.name = 'right';
                     } else {
                         t.setText(line[x]);
                     }
@@ -412,11 +429,11 @@ define([
             this.register.addChild(text);
 
             var line = this.line = new PIXI.Graphics();
-            line.lineStyle(4, 0xffffff, 1);
+            line.lineStyle(2, 0xffffff, 1);
             line.moveTo(0,0);
             line.lineTo(624, 0);
             line.position.x = 72;
-            line.position.y = 408;
+            line.position.y = 403;
             line.visible = false;
             this.register.addChild(line);
 
