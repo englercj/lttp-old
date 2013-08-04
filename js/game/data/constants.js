@@ -60,5 +60,17 @@ define({
         DAMAGING_DESTRUCTIVE: 13,   //can destroy BLOCKING_DESTRUCTABLE and deal damage
         DAMAGING_DESTRUCTIVE_2: 14, //can destroy BLOCKING_DESTRUCTABLE_2, and deal damage
         DAMAGING_SMASHING: 15       //can smash BLOCKING_SMASHABLE and deal damage
-    }
+    },
+
+    ATTACK_CONE: 0.4,
+    USE_CONE: 0.4,
+    ATTACK_SENSOR_RADIUS: 18,
+
+    THROW_DISTANCE_X: 75,
+    THROW_DISTANCE_Y: 50,
+
+    EFFECT_VOLUME: 0.05,
+    MUSIC_VOLUME: 0.25,
+
+    BLOCKED_PUSH_WAIT_TIME: 800
 });

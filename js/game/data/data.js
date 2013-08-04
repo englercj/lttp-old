@@ -1,10 +1,10 @@
 define([
-    'game/data/types',
+    'game/data/constants',
     'game/data/items',
     'game/data/resources'
-], function(types, items, resources) {
+], function(constants, items, resources) {
     return {
-        types: types,
+        constants: constants,
         items: items,
         resources: resources
     };

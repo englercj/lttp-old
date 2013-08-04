@@ -1,21 +1,13 @@
-var ATTACK_CONE = 0.4,
-    ATTACK_SENSOR_RADIUS = 18,
-    USE_CONE = 0.4,
-    THROW_DISTANCE_X = 75;
-    THROW_DISTANCE_Y = 50,
-    EFFECT_VOLUME = 0.05,
-    BLOCKED_PUSH_WAIT_TIME = 800;
-
 define([
-    'game/data/types',
+    'game/data/constants',
     'game/entities/Entity',
     'game/entities/misc/Smash'
-], function(types, Entity, Smash) {
+], function(C, Entity, Smash) {
     var Link = function(spritesheet) {
         Entity.call(this, spritesheet);
 
         //player type
-        this.type = types.ENTITY.PLAYER;
+        this.type = C.ENTITY.PLAYER;
 
         //set name of Link
         this.name = 'link';
@@ -60,7 +52,7 @@ define([
         };
 
         for(var s in this.sounds) {
-            this.sounds[s].volume = EFFECT_VOLUME;
+            this.sounds[s].volume = C.EFFECT_VOLUME;
         }
 
         this.bindKeys();
@@ -253,7 +245,7 @@ define([
         addAttackSensor: function(phys) {
             if(this.atkSensor) return;
 
-            this.atkSensor = phys.addCustomShape(this, new gf.Circle(0, 0, ATTACK_SENSOR_RADIUS), true);
+            this.atkSensor = phys.addCustomShape(this, new gf.Circle(0, 0, C.ATTACK_SENSOR_RADIUS), true);
         },
         //Talk, run, Lift/Throw/Push/Pull
         onUse: function(status) {
@@ -278,7 +270,7 @@ define([
                 if(!t)
                     continue;
 
-                if(this._inCone(e, USE_CONE)) {
+                if(this._inCone(e, C.USE_CONE)) {
                     switch(t) {
                         case 'chest':
                             if(this.lastDir === 'up') {
@@ -338,7 +330,7 @@ define([
 
             //make it on top
             item.parent.removeChild(item);
-            lttp.game.world.addChild(item);
+            lttp.play.addChild(item);
 
             this.gotoAndPlay('lift_' + this.lastDir);
             this.sounds.lift.play();
@@ -365,8 +357,8 @@ define([
             this.sounds.throw.play();
 
             TweenLite.to(item.position, 0.25, {
-                x: '+=' + (THROW_DISTANCE_X * v.x),
-                y: '+=' + ((THROW_DISTANCE_Y * v.y) + (yf * this.height)),
+                x: '+=' + (C.THROW_DISTANCE_X * v.x),
+                y: '+=' + ((C.THROW_DISTANCE_Y * v.y) + (yf * this.height)),
                 ease: Linear.easeNone,
                 onCompleteParams: [item],
                 onComplete: function(obj) {
@@ -403,7 +395,7 @@ define([
                 if(t.indexOf('grass') === -1)
                     continue;
 
-                if(this._inCone(e, ATTACK_CONE)) {
+                if(this._inCone(e, C.ATTACK_CONE)) {
                     if(e.takeDamage) {
                         e.takeDamage(this.damage)
                     } else if(t.indexOf('grass') !== -1) {
@@ -501,7 +493,7 @@ define([
                 console.log(self._phys.body.vx, self._phys.body.vy);
 
                 if(p) self.gotoAndPlay('push_' + self.lastDir);
-            }, BLOCKED_PUSH_WAIT_TIME);
+            }, C.BLOCKED_PUSH_WAIT_TIME);
         },
         _setMoveDirAnimation: function(anim) {
             if(this.movement.x) {
@@ -587,7 +579,7 @@ define([
         _collide: function(obj, vec, colShape, myShape) {
             //we got into range of something to attack
             if(myShape === this.atkSensor) {
-                if(obj.type === types.ENTITY.ENEMY || !obj.type) {
+                if(obj.type === C.ENTITY.ENEMY || !obj.type) {
                     this.inAttackRange.push(obj);
 
                     //something new walked in while we were attacking
@@ -597,14 +589,14 @@ define([
             }
             //colliding with a new zone
             else if(obj.type === 'zone') {
-                lttp.loadZone(obj, vec);
+                lttp.play.gotoZone(obj, vec);
             }
             //collide with an exit
             else if(obj.type === 'exit') {
                 if(this.skipExit)
                     this.skipExit = false;
                 else
-                    lttp.loadWorld(obj, vec);
+                    lttp.play.gotoWorld(obj, vec);
             } else if(!obj.sensor) {
                 this.colliding.push(obj);
                 //this._doBlockedAnim();

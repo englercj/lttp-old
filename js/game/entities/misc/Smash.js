@@ -1,9 +1,7 @@
-var EFFECT_VOLUME = 0.05;
-
 define([
-    'game/data/types',
+    'game/data/constants',
     'game/entities/Entity'
-], function(types, Entity) {
+], function(C, Entity) {
     var Smash = function() {
         Entity.call(this, gf.assetCache['sprite_smash'], 0.2);
 
@@ -15,7 +13,7 @@ define([
         };
 
         for(var s in this.sounds) {
-            this.sounds[s].volume = EFFECT_VOLUME;
+            this.sounds[s].volume = C.EFFECT_VOLUME;
         }
 
         this.on('complete', this._done.bind(this));

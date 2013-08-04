@@ -5,10 +5,6 @@ define([
         Entity.call(this, gf.assetCache.sprite_intro, 0.2);
 
         this._addAnimations();
-
-        this.sounds = {
-            intro: gf.assetCache.music_title
-        };
     };
 
     gf.inherits(Title, Entity, {
@@ -20,14 +16,7 @@ define([
                 frames.push(this.spritesheet[i + '.gif'].frames[0]);
             }
             this.addAnimation('intro', frames, 0.35);
-        },
-        gotoAndPlay: function(anim) {
-            if(anim === 'intro') {
-                this.sounds.intro.play();
-            }
-
-            Entity.prototype.gotoAndPlay.apply(this, arguments);
-        },
+        }
     });
 
     return Title;
