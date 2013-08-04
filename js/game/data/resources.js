@@ -114,6 +114,30 @@ define([], function() {
                 'assets/audio/effects/LTTP_Menu_Select.lite.ogg'
             ]
         },
+        {
+            name: 'effect_menu_select_cursor',
+            src: [
+                'assets/audio/effects/LTTP_Menu_Cursor.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_menu_select_erase',
+            src: [
+                'assets/audio/effects/LTTP_Menu_Erase.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_error',
+            src: [
+                'assets/audio/effects/LTTP_Error.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_lowhp',
+            src: [
+                'assets/audio/effects/LTTP_LowHealth.lite.ogg'
+            ]
+        },
         // HUD
         {
             name: 'sprite_hud',

@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-08-03
+ * Compiled: 2013-08-04
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -21464,6 +21464,15 @@ gf.TextureFont = function(font, settings) {
     this.lineHeight = 1;
 
     /**
+     * The fixed width for all characters, 0 means not forced monospace
+     *
+     * @property monospace
+     * @type Number
+     * @default 0
+     */
+    this.monospace = 0;
+
+    /**
      * The textures for all the characters in the alphabet
      *
      * @property textures
@@ -21560,6 +21569,7 @@ gf.inherits(gf.TextureFont, gf.DisplayObjectContainer, {
      */
     setText: function(txt) {
         this.text = txt;
+        this.width = 0;
 
         //free all sprites
         for(var c = 0, cl = this.children.length; c < cl; ++c) {
@@ -21589,14 +21599,17 @@ gf.inherits(gf.TextureFont, gf.DisplayObjectContainer, {
                     if(spr.texture.frame.height > h)
                         h = spr.texture.frame.height;
 
-                    x += spr.texture.frame.width * this.lineWidth;
+                    x += this.monospace ? this.monospace * this.lineWidth : spr.texture.frame.width * this.lineWidth;
                 } else {
-                    x += this.spaceSize * this.lineWidth;
+                    x += this.monospace ? this.monospace * this.lineWidth : this.spaceSize * this.lineWidth;
                 }
 
             }
 
+            this.width = Math.max(x, this.width);
+
             y += h * this.lineHeight;
+            x = 0;
         }
     }
 });

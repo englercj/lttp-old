@@ -21,7 +21,7 @@ define([
     var ReturnOfGanon = function() {
         gf.TextureFont.call(this, 'font_retofganon', { ext: '.png', map: map });
         this.lineWidth = 1.5;
-        this.spaceSize = 10;
+        this.spaceSize = 11.25;
     };
 
     gf.inherits(ReturnOfGanon, gf.TextureFont);

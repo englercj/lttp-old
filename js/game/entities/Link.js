@@ -168,7 +168,6 @@ define([
             this._checkMovement();
         },
         onGpWalk: function(e) {
-            var dir;
             if(e.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR) {
                 if(e.value === 0) {
                     if(!this._lastHorzGpValue)
