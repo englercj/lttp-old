@@ -10,6 +10,7 @@ define([
 
         this.music = gf.assetCache.music_select;
         this.music.loop = true;
+        this.music.volume = C.MUSIC_VOLUME;
 
         this.sounds = {
             select: gf.assetCache.effect_menu_select,
