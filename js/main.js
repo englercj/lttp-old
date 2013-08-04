@@ -59,10 +59,10 @@ require([
         lttp.select.start();
     }
 
-    function loadGame() {
+    function loadGame(save) {
         lttp.select.stop();
-        //TODO: load game from storage
-        lttp.play.start('world_linkshouse');
+
+        lttp.play.start(save);
     }
 
     function onDebug() {

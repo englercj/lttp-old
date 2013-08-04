@@ -20,8 +20,8 @@ define([
 
         //current inventory of the entity
         this.inventory = {
-            sword: true,
-            shield: true,
+            sword: false,
+            shield: false,
             gloves: false
         };
 

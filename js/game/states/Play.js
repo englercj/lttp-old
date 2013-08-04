@@ -1,11 +1,12 @@
 define([
+    'game/utility/storage',
     'game/data/constants',
     'game/states/State',
     'game/entities/Link',
     'game/fonts/ReturnOfGanon',
     'game/fonts/Hud',
     'game/huditems'
-], function(C, State, Link, ReturnOfGanonFont, HudFont, huditems) {
+], function(store, C, State, Link, ReturnOfGanonFont, HudFont, huditems) {
     var Play = function(game) {
         State.call(this, 'play', game);
 
@@ -25,10 +26,33 @@ define([
     };
 
     gf.inherits(Play, State, {
-        start: function(world) {
+        start: function(save) {
             State.prototype.start.call(this);
 
-            this.gotoWorld(world);
+            this.lastLoad = save;
+
+            //create link
+            this.link = this.createLink();
+
+            //set inventory
+            for(var k in save.inventory) {
+                this.link.inventory[k] = save.inventory[k];
+            }
+
+            //set health
+            this.link.health = save.health;
+            this.link.maxHealth = save.maxHealth;
+
+            //set magic
+            this.link.magic = save.magic;
+            this.link.maxMagic = save.maxMagic;
+
+            this.gotoWorld({
+                name: save.world,
+                properties: {
+                    loc: save.position
+                }
+            });
         },
         activateWorld: function() {
 
@@ -58,6 +82,9 @@ define([
 
             return gui;
         },
+        save: function() {
+            store.save(this.lastLoad.slot, this.lastLoad.name, this.lastExit.name, this.lastExit.properties.loc);
+        },
         onToggleSaveMenu: function() {},
         onToggleMap: function() {},
         onToggleInventory: function() {},
@@ -67,13 +94,12 @@ define([
                 exit = { name: exit };
 
             //remove the player so he isn't destroyed by the world
-            if(this.link) {
-                this.world.removeChild(this.link);
+            if(this.link.parent)
+                this.link.parent.removeChild(this.link);
+
+            if(this.world)
                 this.world.destroy();
-            }
-            else {
-                this.link = this.createLink();
-            }
+
             this.firstZone = true;
 
             var self = this;
@@ -82,6 +108,7 @@ define([
                 //load the new world into the game
                 self.loadWorld(exit.name);
                 self.addChild(self.link);
+                self.lastExit = exit;
 
                 if(self.music)
                     self.music.stop();
@@ -104,8 +131,8 @@ define([
 
                 //set link position
                 self.link.setPosition(
-                    exit.properties ? exit.properties.loc[0] : 128,//2231, //in front of links house
-                    exit.properties ? exit.properties.loc[1] : 128//2849
+                    exit.properties.loc[0],
+                    exit.properties.loc[1]
                 );
                 self.camera.follow(self.link, gf.Camera.FOLLOW.LOCKON);
                 //self.link.reindex();

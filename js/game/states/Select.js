@@ -1,10 +1,11 @@
 var TEXT_SCALE = 1.5;
 
 define([
+    'game/utility/storage',
     'game/data/constants',
     'game/states/State',
     'game/fonts/ReturnOfGanon',
-], function(C, State, ReturnOfGanonFont) {
+], function(store, C, State, ReturnOfGanonFont) {
     var Select = function(game) {
         State.call(this, 'mainmenu', game);
 
@@ -52,7 +53,7 @@ define([
         this._lastHorzGpValue = 0;
         this._lastVertGpValue = 0;
 
-        this.active = 'select';
+        this.activate('select');
         this.selected = 0;
 
         this.ignore = true;
@@ -214,8 +215,11 @@ define([
 
             if(this.active === 'select') {
                 if(this.selected <= 2) {
-                    //this.activate('register');
-                    this.emit('select');
+                    if(!this.saves[this.selected]) {
+                        this.activate('register');
+                    } else {
+                        this.emit('select', this.saves[this.selected]);
+                    }
                 } else if(this.selected === 3) {
                     this.sounds.error.play();
                     return;
@@ -231,10 +235,11 @@ define([
                     c = this.chars[this.char.y][this.char.x];
 
                 if(c.name === 'end') {
-                    if(!c.text) {
-                        return this.sounds.error.play();
+                    if(!n.trim()) {
+                        return this.activate('select')
                     } else {
                         //save new file for name
+                        store.save(this.selected, n.split('').filter(function(ch, i) { return (i % 2 === 0); }).join(''));
                         this.sounds.select.play();
                         return this.activate('select');
                     }
@@ -244,7 +249,6 @@ define([
                     return;
                 } else if(c.name === 'right') {
                     this.panameI = Math.min((c.text.length / 2), this.pnameI + 1);
-
                     this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
                     return;
                 }
@@ -292,8 +296,18 @@ define([
                 this.line.visible = true;
             }
 
-            //if(name === 'select')
-            //    this.loadNames();
+            if(name === 'select') {
+                var s = this.saves = store.loadAll();
+
+                for(var i = 0; i < s.length; ++i) {
+                    var n = i + 1,
+                        sv = s[i];
+
+                    this['slot' + n].setText(n + '.' + (sv ? sv.name : ''));
+                    //TODO: set hearts
+                    //TODO: link icon
+                }
+            }
 
             this.active = name;
         },
@@ -309,9 +323,6 @@ define([
 
             var text = new gf.DisplayObjectContainer(),
                 title = this.fontpool.create(),
-                one = this.fontpool.create(),
-                two = this.fontpool.create(),
-                three = this.fontpool.create(),
                 copy = this.fontpool.create(),
                 erase = this.fontpool.create();
 
@@ -322,20 +333,23 @@ define([
             title.position.y = 75;
             text.addChild(title);
 
-            one.setText('1.');
-            one.position.x = 145;
-            one.position.y = 170;
-            text.addChild(one);
+            this.slot1 = this.fontpool.create();
+            this.slot1.setText('1.');
+            this.slot1.position.x = 145;
+            this.slot1.position.y = 170;
+            text.addChild(this.slot1);
 
-            two.setText('2.');
-            two.position.x = 145;
-            two.position.y = 230;
-            text.addChild(two);
+            this.slot2 = this.fontpool.create();
+            this.slot2.setText('2.');
+            this.slot2.position.x = 145;
+            this.slot2.position.y = 230;
+            text.addChild(this.slot2);
  
-            three.setText('3.');
-            three.position.x = 145;
-            three.position.y = 290;
-            text.addChild(three);
+            this.slot3 = this.fontpool.create();
+            this.slot3.setText('3.');
+            this.slot3.position.x = 145;
+            this.slot3.position.y = 290;
+            text.addChild(this.slot3);
 
             copy.setText('COPY  PLAYER');
             copy.position.x = 100;
