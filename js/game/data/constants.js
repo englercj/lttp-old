@@ -62,7 +62,7 @@ define({
         DAMAGING_SMASHING: 15       //can smash BLOCKING_SMASHABLE and deal damage
     },
 
-    ATTACK_CONE: 0.4,
+    ATTACK_CONE: 0.5,
     USE_CONE: 0.4,
     ATTACK_SENSOR_RADIUS: 18,
 
