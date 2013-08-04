@@ -56,6 +56,8 @@ define([
                     alpha: 1,
                     ease: Linear.easeNone,
                     onComplete: function() {
+                        self.sprites.zpart.visible = true;
+
                         //play sword sounds
                         self.sounds.sword.play(function() {
                             self.sounds.ding.play();
@@ -63,7 +65,7 @@ define([
 
                         //drop the sword
                         TweenLite.to(self.sprites.sword.position, 0.2, {
-                            y: 114,
+                            y: 38,
                             ease: Linear.easeNone,
                             onComplete: function() {
                                 //blink screen
@@ -73,8 +75,6 @@ define([
                                         alpha: 0,
                                         ease: Linear.easeNone,
                                         onComplete: function() {
-                                            self.sprites.zpart.visible = true;
-
                                             self.sprites.intro.gotoAndStop(0);
                                             self.sprites.intro.visible = false;
                                         }
@@ -120,16 +120,15 @@ define([
             this.sprites.intro.addAnimation('intro', frames, 0.5);
         },
         _setupTitleSprites: function() {
-
-            this.sprites.title.position.x = 147;
-            this.sprites.title.position.y = 180;
+            this.sprites.title.position.x = 49;
+            this.sprites.title.position.y = 60;
             this.sprites.title.alpha = 0;
 
-            this.sprites.sword.position.x = 168;
-            this.sprites.sword.position.y = -385; //anim to: 114
+            this.sprites.sword.position.x = 56;
+            this.sprites.sword.position.y = -130; //anim to: 38
 
-            this.sprites.zpart.position.x = 159;
-            this.sprites.zpart.position.y = 258;
+            this.sprites.zpart.position.x = 53;
+            this.sprites.zpart.position.y = 86;
             this.sprites.zpart.visible = false;
         }
     });
