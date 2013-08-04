@@ -47,6 +47,8 @@ p, .rog, #dialog, #hud {
     margin: 0;
     position: absolute;
     top: 0;
+
+    background-color: #000;
 }
 
 /* Fullscreen styles?

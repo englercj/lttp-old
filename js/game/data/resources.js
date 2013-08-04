@@ -26,6 +26,10 @@ define([], function() {
             name: 'sprite_worlditems',
             src: 'assets/worlds/shared_tiles/overworlditems.json'
         },
+        {
+            name: 'sprite_intro',
+            src: 'assets/sprites/misc/intro.json'
+        },
         // Music
         {
             name: 'music_lightworld',
@@ -43,6 +47,12 @@ define([], function() {
             name: 'music_village',
             src: [
                 'assets/audio/music/kakariko_village.lite.ogg'
+            ]
+        },
+        {
+            name: 'music_title',
+            src: [
+                'assets/audio/music/title.lite.ogg'
             ]
         },
         // Sounds
@@ -76,7 +86,7 @@ define([], function() {
                 'assets/audio/effects/LTTP_Shatter.lite.ogg'
             ]
         },
-        //HUD
+        // HUD
         {
             name: 'sprite_hud',
             src: 'assets/sprites/ui/hud.json'

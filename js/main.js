@@ -3,8 +3,9 @@ var MUSIC_VOLUME = 0.25;
 require([
     'game/data/data',
     'game/huditems',
-    'game/entities/Link'
-], function(data, huditems, Link) {
+    'game/entities/Link',
+    'game/entities/misc/Title'
+], function(data, huditems, Link, Title) {
     var $game, game, hud;
 
     window.lttp = {
@@ -25,7 +26,18 @@ require([
         });
 
         game.loader.on('complete', function() {
-            lttp.loadWorld('world_linkshouse');
+            //do intro sequence
+            lttp.intro = new Title();
+            lttp.intro.gotoAndPlay('intro');
+            lttp.intro.once('complete', function() {
+                lttp.loadWorld('world_linkshouse');
+
+                //initialize HUD objects
+                game.addChild(initHud());
+            });
+
+            game.camera.addChild(lttp.intro);
+            lttp.intro.scale.x = lttp.intro.scale.y = 3;
 
             //bind some game related keys
             game.input.keyboard.on(gf.input.KEY.B, onToggleSaveMenu);
@@ -39,9 +51,6 @@ require([
             game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_SHOULDER, onToggleAudio);
 
             game.input.keyboard.once(gf.input.KEY.TILDE, onToggleDebug);
-
-            //initialize HUD objects
-            game.addChild(initHud());
 
             //start render loop
             game.render();
