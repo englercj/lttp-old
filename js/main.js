@@ -27,6 +27,7 @@ require([
         game.loader.on('complete', function() {
             //load starting states
             lttp.intro = new TitleState(game);
+            lttp.intro.input.keyboard.on(gf.input.KEY.ENTER, gotoSelect);
             lttp.intro.input.keyboard.on(gf.input.KEY.SPACE, gotoSelect);
             lttp.intro.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, gotoSelect);
             lttp.intro.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, gotoSelect);
@@ -50,6 +51,7 @@ require([
 
     function gotoSelect() {
         lttp.intro.stop();
+        lttp.intro.input.keyboard.off(gf.input.KEY.ENTER, gotoSelect);
         lttp.intro.input.keyboard.off(gf.input.KEY.SPACE, gotoSelect);
         lttp.intro.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, gotoSelect);
         lttp.intro.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, gotoSelect);

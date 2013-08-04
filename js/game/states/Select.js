@@ -65,49 +65,49 @@ define([
 
             this.music.play();
 
-            this.input.keyboard.on(gf.input.KEY.DOWN, this.onMove.bind(this, 'down'));
-            this.input.keyboard.on(gf.input.KEY.UP, this.onMove.bind(this, 'up'));
-            this.input.keyboard.on(gf.input.KEY.LEFT, this.onMove.bind(this, 'left'));
-            this.input.keyboard.on(gf.input.KEY.RIGHT, this.onMove.bind(this, 'right'));
+            this.input.keyboard.on(gf.input.KEY.DOWN, this._boundMoveDown = this.onMove.bind(this, 'down'));
+            this.input.keyboard.on(gf.input.KEY.UP, this._boundMoveUp = this.onMove.bind(this, 'up'));
+            this.input.keyboard.on(gf.input.KEY.LEFT, this._boundMoveLeft = this.onMove.bind(this, 'left'));
+            this.input.keyboard.on(gf.input.KEY.RIGHT, this._boundMoveRight = this.onMove.bind(this, 'right'));
 
-            this.input.keyboard.on(gf.input.KEY.ENTER, this.onSelect.bind(this));
-            this.input.keyboard.on(gf.input.KEY.SPACE, this.onSelect.bind(this));
+            this.input.keyboard.on(gf.input.KEY.ENTER, this._boundSelect1 = this.onSelect.bind(this));
+            this.input.keyboard.on(gf.input.KEY.SPACE, this._boundSelect2 = this.onSelect.bind(this));
 
-            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_TOP, this.onMove.bind(this, 'up'));
-            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_BOTTOM, this.onMove.bind(this, 'down'));
-            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_LEFT, this.onMove.bind(this, 'left'));
-            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_RIGHT, this.onMove.bind(this, 'right'));
+            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_TOP, this._boundGpMoveUp = this.onMove.bind(this, 'up'));
+            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_BOTTOM, this._boundGpMoveDown = this.onMove.bind(this, 'down'));
+            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_LEFT, this._boundGpMoveLeft = this.onMove.bind(this, 'left'));
+            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_RIGHT, this._boundGpMoveRight = this.onMove.bind(this, 'right'));
 
-            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, this.onSelect.bind(this));
-            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, this.onSelect.bind(this));
-            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, this.onSelect.bind(this));
+            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, this._boundGpSelect1 = this.onSelect.bind(this));
+            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, this._boundGpSelect2 = this.onSelect.bind(this));
+            this.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, this._boundGpSelect3 = this.onSelect.bind(this));
 
-            this.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this.onGpMove.bind(this));
-            this.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this.onGpMove.bind(this));
+            this.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this._boundGpMove1 = this.onGpMove.bind(this));
+            this.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this._boundGpMove2 = this.onGpMove.bind(this));
             this.input.gamepad.sticks.threshold = 0.35;
         },
         stop: function() {
             State.prototype.stop.call(this);
 
-            this.input.keyboard.off(gf.input.KEY.DOWN, this._events[gf.input.KEY.DOWN]);
-            this.input.keyboard.off(gf.input.KEY.UP, this._events[gf.input.KEY.UP]);
-            this.input.keyboard.off(gf.input.KEY.LEFT, this._events[gf.input.KEY.LEFT]);
-            this.input.keyboard.off(gf.input.KEY.RIGHT, this._events[gf.input.KEY.RIGHT]);
+            this.input.keyboard.off(gf.input.KEY.DOWN, this._boundMoveDown);
+            this.input.keyboard.off(gf.input.KEY.UP, this._boundMoveUp);
+            this.input.keyboard.off(gf.input.KEY.LEFT, this._boundMoveLeft);
+            this.input.keyboard.off(gf.input.KEY.RIGHT, this._boundMoveRight);
 
-            this.input.keyboard.off(gf.input.KEY.ENTER, this._events[gf.input.KEY.ENTER]);
-            this.input.keyboard.off(gf.input.KEY.SPACE, this._events[gf.input.KEY.SPACE]);
+            this.input.keyboard.off(gf.input.KEY.ENTER, this._boundSelect1);
+            this.input.keyboard.off(gf.input.KEY.SPACE, this._boundSelect2);
 
-            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_TOP, this._events[gf.input.GP_BUTTON.PAD_TOP]);
-            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_BOTTOM, this._events[gf.input.GP_BUTTON.PAD_BOTTOM]);
-            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_LEFT, this._events[gf.input.GP_BUTTON.PAD_LEFT]);
-            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_RIGHT, this._events[gf.input.GP_BUTTON.PAD_RIGHT]);
+            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_TOP, this._boundGpMoveDown);
+            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_BOTTOM, this._boundGpMoveUp);
+            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_LEFT, this._boundGpMoveLeft);
+            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_RIGHT, this._boundGpMoveRight);
 
-            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, this._events[gf.input.GP_BUTTON.FACE_1]);
-            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_2, this._events[gf.input.GP_BUTTON.FACE_2]);
-            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, this._events[gf.input.GP_BUTTON.START]);
+            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, this._boundGpSelect1);
+            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_2, this._boundGpSelect2);
+            this.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, this._boundGpSelect3);
 
-            this.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this._events[gf.input.GP_AXIS.LEFT_ANALOGUE_HOR]);
-            this.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this._events[gf.input.GP_AXIS.LEFT_ANALOGUE_VERT]);
+            this.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this._boundGpMove1);
+            this.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this._boundGpMove2);
         },
         onMove: function(dir, status) {
             if(!status.down)
@@ -214,7 +214,8 @@ define([
 
             if(this.active === 'select') {
                 if(this.selected <= 2) {
-                    this.activate('register');
+                    //this.activate('register');
+                    this.emit('select');
                 } else if(this.selected === 3) {
                     this.sounds.error.play();
                     return;
