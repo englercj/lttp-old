@@ -34,6 +34,10 @@ define([], function() {
             name: 'sprite_select',
             src: 'assets/sprites/misc/selectscreen.json'
         },
+        {
+            name: 'sprite_particles',
+            src: 'assets/sprites/misc/particles.json'
+        },
         // Music
         {
             name: 'music_lightworld',
