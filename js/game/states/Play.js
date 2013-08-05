@@ -147,7 +147,7 @@ define([
 
                         last = now;
                     },
-                    done: _zoneReady.bind(this)
+                    done: this._zoneReady.bind(this)
                 });
             } else {
                 this._zoneReady();
