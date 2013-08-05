@@ -1,22 +1,29 @@
 define([
-], function() {
-    var HudItem = function(pos, settings) {
-        this.name = '';
+    'game/fonts/ReturnOfGanon',
+    'game/fonts/Hud'
+], function(ReturnOfGanonFont, HudFont) {
+    var HudItem = function(pos, name, value) {
+        this.name = name;
         this.value = 0;
 
-        gf.DisplayObjectContainer.call(this, settings);
+        gf.DisplayObjectContainer.call(this);
         this.setPosition(pos[0], pos[1]);
 
         this.sprites = new gf.ObjectPool(gf.Sprite, this);
     };
 
     gf.inherits(HudItem, gf.DisplayObjectContainer, {
+        set: function(val) {
+            this.value = val;
+
+            return this;
+        }
     });
 
-    var MagicMeter = function(pos, settings) {
+    var MagicMeter = function(pos, value) {
         this.textures = gf.assetCache.sprite_hud;
 
-        HudItem.call(this, pos, settings);
+        HudItem.call(this, pos, 'magic', value);
 
         //add the background
         this.sprites.create(this.textures['magic_meter.png']);
@@ -25,22 +32,24 @@ define([
 
         this.maxHeight = this.sprValue.height;
         this.sprValue.position.x = 6;
-        this.set(settings.value);
+        this.set(value);
     };
 
     gf.inherits(MagicMeter, HudItem, {
         set: function(val) {
-            this.value = val;
+            HudItem.prototype.set.call(this, val);
 
-            this.sprValue.height = this.maxHeight * this.value;
+            this.sprValue.height = this.maxHeight * val;
             this.sprValue.position.y = (this.maxHeight - this.sprValue.height) + 8;
+
+            return this;
         }
     });
 
-    var LifeMeter = function(pos, settings) {
+    var LifeMeter = function(pos, value) {
         this.textures = gf.assetCache.sprite_hud;
 
-        HudItem.call(this, pos, settings);
+        HudItem.call(this, pos, 'life', value);
 
         this.dash1 = this.sprites.create(this.textures['life-dash.png']);
         this.dash1.position.x = this.dash1X = 35;
@@ -53,13 +62,12 @@ define([
         this.dash2 = this.sprites.create(this.textures['life-dash.png']);
         this.dash2.position.x = this.dash2X = 100;
         this.dash1.position.y = this.dashY = 0;
-
-        this.set(settings.value);
+        this.set(value);
     };
 
     gf.inherits(LifeMeter, HudItem, {
         set: function(val) {
-            this.value = val;
+            HudItem.prototype.set.call(this, val);
 
             for(var i = 0, il = this.children.length; i < il; ++i) {
                 var child = this.children[i];
@@ -94,7 +102,7 @@ define([
                 perRow = 10,
                 done = 0;
 
-            for(var hp = this.value; hp > 0; --hp) {
+            for(var hp = val; hp > 0; --hp) {
                 done++;
 
                 var off = 0,
@@ -145,51 +153,50 @@ define([
         }
     });
 
-    var EquiptedItem = function(pos, settings) {
+    var EquiptedItem = function(pos, value) {
         this.textures = gf.assetCache.sprite_hud;
 
-        HudItem.call(this, pos, settings);
+        HudItem.call(this, pos, 'equipted', value);
 
         //add the frame
         this.sprites.create(this.textures['item-frame.png']);
+        //this.set(value);
     };
 
     gf.inherits(EquiptedItem, HudItem, {
         set: function(val) {
-            this.value = val;
+            HudItem.prototype.set.call(this, val);
 
             //add the sprite
             if(!this.children[1]) {
-                this.sprites.create(this.value + '.png');
+                this.sprites.create(val + '.png');
             }
             //set the sprite of the image shown
             else {
-                this.children[1].setTexture(this.value + '.png');
+                this.children[1].setTexture(val + '.png');
             }
+
             return this;
         }
     });
 
-    var InventoryCounter = function(pos, settings) {
-        this.font = null;
+    var InventoryCounter = function(pos, name, value) {
         this.textures = gf.assetCache.sprite_hud;
 
-        HudItem.call(this, pos, settings);
+        HudItem.call(this, pos, name, value);
 
         //add the icon
         this.icon = this.sprites.create(this.textures['indicator-' + this.name + '.png']);
 
-        if(this.name === 'rupees')
+        if(name === 'rupees')
             this.icon.position.x += 13;
-        else if(this.name === 'bombs')
+        else if(name === 'bombs')
             this.icon.position.x += 5;
 
-        if(this.font) {
-            this.addChild(this.font);
-            this.font.position.y = 20;
-        }
-
-        this.set(settings.value);
+        this.font = new HudFont();
+        this.addChild(this.font);
+        this.font.position.y = 30;
+        this.set(value);
     };
 
     gf.inherits(InventoryCounter, HudItem, {
@@ -200,14 +207,38 @@ define([
                 val = '0' + val;
             }
 
-            this.value = val;
+            HudItem.prototype.set.call(this, val);
 
             if(this.font)
                 this.font.setText(val);
+
+            return this;
         }
     });
 
+    function initHud(gui) {
+        gui.scale.x = gui.scale.y = 1.5;
+        gui.items = {};
+
+        //Add magic meter
+        gui.addChild(gui.items.magicMeter = new MagicMeter([40, 36], 1));
+
+        //Add equipted item
+        gui.addChild(gui.items.equipted = new EquiptedItem([75, 42], ''));
+
+        //Add inventory counters
+        gui.addChild(gui.items.rupees = new InventoryCounter([135, 30], 'rupees', 0));
+        gui.addChild(gui.items.bombs = new InventoryCounter([195, 30], 'bombs', 0));
+        gui.addChild(gui.items.arrows = new InventoryCounter([245, 30], 'arrows', 0));
+
+        //Add life hearts
+        gui.addChild(gui.items.life = new LifeMeter([320, 35], 3));
+
+        return gui;
+    }
+
     return {
+        initHud: initHud,
         MagicMeter: MagicMeter,
         LifeMeter: LifeMeter,
         EquiptedItem: EquiptedItem,

@@ -3,15 +3,15 @@ define([
     'game/data/constants',
     'game/states/State',
     'game/entities/Link',
-    'game/fonts/ReturnOfGanon',
-    'game/fonts/Hud',
-    'game/huditems'
-], function(store, C, State, Link, ReturnOfGanonFont, HudFont, huditems) {
+    'game/gui/huditems'
+], function(store, C, State, Link, huditems) {
     var Play = function(game) {
         State.call(this, 'play', game);
 
         //initialize HUD objects
-        this.camera.addChild(this.initHud());
+        this.gui = new gf.Gui();
+        this.camera.addChild(this.gui);
+        huditems.initHud(this.gui);
 
         //bind some game related keys
         this.input.keyboard.on(gf.input.KEY.B, this.onToggleSaveMenu.bind(this));
@@ -54,31 +54,6 @@ define([
         },
         activateWorld: function() {
 
-        },
-        initHud: function() {
-            var gui,
-                retofganon = new ReturnOfGanonFont(),
-                hudfnt = new HudFont();
-
-            this.gui = gui = new gf.Gui();
-            gui.scale.x = gui.scale.y = 1.5;
-            gui.items = {};
-
-            //Add magic meter
-            gui.addChild(gui.items.magicMeter = new huditems.MagicMeter([40, 36], { value: 1 }));
-
-            //Add equipted item
-            gui.addChild(gui.items.equipted = new huditems.EquiptedItem([75, 42], { value: '' }));
-
-            //Add inventory counters
-            gui.addChild(gui.items.rupees = new huditems.InventoryCounter([135, 30], { value: 0, name: 'rupees', font: hudfnt.clone() }));
-            gui.addChild(gui.items.bombs = new huditems.InventoryCounter([195, 30], { value: 0, name: 'bombs', font: hudfnt.clone() }));
-            gui.addChild(gui.items.arrows = new huditems.InventoryCounter([245, 30], { value: 0, name: 'arrows', font: hudfnt.clone() }));
-
-            //Add life hearts
-            gui.addChild(gui.items.life = new huditems.LifeMeter([320, 35], { value: 3, font: retofganon.clone() }));
-
-            return gui;
         },
         save: function() {
             store.save(this.lastLoad.slot, this.lastLoad.name, this.lastExit.name, this.lastExit.properties.loc);
