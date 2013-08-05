@@ -182,7 +182,7 @@ define([
             num--;
 
             var self = this,
-                len = 35,
+                len = 20,
                 alpha = 0.9;
 
             self.camera.flash(0xff0000, len, alpha, function() {
