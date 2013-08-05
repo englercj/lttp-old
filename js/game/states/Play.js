@@ -17,12 +17,10 @@ define([
         this.input.keyboard.on(gf.input.KEY.B, this.onToggleSaveMenu.bind(this));
         this.input.keyboard.on(gf.input.KEY.M, this.onToggleMap.bind(this));
         this.input.keyboard.on(gf.input.KEY.I, this.onToggleInventory.bind(this));
-        this.input.keyboard.on(gf.input.KEY.P, this.onToggleAudio.bind(this));
 
         this.input.gamepad.buttons.on(gf.input.GP_BUTTON.SELECT, this.onToggleSaveMenu.bind(this));
         this.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_3, this.onToggleMap.bind(this));
         this.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, this.onToggleInventory.bind(this));
-        this.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_SHOULDER, this.onToggleAudio.bind(this));
     };
 
     gf.inherits(Play, State, {
@@ -88,7 +86,12 @@ define([
         onToggleSaveMenu: function() {},
         onToggleMap: function() {},
         onToggleInventory: function() {},
-        onToggleAudio: function() {},
+        onToggleAudio: function() {
+            if(this.audio._muted)
+                this.audio.unmute();
+            else
+                this.audio.mute();
+        },
         gotoWorld: function(exit, vec) {
             if(typeof exit === 'string')
                 exit = { name: exit };
@@ -118,6 +121,7 @@ define([
                     self.music = gf.assetCache[self.world.properties.music];
                     self.music.volume = C.MUSIC_VOLUME;
                     self.music.loop = true;
+                    self.audio.attach(self.music);
 
                     if(!self.music)
                         console.warn('Music not loaded! "' + self.world.properties.music + '"');

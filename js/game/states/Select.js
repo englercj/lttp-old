@@ -12,6 +12,7 @@ define([
         this.music = gf.assetCache.music_select;
         this.music.loop = true;
         this.music.volume = C.MUSIC_VOLUME;
+        this.audio.attach(this.music);
 
         this.sounds = {
             select: gf.assetCache.effect_menu_select,
@@ -23,6 +24,7 @@ define([
 
         for(var s in this.sounds) {
             this.sounds[s].volume = C.MUSIC_VOLUME;
+            this.audio.attach(this.sounds[s]);
         }
 
         this.sprites = {

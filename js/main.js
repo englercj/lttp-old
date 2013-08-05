@@ -4,7 +4,7 @@ require([
     'game/states/Select',
     'game/states/Play'
 ], function(resources, TitleState, SelectState, PlayState) {
-    var $game, game;
+    var $game, game, muted;
 
     window.lttp = {
         firstZone: true
@@ -41,6 +41,8 @@ require([
             lttp.play = new PlayState(game);
 
             game.input.keyboard.once(gf.input.KEY.TILDE, onDebug);
+            game.input.keyboard.on(gf.input.KEY.P, onToggleAudio);
+            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_SHOULDER, onToggleAudio);
 
             //start render loop
             game.render();
@@ -67,5 +69,21 @@ require([
 
     function onDebug() {
         gf.debug.show(game);
+    }
+
+    function onToggleAudio(status) {
+        if(status.down) return;
+
+        if(muted) {
+            lttp.intro.audio.unmute();
+            lttp.select.audio.unmute();
+            lttp.play.audio.unmute();
+            muted = false;
+        } else {
+            lttp.intro.audio.mute();
+            lttp.select.audio.mute();
+            lttp.play.audio.mute();
+            muted = true;
+        }
     }
 });

@@ -13,6 +13,7 @@ define([
 
         for(var s in this.sounds) {
             this.sounds[s].volume = C.MUSIC_VOLUME;
+            this.audio.attach(this.sounds[s]);
         }
 
         this.sprites = {
@@ -88,7 +89,7 @@ define([
                             ease: Linear.easeNone,
                             onComplete: function() {
                                 //blink screen
-                                self._doBlink(8, function() {
+                                self.blink(8, function() {
                                     //Fade out the intro
                                     TweenLite.to(self.sprites.intro, 1, {
                                         alpha: 0,
@@ -174,19 +175,21 @@ define([
                 }, 500);
             });
         },
-        _doBlink: function(num, cb) {
+        blink: function(num, cb) {
             if(num === 0)
                 return cb();
 
             num--;
 
             var self = this,
-                len = 25,
+                len = 35,
                 alpha = 0.9;
 
             self.camera.flash(0xff0000, len, alpha, function() {
-                self.camera.flash(0x0000ff, len, alpha, function() {
-                    self._doBlink(num, cb);
+                self.camera.flash(0x00ff00, len, alpha, function() {
+                    self.camera.flash(0x0000ff, len, alpha, function() {
+                        self.blink(num, cb);
+                    });
                 });
             });
         },

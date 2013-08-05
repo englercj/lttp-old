@@ -53,6 +53,7 @@ define([
 
         for(var s in this.sounds) {
             this.sounds[s].volume = C.EFFECT_VOLUME;
+            lttp.play.audio.attach(this.sounds[s]);
         }
 
         this.bindKeys();
