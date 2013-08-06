@@ -13,6 +13,8 @@ define([
         this.camera.addChild(this.gui);
         huditems.initHud(this.gui);
 
+        this.worlds = {};
+
         //bind some game related keys
         this.input.keyboard.on(gf.input.KEY.B, this.onToggleSaveMenu.bind(this));
         this.input.keyboard.on(gf.input.KEY.M, this.onToggleMap.bind(this));
@@ -71,20 +73,40 @@ define([
             if(typeof exit === 'string')
                 exit = { name: exit };
 
+            var self = this;
+            /*if(this.world) {
+                this.camera.close('ellipse', 2000, this.link.position, function() {
+                    self._doGotoWorld(exit, vec);
+                });
+            } else {*/
+                this._doGotoWorld(exit, vec);
+            //}
+        },
+        _doGotoWorld: function(exit, vec) {
+            var self = this;
+
             //remove the player so he isn't destroyed by the world
             if(this.link.parent)
                 this.link.parent.removeChild(this.link);
 
-            if(this.world)
-                this.world.destroy();
+            if(this.world) {
+                this.world.visible = false;
+                this.world.despawnObjects();
+            }
 
             this.firstZone = true;
 
-            var self = this;
             this.physics.nextTick(function() {
                 self.physics.skip(2);
                 //load the new world into the game
-                self.loadWorld(exit.name);
+                if(self.worlds[exit.name]) {
+                    self.world = self.worlds[exit.name];
+                    self.world.visible = true;
+                } else {
+                    self.loadWorld(exit.name);
+                    self.worlds[exit.name] = self.world;
+                }
+
                 self.addChild(self.link);
                 self.lastExit = exit;
 
