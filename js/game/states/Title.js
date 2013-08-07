@@ -113,6 +113,9 @@ define([
             this.sprites.sparkle.stop();
             this.sprites.sparkle.visible = false;
 
+            //TODO: Loop through all the textures used here and destroy them
+            // to free up memory in webgl
+
             State.prototype.stop.call(this);
         },
         shine: function() {

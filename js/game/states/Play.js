@@ -16,13 +16,13 @@ define([
         this.worlds = {};
 
         //bind some game related keys
-        this.input.keyboard.on(gf.input.KEY.B, this.onToggleSaveMenu.bind(this));
-        this.input.keyboard.on(gf.input.KEY.M, this.onToggleMap.bind(this));
-        this.input.keyboard.on(gf.input.KEY.I, this.onToggleInventory.bind(this));
+        this.game.input.keyboard.on(gf.input.KEY.B, this.onToggleSaveMenu.bind(this));
+        this.game.input.keyboard.on(gf.input.KEY.M, this.onToggleMap.bind(this));
+        this.game.input.keyboard.on(gf.input.KEY.I, this.onToggleInventory.bind(this));
 
-        this.input.gamepad.buttons.on(gf.input.GP_BUTTON.SELECT, this.onToggleSaveMenu.bind(this));
-        this.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_3, this.onToggleMap.bind(this));
-        this.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, this.onToggleInventory.bind(this));
+        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.SELECT, this.onToggleSaveMenu.bind(this));
+        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_3, this.onToggleMap.bind(this));
+        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, this.onToggleInventory.bind(this));
     };
 
     gf.inherits(Play, State, {

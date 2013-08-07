@@ -27,10 +27,6 @@ require([
         game.loader.on('complete', function() {
             //load starting states
             lttp.intro = new TitleState(game);
-            lttp.intro.input.keyboard.on(gf.input.KEY.ENTER, gotoSelect);
-            lttp.intro.input.keyboard.on(gf.input.KEY.SPACE, gotoSelect);
-            lttp.intro.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, gotoSelect);
-            lttp.intro.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, gotoSelect);
             lttp.intro.start();
 
             //load select state
@@ -39,6 +35,11 @@ require([
 
             //load the play state
             lttp.play = new PlayState(game);
+
+            game.input.keyboard.on(gf.input.KEY.ENTER, gotoSelect);
+            game.input.keyboard.on(gf.input.KEY.SPACE, gotoSelect);
+            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, gotoSelect);
+            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, gotoSelect);
 
             game.input.keyboard.once(gf.input.KEY.TILDE, onDebug);
             game.input.keyboard.on(gf.input.KEY.P, onToggleAudio);
@@ -53,10 +54,11 @@ require([
 
     function gotoSelect() {
         lttp.intro.stop();
-        lttp.intro.input.keyboard.off(gf.input.KEY.ENTER, gotoSelect);
-        lttp.intro.input.keyboard.off(gf.input.KEY.SPACE, gotoSelect);
-        lttp.intro.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, gotoSelect);
-        lttp.intro.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, gotoSelect);
+
+        game.input.keyboard.off(gf.input.KEY.ENTER, gotoSelect);
+        game.input.keyboard.off(gf.input.KEY.SPACE, gotoSelect);
+        game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, gotoSelect);
+        game.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, gotoSelect);
 
         lttp.select.start();
     }
