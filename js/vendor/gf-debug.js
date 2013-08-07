@@ -4,7 +4,7 @@
  * Copyright (c) 2013, Chad Engler
  * https://github.com/grapefruitjs/gf-debug
  *
- * Compiled: 2013-08-03
+ * Compiled: 2013-08-06
  *
  * GrapeFruit Debug Plugin is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -33,7 +33,6 @@ gf.debug.onTick = function() {
     if(gf.debug.panels) {
         gf.debug.panels.map.tick();
         gf.debug.panels.performance.tick();
-        gf.debug.panels.gamepad.tick();
         gf.debug.panels.sprites.tick();
     }
 };
@@ -219,6 +218,7 @@ gf.inherits(gf.debug.Panel, Object, {
     createPanelElement: function() {
         var div = this._panel = document.createElement('div');
         gf.debug.ui.addClass(div, 'gf_debug_panel');
+        gf.debug.ui.addClass(div, this.name);
 
         return div;
     },
@@ -248,18 +248,47 @@ gf.debug.GamepadPanel = function(game) {
 
     this.name = 'gamepad';
     this.title = 'Gamepad';
+
+    this.gamepad = new gf.debug.Gamepad();
+    this.bindEvents();
 };
 
 gf.inherits(gf.debug.GamepadPanel, gf.debug.Panel, {
     createPanelElement: function() {
         var div = gf.debug.Panel.prototype.createPanelElement.call(this);
 
-        gf.debug.ui.setText(div, 'a gamepad image that shows the current gamepad state');
+        div.appendChild(this.gamepad.element);
+        window.console.log(this.gamepad.element);
 
         return div;
     },
-    tick: function() {
-        
+    bindEvents: function() {
+        var game = this.game,
+            pad = this.gamepad;
+
+        //bind all buttons
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_3, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_4, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.LEFT_SHOULDER, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_SHOULDER, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.LEFT_TRIGGER, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_TRIGGER, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.SELECT, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.LEFT_ANALOGUE_STICK, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_ANALOGUE_STICK, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_TOP, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_BOTTOM, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_LEFT, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_RIGHT, pad.updateButton.bind(pad));
+
+        //bind all sticks
+        game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, pad.updateAxis.bind(pad));
+        game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, pad.updateAxis.bind(pad));
+        game.input.gamepad.sticks.on(gf.input.GP_AXIS.RIGHT_ANALOGUE_HOR, pad.updateAxis.bind(pad));
+        game.input.gamepad.sticks.on(gf.input.GP_AXIS.RIGHT_ANALOGUE_VERT, pad.updateAxis.bind(pad));
     }
 });
 gf.debug.PerformancePanel = function(game) {
@@ -275,7 +304,7 @@ gf.inherits(gf.debug.PerformancePanel, gf.debug.Panel, {
     createPanelElement: function() {
         var div = gf.debug.Panel.prototype.createPanelElement.call(this);
 
-        this.graph = new gf.debug.Graph(div, window.innerWidth, 200, {
+        this.graph = new gf.debug.Graph(div, window.innerWidth - 10, 250 - 5, {
             input: 'rgba(80, 220, 80, 1)',
             camera: 'rgba(80, 80, 220, 1)',
             phys: 'rgba(80, 220, 200, 1)',
@@ -333,6 +362,7 @@ gf.debug.SpritesPanel = function(game) {
 gf.inherits(gf.debug.SpritesPanel, gf.debug.Panel, {
     createPanelElement: function() {
         var div = gf.debug.Panel.prototype.createPanelElement.call(this),
+            pad = document.createElement('div'),
             col = document.createElement('div');
 
         // Show colliders
@@ -343,7 +373,9 @@ gf.inherits(gf.debug.SpritesPanel, gf.debug.Panel, {
             '<span>Show sprite colliders</span>'
         );
         gf.debug.ui.bindDelegate(col, 'click', 'gf_debug_toggleCollisions', this.toggleCollisions.bind(this), 'input');
-        div.appendChild(col);
+        pad.appendChild(col);
+
+        div.appendChild(pad);
 
         return div;
     },
@@ -723,6 +755,123 @@ gf.inherits(gf.debug.Minimap, Object, {
         );
     }
 });
+//based on: http://www.html5rocks.com/en/tutorials/doodles/gamepad/
+var STICK_OFFSET = 10,
+btnIds = [
+    'button-1',
+    'button-2',
+    'button-3',
+    'button-4',
+    'button-left-shoulder-top',
+    'button-right-shoulder-top',
+    'button-left-shoulder-bottom',
+    'button-right-shoulder-bottom',
+    'button-select',
+    'button-start',
+    'stick-1',
+    'stick-2',
+    'button-dpad-top',
+    'button-dpad-bottom',
+    'button-dpad-left',
+    'button-dpad-right'
+],
+axisIds = [
+    ['stick-1-axis-x', 'stick-1'],
+    ['stick-1-axis-y', 'stick-1'],
+    ['stick-2-axis-x', 'stick-2'],
+    ['stick-2-axis-y', 'stick-2']
+],
+template =
+'<div class="gf_debug_gp_buttons">' +
+    '<div class="gf_debug_gp_face" name="button-1"></div>' +
+    '<div class="gf_debug_gp_face" name="button-2"></div>' +
+    '<div class="gf_debug_gp_face" name="button-3"></div>' +
+    '<div class="gf_debug_gp_face" name="button-4"></div>' +
+    '<div class="gf_debug_gp_top-shoulder" name="button-left-shoulder-top"></div>' +
+    '<div class="gf_debug_gp_top-shoulder" name="button-right-shoulder-top"></div>' +
+    '<div class="gf_debug_gp_bottom-shoulder" name="button-left-shoulder-bottom"></div>' +
+    '<div class="gf_debug_gp_bottom-shoulder" name="button-right-shoulder-bottom"></div>' +
+    '<div class="gf_debug_gp_select-start" name="button-select"></div>' +
+    '<div class="gf_debug_gp_select-start" name="button-start"></div>' +
+    '<div class="gf_debug_gp_stick" name="stick-1"></div>' +
+    '<div class="gf_debug_gp_stick" name="stick-2"></div>' +
+    '<div class="gf_debug_gp_face" name="button-dpad-top"></div>' +
+    '<div class="gf_debug_gp_face" name="button-dpad-bottom"></div>' +
+    '<div class="gf_debug_gp_face" name="button-dpad-left"></div>' +
+    '<div class="gf_debug_gp_face" name="button-dpad-right"></div>' +
+'</div>' +
+'<div class="gf_debug_gp_labels">' +
+    '<label for="button-1">?</label>' +
+    '<label for="button-2">?</label>' +
+    '<label for="button-3">?</label>' +
+    '<label for="button-4">?</label>' +
+    '<label for="button-left-shoulder-top">?</label>' +
+    '<label for="button-right-shoulder-top">?</label>' +
+    '<label for="button-left-shoulder-bottom">?</label>' +
+    '<label for="button-right-shoulder-bottom">?</label>' +
+    '<label for="button-select">?</label>' +
+    '<label for="button-start">?</label>' +
+    '<label for="stick-1">?</label>' +
+    '<label for="stick-2">?</label>' +
+    '<label for="button-dpad-top">?</label>' +
+    '<label for="button-dpad-bottom">?</label>' +
+    '<label for="button-dpad-left">?</label>' +
+    '<label for="button-dpad-right">?</label>' +
+    '<label for="stick-1-axis-x">?</label>' +
+    '<label for="stick-1-axis-y">?</label>' +
+    '<label for="stick-2-axis-x">?</label>' +
+    '<label for="stick-2-axis-y">?</label>' +
+'</div>' +
+'<div class="gf_debug_gp_name">Grapefruit</div>';
+
+gf.debug.Gamepad = function() {
+    var el = this.element = document.createElement('div');
+    el.classList.add('gf_debug_gp');
+    el.innerHTML = template;
+};
+
+gf.inherits(gf.debug.Gamepad, Object, {
+    updateButton: function(status) {
+        var buttonEl = this.element.querySelector('[name="' + btnIds[status.code] + '"]'),
+            labelEl = this.element.querySelector('label[for="' + btnIds[status.code] + '"]');
+
+        labelEl.innerHTML = status.value.toFixed(2);
+
+        if(status.down) {
+            buttonEl.classList.add('pressed');
+            labelEl.classList.add('visible');
+        } else {
+            buttonEl.classList.remove('pressed');
+            labelEl.classList.remove('visible');
+        }
+    },
+    updateAxis: function(status) {
+        var stickEl = this.element.querySelector('[name="' + axisIds[status.code][1] + '"]'),
+            labelEl = this.element.querySelector('label[for="' + axisIds[status.code][0] + '"]'),
+            offsetVal = status.value * STICK_OFFSET;
+
+        if(status.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR || status.code === gf.input.GP_AXIS.RIGHT_ANALOGUE_HOR) {
+            stickEl.style.marginLeft = offsetVal + 'px';
+        } else {
+            stickEl.style.marginTop = offsetVal + 'px';
+        }
+
+        labelEl.innerHTML = status.value.toFixed(2);
+        if(status.value !== 0) {
+            labelEl.classList.add('visible');
+            if (status.value > 0) {
+                labelEl.classList.add('positive');
+            } else {
+                labelEl.classList.add('negative');
+            }
+        } else {
+            labelEl.classList.remove('visible');
+            labelEl.classList.remove('positive');
+            labelEl.classList.remove('negative');
+        }
+    }
+});
+
 //Some general dom helpers
 gf.debug.ui = {
     bindDelegate: function(dom, evt, cls, fn, name) {
