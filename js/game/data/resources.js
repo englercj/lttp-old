@@ -144,8 +144,8 @@ define([], function() {
         },
         // HUD
         {
-            name: 'sprite_hud',
-            src: 'assets/sprites/ui/hud.json'
+            name: 'sprite_gui',
+            src: 'assets/sprites/ui/gui.json'
         },
         {
             name: 'font_retofganon',

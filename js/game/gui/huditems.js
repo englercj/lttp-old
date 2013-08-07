@@ -21,14 +21,14 @@ define([
     });
 
     var MagicMeter = function(pos, value) {
-        this.textures = gf.assetCache.sprite_hud;
+        this.textures = gf.assetCache.sprite_gui;
 
         HudItem.call(this, pos, 'magic', value);
 
         //add the background
-        this.sprites.create(this.textures['magic_meter.png']);
+        this.sprites.create(this.textures['hud/magic_meter.png']);
         //add the value
-        this.sprValue = this.sprites.create(this.textures['magic_meter_value.png']);
+        this.sprValue = this.sprites.create(this.textures['hud/magic_meter_value.png']);
 
         this.maxHeight = this.sprValue.height;
         this.sprValue.position.x = 6;
@@ -47,11 +47,11 @@ define([
     });
 
     var LifeMeter = function(pos, value) {
-        this.textures = gf.assetCache.sprite_hud;
+        this.textures = gf.assetCache.sprite_gui;
 
         HudItem.call(this, pos, 'life', value);
 
-        this.dash1 = this.sprites.create(this.textures['life-dash.png']);
+        this.dash1 = this.sprites.create(this.textures['hud/life-dash.png']);
         this.dash1.position.x = this.dash1X = 35;
         this.dash1.position.y = this.dashY = 0;
 
@@ -59,7 +59,7 @@ define([
         this.life.position.x = this.lifeX = 65;
         this.life.position.y = this.lifeY = -7;
 
-        this.dash2 = this.sprites.create(this.textures['life-dash.png']);
+        this.dash2 = this.sprites.create(this.textures['hud/life-dash.png']);
         this.dash2.position.x = this.dash2X = 100;
         this.dash1.position.y = this.dashY = 0;
         this.set(value);
@@ -78,14 +78,14 @@ define([
                 }
             }
 
-            this.dash1 = this.sprites.create(this.textures['life-dash.png']);
-            this.dash1.setTexture(this.textures['life-dash.png']);
+            this.dash1 = this.sprites.create(this.textures['hud/life-dash.png']);
+            this.dash1.setTexture(this.textures['hud/life-dash.png']);
             this.dash1.position.x = this.dash1X;
             this.dash1.position.y = this.dashY;
             this.dash1.visible = true;
 
-            this.dash2 = this.sprites.create(this.textures['life-dash.png']);
-            this.dash2.setTexture(this.textures['life-dash.png']);
+            this.dash2 = this.sprites.create(this.textures['hud/life-dash.png']);
+            this.dash2.setTexture(this.textures['hud/life-dash.png']);
             this.dash2.position.x = this.dash2X;
             this.dash2.position.y = this.dashY;
             this.dash2.visible = true;
@@ -109,10 +109,10 @@ define([
                     spr,
                     tx;
                 if(hp < 1) { //partial
-                    tx = this.textures['heart-half.png'];
+                    tx = this.textures['hud/heart-half.png'];
                     off = 2;
                 } else {
-                    tx = this.textures['heart-full.png'];
+                    tx = this.textures['hud/heart-full.png'];
                 }
 
                 spr = this.sprites.create(tx);
@@ -131,7 +131,7 @@ define([
 
             if(done < this.default) {
                 for(done; done < this.default; ++done) {
-                    var tx = this.textures['heart-empty.png'],
+                    var tx = this.textures['hud/heart-empty.png'],
                         spr = this.sprites.create(tx);
 
                     spr.setTexture(tx);
@@ -154,12 +154,12 @@ define([
     });
 
     var EquiptedItem = function(pos, value) {
-        this.textures = gf.assetCache.sprite_hud;
+        this.textures = gf.assetCache.sprite_gui;
 
         HudItem.call(this, pos, 'equipted', value);
 
         //add the frame
-        this.sprites.create(this.textures['item-frame.png']);
+        this.sprites.create(this.textures['hud/item-frame.png']);
         //this.set(value);
     };
 
@@ -181,12 +181,12 @@ define([
     });
 
     var InventoryCounter = function(pos, name, value) {
-        this.textures = gf.assetCache.sprite_hud;
+        this.textures = gf.assetCache.sprite_gui;
 
         HudItem.call(this, pos, name, value);
 
         //add the icon
-        this.icon = this.sprites.create(this.textures['indicator-' + this.name + '.png']);
+        this.icon = this.sprites.create(this.textures['hud/indicator-' + this.name + '.png']);
 
         if(name === 'rupees')
             this.icon.position.x += 13;
