@@ -13283,8 +13283,23 @@
         {
          "draworder":"topdown",
          "height":256,
-         "name":"Eastern Palance - Entrance",
-         "objects":[],
+         "name":"Eastern Palace - Entrance",
+         "objects":[
+                {
+                 "gid":5680,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2784,
+                 "y":2992
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -15716,7 +15731,7 @@
                  "name":"world_linkshouse",
                  "properties":
                     {
-                     "loc":"[128, 128]"
+                     "loc":"[105,161]"
                     },
                  "rotation":0,
                  "type":"exit",
