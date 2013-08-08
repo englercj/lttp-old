@@ -1,6 +1,3 @@
-var GUI_SCALE = 3,
-    DROP_TIME = 0.5;
-
 define([
     'game/data/constants',
     'game/data/items'
@@ -25,8 +22,8 @@ define([
 
         this._setup();
 
-        this.scale.x = this.scale.y = GUI_SCALE;
-        this.position.y = -224 * this.scale.y;
+        this.scale.x = this.scale.y = C.SCALE;
+        this.position.y = -C.HEIGHT * C.SCALE;
         this.visible = false;
     };
 
@@ -81,8 +78,8 @@ define([
             this.sounds.open.play();
 
             var self = this;
-            TweenLite.to(this.parent.position, DROP_TIME, {
-                y: 224 * this.scale.y,
+            TweenLite.to(this.parent.position, C.INVENTORY_DROP_TIME, {
+                y: C.HEIGHT * C.SCALE,
                 ease: Linear.easeNone,
                 onComplete: function() {
                     self.moving = false;

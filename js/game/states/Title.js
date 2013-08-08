@@ -50,7 +50,7 @@ define([
         this._setupIntroSprite();
         this._setupTitleSprites();
 
-        this.scale.x = this.scale.y = 3;
+        this.scale.x = this.scale.y = C.SCALE;
         this.doPlay = true;
     };
 

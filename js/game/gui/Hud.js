@@ -1,10 +1,11 @@
 define([
+    'game/data/constants',
     'game/gui/huditems'
-], function(items) {
+], function(C, items) {
     var Hud = function() {
         gf.Gui.call(this);
 
-        this.scale.x = this.scale.y = 1.5;
+        this.scale.x = this.scale.y = C.SCALE / 2;
         this.items = {};
 
         //Add magic meter
