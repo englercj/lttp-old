@@ -115,7 +115,7 @@ define([
                     self.worlds[exit.name] = self.world;
                 }
 
-                self.addChild(self.link);
+                self.world.addChildAt(self.link, self.world.children.length - 1);
                 self.lastExit = exit;
 
                 if(self.music)
