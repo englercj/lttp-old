@@ -3,15 +3,13 @@ define([
     'game/data/constants',
     'game/states/State',
     'game/entities/Link',
-    'game/gui/huditems'
-], function(store, C, State, Link, huditems) {
+    'game/gui/Hud'
+], function(store, C, State, Link, Hud) {
     var Play = function(game) {
         State.call(this, 'play', game);
 
         //initialize HUD objects
-        this.gui = new gf.Gui();
-        this.camera.addChild(this.gui);
-        huditems.initHud(this.gui);
+        this.camera.addChild(new Hud());
 
         this.worlds = {};
 

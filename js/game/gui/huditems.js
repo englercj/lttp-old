@@ -216,29 +216,7 @@ define([
         }
     });
 
-    function initHud(gui) {
-        gui.scale.x = gui.scale.y = 1.5;
-        gui.items = {};
-
-        //Add magic meter
-        gui.addChild(gui.items.magicMeter = new MagicMeter([40, 36], 1));
-
-        //Add equipted item
-        gui.addChild(gui.items.equipted = new EquiptedItem([75, 42], ''));
-
-        //Add inventory counters
-        gui.addChild(gui.items.rupees = new InventoryCounter([135, 30], 'rupees', 0));
-        gui.addChild(gui.items.bombs = new InventoryCounter([195, 30], 'bombs', 0));
-        gui.addChild(gui.items.arrows = new InventoryCounter([245, 30], 'arrows', 0));
-
-        //Add life hearts
-        gui.addChild(gui.items.life = new LifeMeter([320, 35], 3));
-
-        return gui;
-    }
-
     return {
-        initHud: initHud,
         MagicMeter: MagicMeter,
         LifeMeter: LifeMeter,
         EquiptedItem: EquiptedItem,
