@@ -1,385 +1,180 @@
 define([
-    'game/data/types'
-], function(types) {
-    return {
-        /////////////////////////////////////////////////////////
-        // Weapons!
-        ///////////////////
-        //Having these in your hand and being in an attack state will do stuffs
-        /////////////////////////////////////////////////////////
-        FIGHTER_SWORD: {
-            type: types.WEAPON.DAMAGING,
-            damage: 1,
-            range: 2,
-            knockback: 5
+], function() {
+    return [
+        //Special items
+        {
+            name: 'sword',
+            icon: 'items/sword%d.png',
+            position: [180, 160]
         },
-        MASTER_SWORD: {
-            type: types.WEAPON.DAMAGING,
-            damage: 2,
-            range: 2,
-            knockback: 5
+        {
+            name: 'shield',
+            icon: 'items/shield%d.png',
+            position: [200, 160]
         },
-        TEMPERED_SWORD: {
-            type: types.WEAPON.DAMAGING,
-            damage: 4,
-            range: 2,
-            knockback: 5
+        {
+            name: 'armor',
+            icon: 'items/armor%d.png',
+            position: [220, 160]
         },
-        GOLDEN_SWORD: {
-            type: types.WEAPON.DAMAGING,
-            damage: 8,
-            range: 2,
-            knockback: 5
+        {
+            name: 'boot',
+            icon: 'items/boot.png',
+            position: [32, 190]
         },
-        SWORD_BEAM:{
-            type: types.WEAPON.DAMAGING,
-            damage: 1,
-            range: 10,
-            projectile: true,
-            knockback: 5
+        {
+            name: 'gloves',
+            icon: 'items/gloves%d.png',
+            position: [64, 190]
         },
-        BOOMERANG: {
-            type: types.WEAPON.DAMAGING_PARALIZING,
-            damage: 0.5,
-            range: 10,
-            projectile: true,
-            roundtrip: true,
-            speed: 350,
-            knockback: 1
+        {
+            name: 'flippers',
+            icon: 'items/flippers.png',
+            position: [96, 190]
         },
-        MAGICAL_BOOMERANG: {
-            type: types.WEAPON.DAMAGING_PARALIZING,
-            damage: 0.5,
-            range: null,
-            projectile: true,
-            roundTrip: true,
-            speed: 350,
-            knockback: 1
+        {
+            name: 'pearl',
+            icon: 'items/pearl.png',
+            position: [128, 190]
         },
-        HOOKSHOT: {
-            type: types.WEAPON.PARALIZING,
-            range: 10,
-            projectile: true,
-            roundTrip: true,
-            speed: 350,
-            knockback: 1
+        {
+            name: 'heart',
+            icon: 'items/heart%d.png',
+            position: [200, 190]
         },
-        BOMB: {
-            type: types.WEAPON.DAMAGING_DESTRUCTIVE,
-            damage: 2,
-            range: 3,
-            speed: 350,
-            timeout: 3,
-            thrown: true,
-            knockback: 5
+        {
+            name: 'txtLiftNum',
+            icon: 'text/%d.png',
+            position: [67, 161]
         },
-        SUPER_BOMB: {
-            type: types.WEAPON.DAMAGING_DESTRUCTIVE_2,
-            damage: 10,
-            range: 4,
-            speed: 350,
-            timeout: 3,
-            thrown: true,
-            knockback: 5
+        {
+            name: 'txtRun',
+            icon: 'text/run.png',
+            position: [81, 176]
         },
-        HAMMER: {
-            type: types.WEAPON.DAMAGING_SMASHING,
-            damage: 4,
-            range: 1,
-            knockback: 5
+        {
+            name: 'txtSwim',
+            icon: 'text/swim.png',
+            position: [121, 176]
         },
-        BOW_ARROW: {
-            type: types.WEAPON.DAMAGING,
-            damage: 2,
-            range: 10,
-            projectile: true,
-            speed: 400,
-            knockback: 5
+        //equiptable items
+        {
+            name: 'bow',
+            icon: function(link) {
+                if(link.inventory.silver_arrows && link.inventory.arrows)
+                    return 'items/bow_and_silver_arrow.png';
+                else if(link.inventory.arrows)
+                    return 'items/bow_and_arrow.png'
+                else
+                    return 'items/bow.png';
+            },
+            _icon: 'items/bow.png',
+            position: [32, 32]
         },
-        BOW_SILVER_ARROW: {
-            type: types.WEAPON.DAMAGING,
-            damage: 100,
-            range: 10,
-            projectile: true,
-            speed: 400,
-            bossImmune: true,
-            knockback: 5
+        {
+            name: 'boomerang',
+            icon: 'items/boomerang%d.png',
+            position: [56, 32]
         },
-        ROD_FIRE: {
-            type: types.WEAPON.DAMAGING_BURNING,
-            damage: 4,
-            range: 10,
-            projectile: true,
-            speed: 400,
-            cost: 2,
-            knockback: 5
+        {
+            name: 'hookshot',
+            icon: 'items/hookshot.png',
+            position: [80, 32]
         },
-        ROD_ICE: {
-            type: types.WEAPON.DAMAGING_FREEZING,
-            damage: 4,
-            range: 10,
-            projectile: true,
-            speed: 400,
-            cost: 2,
-            knockback: 5
+        {
+            name: 'bombs',
+            icon: 'items/bomb.png',
+            position: [104, 32]
         },
-        MEDALLION_BOMBOS: {
-            type: types.WEAPON.DAMAGING,
-            damage: 50,
-            range: null,
-            cost: 5,
-            bossImmune: true
+        {
+            name: 'mushroom',
+            icon: 'items/mushroom.png',
+            position: [128, 32]
         },
-        MEDALLION_ETHER: {
-            type: types.WEAPON.DAMAGING_FREEZING,
-            damage: 25,
-            range: null,
-            cost: 5,
-            bossImmune: true
+        {
+            name: 'powder',
+            icon: 'items/magic_powder.png',
+            position: [128, 32]
         },
-        MEDALLION_QUAKE: {
-            type: types.WEAPON.DAMAGING,
-            damage: 25,
-            range: null,
-            cost: 5,
-            bossImmune: true
+        {
+            name: 'firerod',
+            icon: 'items/firerod.png',
+            position: [32, 56]
         },
-        STINGER: { //for bees
-            type: types.WEAPON.DAMAGING,
-            damage: 0.25,
-            range: 0,
-            knockback: 2
+        {
+            name: 'icerod',
+            icon: 'items/icerod.png',
+            position: [56, 56]
         },
-        LIFTED_BUSH: {
-            type: types.WEAPON.DAMAGING,
-            damage: 1,
-            range: 10,
-            thrown: true,
-            knockback: 5
+        {
+            name: 'bombos',
+            icon: 'items/bombos.png',
+            position: [80, 56]
         },
-        LIFTED_MISC: { //like pots, rocks, etc
-            type: types.WEAPON.DAMAGING,
-            damage: 4,
-            range: 10,
-            thrown: true,
-            knockback: 5
+        {
+            name: 'ether',
+            icon: 'items/ether.png',
+            position: [104, 56]
         },
-        /////////////////////////////////////////////////////////
-        // Usable Items
-        ///////////////////
-        //These items can be activated to do something, defined by their type
-        /////////////////////////////////////////////////////////
-        CANE_OF_SOMARIA: {
-            type: types.ITEM.SPAWNING,
-            entity: 'BLOCK_RED',
-            lifespan: 5000,
-            cost: 2
+        {
+            name: 'quake',
+            icon: 'items/quake.png',
+            position: [128, 56]
         },
-        CANE_OF_BYRNA: {
-            type: types.ITEM.PROTECTING,
-            cost: 2,
-            toggle: true
+        {
+            name: 'lantern',
+            icon: 'items/lantern.png',
+            position: [32, 80]
         },
-        LANTERN: {
-            type: types.ITEM.LIGHTING,
-            cost: 1
+        {
+            name: 'hammer',
+            icon: 'items/hammer.png',
+            position: [56, 80]
         },
-        MAGIC_CAPE: {
-            type: types.ITEM.INVIS,
-            cost: 2,
-            toggle: true
+        {
+            name: 'shovel',
+            icon: 'items/shovel.png',
+            position: [80, 80]
         },
-        MAGIC_POWDER: {
-            type: types.ITEM.TRANSFORM,
-            cost: 2
+        {
+            name: 'flute',
+            icon: 'items/flute.png',
+            position: [80, 80]
         },
-        FLUTE: {
-            type: types.ITEM.MUSICAL,
-            cost: 2
+        {
+            name: 'net',
+            icon: 'items/net.png',
+            position: [104, 80]
         },
-        BUG_CATCHING_NET: {
-            type: types.ITEM.CATCHING
+        {
+            name: 'book',
+            icon: 'items/book_of_mudora.png',
+            position: [128, 80]
         },
-        BOOK_OF_MUDORA: {
-            type: types.ITEM.TRANSLATING
+        {
+            name: 'bottle',
+            icon: 'items/bottle_empty.png', ///hmmmm..
+            position: [32, 104]
         },
-        BOTTLE: {
-            type: types.ITEM.CONTAINER
+        {
+            name: 'somaria',
+            icon: 'items/cane_of_somaria.png',
+            position: [56, 104]
         },
-        BOTTLE_RED: {
-            type: types.ITEM.HEALING,
-            heal: 100,
-            replaceWith: 'BOTTLE' //after use, replace with this item
+        {
+            name: 'byrna',
+            icon: 'items/cane_of_byrna.png',
+            position: [80, 104]
         },
-        BOTTLE_GREEN: {
-            type: types.ITEM.REFRESHING,
-            refresh: 100,
-            replaceWith: 'BOTTLE' //after use, replace with bottle
+        {
+            name: 'cape',
+            icon: 'items/magic_cape.png',
+            position: [104, 104]
         },
-        BOTTLE_BLUE: {
-            type: types.ITEM.HEALING_REFRESHING,
-            heal: 100,
-            refresh: 100,
-            replaceWith: 'BOTTLE' //after use, replace with bottle
-        },
-        MAGIC_MIRROR: {
-            type: types.ITEM.TELEPORTING,
-
-        },
-        /////////////////////////////////////////////////////////
-        // Modifier Items
-        ///////////////////
-        //Then items are not "usable" they just buff the player in some way
-        /////////////////////////////////////////////////////////
-        BOOTS: {
-            type: types.ITEM.ENHANCING,
-            buff: 'canSprint',
-            value: true
-        },
-        POWER_GLOVES: {
-            type: types.ITEM.ENHANCING,
-            buff: 'liftPower',
-            value: 2
-        },
-        TITANS_MITT: {
-            type: types.ITEM.ENHANCING,
-            buff: 'liftPower',
-            value: 3
-        },
-        FLIPPERS: {
-            type: types.ITEM.ENHANCING,
-            buff: 'canSwim',
-            value: true
-        },
-        MOON_PEARL: {
-            type: types.ITEM.ENHANCING,
-            buff: 'canRetainShape',
-            value: true
-        },
-        SHIELD_FIGHTER: {
-            type: types.ITEM.ENHANCING,
-            buff: 'canBlock',
-            value: true
-        },
-        SHIELD_FIRE: {
-            type: types.ITEM.ENHANCING,
-            buff: 'canBlockFire',
-            value: true
-        },
-        SHIELD_MIRROR: {
-            type: types.ITEM.ENHANCING,
-            buff: 'canReflect',
-            value: true
-        },
-        MAIL_GREEN: {
-            type: types.ITEM.ENHANCING,
-            buff: 'damageReduction',
-            value: 1
-        },
-        MAIL_BLUE: {
-            type: types.ITEM.ENHANCING,
-            buff: 'damageReduction',
-            value: 0.5
-        },
-        MAIL_RED: {
-            type: types.ITEM.ENHANCING,
-            buff: 'damageReduction',
-            value: 0.25
-        },
-        /////////////////////////////////////////////////////////
-        // Gatherable Items
-        ///////////////////
-        //Then items increase inventory for whatever they pickup
-        /////////////////////////////////////////////////////////
-        HEART_PIECE: {
-            type: types.ITEM.GATHERABLE,
-            item: 'heart_pieces',
-            count: 1
-        },
-        MAGIC_JAR_SMALL: {
-            type: types.ITEM.REFRESHING,
-            refresh: 10
-        },
-        MAGIC_JAR_LARGE: {
-            type: types.ITEM.REFRESHING,
-            refresh: 25
-        },
-        RUPEE_GREEN: {
-            type: types.ITEM.GATHERABLE,
-            item: 'rupees',
-            count: 1
-        },
-        RUPEE_BLUE: {
-            type: types.ITEM.GATHERABLE,
-            item: 'rupees',
-            count: 5
-        },
-        RUPEE_RED: {
-            type: types.ITEM.GATHERABLE,
-            item: 'rupees',
-            count: 20
-        },
-        BOMB_PIECE: { //bomb on the ground that you can gather, little different then placed bomb that is exploding
-            type: types.ITEM.GATHERABLE,
-            item: 'bombs',
-            count: 1
-        },
-        ARROW: {
-            type: types.ITEM.GATHERABLE,
-            item: 'arrows',
-            count: 1
-        },
-        /////////////////////////////////////////////////////////
-        // Quest Items
-        ///////////////////
-        //The items don't "do" anything, just for funzies
-        /////////////////////////////////////////////////////////
-        PENDANT_OF_COURAGE: { //the green one
-            type: types.ITEM.QUEST
-        },
-        PENDANT_OF_POWER: { //the blue one
-            type: types.ITEM.QUEST
-        },
-        PENDANT_OF_WISDOM: { //the red one
-            type: types.ITEM.QUEST
-        },
-        MAIDEN_CRYSTAL: {
-            type: types.ITEM.QUEST,
-            item: 'crystals',
-            count: 1
-        },
-        /////////////////////////////////////////////////////////
-        // Dungeon Items
-        ///////////////////
-        //Not sure how I want to handle these yet, so I will just put them here
-        /////////////////////////////////////////////////////////
-        DUNGEON_MAP: {
-            type: types.ITEM.ENHANCING,
-            buff: 'hasDungeonMap',
-            value: true,
-            dungeonOnly: true
-        },
-        COMPASS: {
-            type: types.ITEM.ENHANCING,
-            buff: 'hasDungeonCompass',
-            value: true,
-            dungeonOnly: true
-        },
-        BIG_KEY: {
-            type: types.ITEM.ENHANCING,
-            buff: 'hasDungeonBigKey',
-            value: true,
-            dungeonOnly: true
-        },
-        KEY: {
-            type: types.ITEM.GATHERABLE,
-            item: 'keys',
-            count: 1
-        },
-        HEART_CONTAINER: {
-            type: types.ITEM.GATHERABLE,
-            item: 'hearts',
-            count: 1
+        {
+            name: 'mirror',
+            icon: 'items/magic_mirror.png',
+            position: [128, 104]
         }
-    };
+    ];
 });

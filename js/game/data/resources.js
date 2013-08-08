@@ -142,6 +142,12 @@ define([], function() {
                 'assets/audio/effects/LTTP_LowHealth.lite.ogg'
             ]
         },
+        {
+            name: 'effect_pause_close',
+            src: [
+                'assets/audio/effects/LTTP_Pause_Close.lite.ogg'
+            ]
+        },
         // HUD
         {
             name: 'sprite_gui',

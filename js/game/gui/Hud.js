@@ -23,7 +23,17 @@ define([
     };
 
     gf.inherits(Hud, gf.Gui, {
+        updateValues: function(link) {
+            //this.items.equipted.set(link.equipted);
+            this.items.rupees.set(link.inventory.rupees);
+            this.items.bombs.set(link.inventory.bombs);
+            this.items.arrows.set(link.inventory.arrows);
 
+            this.items.magicMeter.set(link.magic / link.maxMagic);
+
+            this.items.life.max = link.maxHealth;
+            this.items.life.set(link.health);
+        }
     });
 
     return Hud;

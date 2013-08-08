@@ -20,9 +20,41 @@ define([
 
         //current inventory of the entity
         this.inventory = {
-            sword: false,
-            shield: false,
-            gloves: false
+            armor: 0,
+            arrows: 0,
+            keys: 0,
+            big_key: 0,
+            bombs: 0,
+            bombos: 0,
+            mudora: 0,
+            boomerang: 0,
+            boot: 0,
+            bow: 0,
+            byrna: 0,
+            somaria: 0,
+            crystals: 0,
+            ether: 0,
+            firerod: 0,
+            flippers: 0,
+            flute: 0,
+            gloves: 0,
+            hammer: 0,
+            heart_pieces: 0,
+            hookshot: 0,
+            icerod: 0,
+            lantern: 0,
+            cape: 0,
+            mirror: 0,
+            powder: 0,
+            mushroom: 0,
+            net: 0,
+            pearl: 0,
+            pendants: 0,
+            quake: 0,
+            rupees: 0,
+            shield: 0,
+            shovel: 0,
+            sword: 0
         };
 
         //objects currently within attack range

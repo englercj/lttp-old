@@ -51,6 +51,8 @@ define([
 
         HudItem.call(this, pos, 'life', value);
 
+        this.max = 3;
+
         this.dash1 = this.sprites.create(this.textures['hud/life-dash.png']);
         this.dash1.position.x = this.dash1X = 35;
         this.dash1.position.y = this.dashY = 0;
@@ -129,22 +131,20 @@ define([
                 }
             }
 
-            if(done < this.default) {
-                for(done; done < this.default; ++done) {
-                    var tx = this.textures['hud/heart-empty.png'],
-                        spr = this.sprites.create(tx);
+            for(done; done < this.max; ++done) {
+                var tx = this.textures['hud/heart-empty.png'],
+                    spr = this.sprites.create(tx);
 
-                    spr.setTexture(tx);
-                    spr.position.x = x;
-                    spr.position.y = y;
-                    spr.visible = true;
+                spr.setTexture(tx);
+                spr.position.x = x;
+                spr.position.y = y;
+                spr.visible = true;
 
-                    if((x / size) >= perRow) {
-                        x = 0;
-                        y += size;
-                    } else {
-                        x += size;
-                    }
+                if((x / size) >= perRow) {
+                    x = 0;
+                    y += size;
+                } else {
+                    x += size;
                 }
             }
 

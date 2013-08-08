@@ -3,13 +3,11 @@ define([
     'game/data/constants',
     'game/states/State',
     'game/entities/Link',
-    'game/gui/Hud'
-], function(store, C, State, Link, Hud) {
+    'game/gui/Hud',
+    'game/gui/Inventory'
+], function(store, C, State, Link, Hud, Inventory) {
     var Play = function(game) {
         State.call(this, 'play', game);
-
-        //initialize HUD objects
-        this.camera.addChild(new Hud());
 
         this.worlds = {};
 
@@ -45,6 +43,10 @@ define([
             this.link.magic = save.magic;
             this.link.maxMagic = save.maxMagic;
 
+            //initialize HUD objects
+            this.addChild(this.hud = new Hud());
+            this.addChild(this.inventory = new Inventory());
+
             this.gotoWorld({
                 name: save.world,
                 properties: {
@@ -60,7 +62,15 @@ define([
         },
         onToggleSaveMenu: function() {},
         onToggleMap: function() {},
-        onToggleInventory: function() {},
+        onToggleInventory: function(status) {
+            if(status.down) return;
+
+            if(this.inventory.visible) {
+                this.inventory.hide();
+            } else {
+                this.inventory.show();
+            }
+        },
         onToggleAudio: function() {
             if(this.audio._muted)
                 this.audio.unmute();
