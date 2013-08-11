@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-08-06
+ * Compiled: 2013-08-10
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -44,7 +44,7 @@ Object.freeze;Object.freeze=function(a){return typeof a=="function"?a:s(a)}}Obje
  * Copyright (c) 2012, Mat Groves
  * http://goodboydigital.com/
  *
- * Compiled: 2013-07-27
+ * Compiled: 2013-08-10
  *
  * Pixi.JS is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -9632,6 +9632,7 @@ PIXI.RenderTexture.prototype.renderWebGL = function(displayObject, position, cle
 	var children = displayObject.children;
 
 	//TODO -? create a new one??? dont think so!
+    var originalWorldTransform = displayObject.worldTransform;
 	displayObject.worldTransform = PIXI.mat3.create();//sthis.indetityMatrix;
 	// modify to flip...
 	displayObject.worldTransform[4] = -1;
@@ -9670,6 +9671,8 @@ PIXI.RenderTexture.prototype.renderWebGL = function(displayObject, position, cle
 		this.renderGroup.setRenderable(displayObject);
 		this.renderGroup.render(this.projection);
 	}
+
+    displayObject.worldTransform = originalWorldTransform;
 }
 
 
@@ -21773,6 +21776,15 @@ gf.Game = function(contId, settings) {
     this.spritepool = new gf.SpritePool();
 
     /**
+     * The input instance for this game
+     *
+     * @property input
+     * @type InputManager
+     * @readOnly
+     */
+    this.input = new gf.InputManager(this.renderer.view);
+
+    /**
      * The GameStates added to the game
      *
      * @property states
@@ -21815,7 +21827,7 @@ gf.Game = function(contId, settings) {
 
     //define getters for common properties in GameState
     var self = this;
-    ['audio', 'input', 'physics', 'camera', 'world'].forEach(function(prop) {
+    ['audio', 'physics', 'camera', 'world'].forEach(function(prop) {
         self.__defineGetter__(prop, function() {
             return self.activeState[prop];
         });
@@ -22050,9 +22062,16 @@ gf.inherits(gf.Game, Object, {
         //start render loop
         window.requestAnimFrame(this._tick.bind(this));
 
+        var dt = this.clock.getDelta();
+
+        //gather input from user
+        this.timings.inputStart = this.timings._timer.now();
+        this.input.update(dt);
+        this.timings.inputEnd = this.timings._timer.now();
+
         //update this game state
         this.timings.stateStart = this.timings._timer.now();
-        this.activeState.update(this.clock.getDelta());
+        this.activeState.update(dt);
         this.timings.stateEnd = this.timings._timer.now();
 
         //render scene
@@ -22116,15 +22135,6 @@ gf.GameState = function(name, settings) {
     this.physics = new gf.PhysicsSystem({ gravity: settings.gravity });
 
     /**
-     * The input instance for this game
-     *
-     * @property input
-     * @type InputManager
-     * @readOnly
-     */
-    this.input = null; //need to be added to a game first
-
-    /**
      * The camera you view the scene through
      *
      * @property camera
@@ -22171,8 +22181,6 @@ gf.inherits(gf.GameState, gf.DisplayObjectContainer, {
      */
     _setGame: function(game) {
         this._game = game;
-
-        this.input = new gf.InputManager(game.renderer.view);
 
         if(this.camera)
             this.removeChild(this.camera);
@@ -22249,11 +22257,6 @@ gf.inherits(gf.GameState, gf.DisplayObjectContainer, {
      * @private
      */
     update: function(dt) {
-        //gather input from user
-        this.game.timings.inputStart = this.game.timings._timer.now();
-        this.input.update(dt);
-        this.game.timings.inputEnd = this.game.timings._timer.now();
-
         //update any camera effects
         this.game.timings.cameraStart = this.game.timings._timer.now();
         this.camera.update(dt);

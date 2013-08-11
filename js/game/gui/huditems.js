@@ -1,7 +1,8 @@
 define([
+    'game/data/constants',
     'game/fonts/ReturnOfGanon',
     'game/fonts/Hud'
-], function(ReturnOfGanonFont, HudFont) {
+], function(C, ReturnOfGanonFont, HudFont) {
     var HudItem = function(pos, name, value) {
         this.name = name;
         this.value = 0;
@@ -160,21 +161,22 @@ define([
 
         //add the frame
         this.sprites.create(this.textures['hud/item-frame.png']);
-        //this.set(value);
+        this.sprites.create(this.textures['items/lantern.png']);
+
+        this.children[1].visible = false;
+        this.children[1].position.x = this.children[1].position.y = 6;
+        this.children[1].scale.x = this.children[1].scale.y = 2;
     };
 
     gf.inherits(EquiptedItem, HudItem, {
         set: function(val) {
             HudItem.prototype.set.call(this, val);
 
+            var tx = this.textures['items/' + val + '.png'];
+
             //add the sprite
-            if(!this.children[1]) {
-                this.sprites.create(val + '.png');
-            }
-            //set the sprite of the image shown
-            else {
-                this.children[1].setTexture(val + '.png');
-            }
+            this.children[1].setTexture(tx);
+            this.children[1].visible = true;
 
             return this;
         }

@@ -15,6 +15,7 @@ define([
                     maxHealth: link.maxHealth || 3,
                     magic: link.magic || 10,
                     maxMagic: link.maxMagic || 10,
+                    equipted: link.equipted || null,
                     name: name,
                     slot: slot
                 };

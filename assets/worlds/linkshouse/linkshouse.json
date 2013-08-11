@@ -32,12 +32,12 @@
          "name":"inside",
          "objects":[
                 {
-                 "gid":317,
+                 "gid":269,
                  "height":0,
                  "name":"",
                  "properties":
                     {
-
+                     "loot":"lantern"
                     },
                  "rotation":0,
                  "type":"",
@@ -47,27 +47,27 @@
                  "y":144
                 }, 
                 {
-                 "gid":266,
+                 "gid":232,
                  "height":0,
                  "name":"",
                  "properties":
                     {
-
+                     "loot":"rupees_1"
                     },
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
                  "x":41,
-                 "y":56
+                 "y":88
                 }, 
                 {
-                 "gid":266,
+                 "gid":232,
                  "height":0,
                  "name":"",
                  "properties":
                     {
-
+                     "loot":"rupees_5"
                     },
                  "rotation":0,
                  "type":"",
@@ -77,19 +77,19 @@
                  "y":72
                 }, 
                 {
-                 "gid":266,
+                 "gid":232,
                  "height":0,
                  "name":"",
                  "properties":
                     {
-
+                     "loot":"rupees_20"
                     },
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
                  "x":41,
-                 "y":88
+                 "y":56
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -119,7 +119,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "width":16,
          "x":0,
          "y":0
@@ -134,7 +134,7 @@
                  "name":"world_lightworld",
                  "properties":
                     {
-                     "loc":"[2232.5,2833]"
+                     "loc":"[2232.5,2835]"
                     },
                  "rotation":0,
                  "type":"exit",
@@ -199,15 +199,15 @@
          "tileheight":16,
          "tileproperties":
             {
-             "120":
-                {
-                 "static":"true",
-                 "type":"chest"
-                },
-             "69":
+             "35":
                 {
                  "static":"true",
                  "type":"pot"
+                },
+             "72":
+                {
+                 "static":"true",
+                 "type":"chest"
                 }
             },
          "tilewidth":16

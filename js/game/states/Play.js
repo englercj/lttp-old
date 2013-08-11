@@ -12,13 +12,19 @@ define([
         this.worlds = {};
 
         //bind some game related keys
-        this.game.input.keyboard.on(gf.input.KEY.B, this.onToggleSaveMenu.bind(this));
-        this.game.input.keyboard.on(gf.input.KEY.M, this.onToggleMap.bind(this));
-        this.game.input.keyboard.on(gf.input.KEY.I, this.onToggleInventory.bind(this));
+        this.game.input.keyboard.on(gf.input.KEY.B, this._boundToggleSaveMenu = this.onToggleSaveMenu.bind(this));
+        this.game.input.keyboard.on(gf.input.KEY.M, this._boundToggleMap = this.onToggleMap.bind(this));
+        this.game.input.keyboard.on(gf.input.KEY.I, this._boundToggleInventory = this.onToggleInventory.bind(this));
 
-        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.SELECT, this.onToggleSaveMenu.bind(this));
-        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_3, this.onToggleMap.bind(this));
-        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, this.onToggleInventory.bind(this));
+        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.SELECT, this._boundGpToggleSaveMenu = this.onToggleSaveMenu.bind(this));
+        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_3, this._boundGpToggleMap = this.onToggleMap.bind(this));
+        this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, this._boundGpToggleInventory = this.onToggleInventory.bind(this));
+
+        this._bgtx = new PIXI.RenderTexture(this.camera.size.x, this.camera.size.y);
+        this._bgspr = new gf.Sprite(this._bgtx);
+        this._bgspr.visible = false;
+
+        this.game.stage.addChildAt(this._bgspr, 0);
     };
 
     gf.inherits(Play, State, {
@@ -43,9 +49,15 @@ define([
             this.link.magic = save.magic;
             this.link.maxMagic = save.maxMagic;
 
+            //equipted item
+            this.link.equipted = save.equipted;
+
             //initialize HUD objects
             this.addChild(this.hud = new Hud());
             this.addChild(this.inventory = new Inventory());
+
+            this.hud.updateValues(this.link);
+            this.inventory.updateValues(this.link);
 
             this.gotoWorld({
                 name: save.world,
@@ -54,11 +66,48 @@ define([
                 }
             });
         },
+        stop: function() {
+            //unbind the keyboard
+            this.game.input.keyboard.off(gf.input.KEY.W, this._boundMoveUp);
+            this.game.input.keyboard.off(gf.input.KEY.S, this._boundMoveDown);
+            this.game.input.keyboard.off(gf.input.KEY.A, this._boundMoveLeft);
+            this.game.input.keyboard.off(gf.input.KEY.D, this._boundMoveRight);
+
+            this.game.input.keyboard.off(gf.input.KEY.E, this._boundUse);
+            this.game.input.keyboard.on(gf.input.KEY.V, this._boundUseItem);
+            this.game.input.keyboard.off(gf.input.KEY.M, this._boundToggleMap);
+            this.game.input.keyboard.off(gf.input.KEY.SPACE, this._boundAttack);
+
+            this.game.input.keyboard.off(gf.input.KEY.B, this._boundToggleSaveMenu);
+            this.game.input.keyboard.off(gf.input.KEY.I, this._boundToggleInventory);
+
+            //unbind the gamepad
+            this.game.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this._boundGpMoveHor);
+            this.game.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT,  this._boundGpMoveVert);
+
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_TOP, this._boundGpMoveUp);
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_BOTTOM, this._boundGpMoveDown);
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_LEFT, this._boundGpMoveLeft);
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_RIGHT, this._boundGpMoveRight);
+
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, this._boundGpUse);
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_2, this._boundGpAttack);
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_3, this._boundGpToggleMap);
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_4, this._boundGpUseItem);
+
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.SELECT, this._boundGpToggleSaveMenu);
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, this._boundGpToggleInventory);
+        },
         activateWorld: function() {
 
         },
         save: function() {
-            store.save(this.lastLoad.slot, this.lastLoad.name, this.lastExit.name, this.lastExit.properties.loc);
+            store.save(
+                this.lastLoad.slot,
+                this.lastLoad.name,
+                this.lastExit.name,
+                this.lastExit.properties.loc
+            );
         },
         onToggleSaveMenu: function() {},
         onToggleMap: function() {},
@@ -66,8 +115,19 @@ define([
             if(status.down) return;
 
             if(this.inventory.visible) {
-                this.inventory.hide();
+                var self = this,
+                    v = this.inventory.grid[this.inventory.selected.x][this.inventory.selected.y];
+
+                if(!this.inventory.empty) {
+                    this.link.equipted = v.item.name;
+                    this.hud.updateValues(this.link);
+                }
+
+                this.inventory.hide(function() {
+                    self.resume();
+                });
             } else {
+                this.pause();
                 this.inventory.show();
             }
         },
@@ -76,6 +136,25 @@ define([
                 this.audio.unmute();
             else
                 this.audio.mute();
+        },
+        pause: function() {
+            //render the current world onto a texture (excluding camera)
+            this.camera.visible = false;
+            this._bgtx.render(this.game.stage);
+            this._bgspr.visible = true;
+
+            //turn the camera back on
+            this.camera.visible = true;
+
+            //stop physics updates
+            this.physics.pause();
+            //stop updates to the world
+            this.world.visible = false;
+        },
+        resume: function() {
+            this._bgspr.visible = false;
+            this.physics.resume();
+            this.world.visible = true;
         },
         gotoWorld: function(exit, vec) {
             if(typeof exit === 'string')
@@ -239,7 +318,61 @@ define([
             l.enablePhysics(this.physics);
             l.addAttackSensor(this.physics);
 
+            //bind the keyboard
+            this.game.input.keyboard.on(gf.input.KEY.W, this._boundMoveUp = this.onMove.bind(this, 'up'));
+            this.game.input.keyboard.on(gf.input.KEY.S, this._boundMoveDown = this.onMove.bind(this, 'down'));
+            this.game.input.keyboard.on(gf.input.KEY.A, this._boundMoveLeft = this.onMove.bind(this, 'left'));
+            this.game.input.keyboard.on(gf.input.KEY.D, this._boundMoveRight = this.onMove.bind(this, 'right'));
+
+            this.game.input.keyboard.on(gf.input.KEY.E, this._boundUse = this.onUse.bind(this));
+            this.game.input.keyboard.on(gf.input.KEY.V, this._boundUseItem = this.onUseItem.bind(this));
+            this.game.input.keyboard.on(gf.input.KEY.SPACE, this._boundAttack = this.onAttack.bind(this));
+
+            //bind the gamepad
+            this.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this._boundGpMoveHor = this.onGpMove.bind(this));
+            this.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT,  this._boundGpMoveVert = this.onGpMove.bind(this));
+            this.game.input.gamepad.sticks.threshold = 0.35;
+
+            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_TOP, this._boundGpMoveUp = this.onMove.bind(this, 'up'));
+            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_BOTTOM, this._boundGpMoveDown = this.onMove.bind(this, 'down'));
+            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_LEFT, this._boundGpMoveLeft = this.onMove.bind(this, 'left'));
+            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_RIGHT, this._boundGpMoveRight = this.onMove.bind(this, 'right'));
+
+            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, this._boundGpUse = this.onUse.bind(this));
+            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, this._boundGpAttack = this.onAttack.bind(this));
+            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_4, this._boundGpUseItem = this.onUseItem.bind(this));
+
             return l;
+        },
+        onMove: function(dir, status) {
+            if(this.inventory.visible)
+                this.inventory.onMove(dir, status);
+            else
+                this.link.onWalk(dir, status);
+        },
+        onGpMove: function(status) {
+            if(this.inventory.visible)
+                this.inventory.onGpMove(status);
+            else
+                this.link.onGpWalk(status);
+        },
+        onUse: function(status) {
+            //if(this.inventory.visible)
+            //    this.inventory.onSelect(status);
+            //else
+                this.link.onUse(status);
+        },
+        onUseItem: function(status) {
+            //if(this.inventory.visible)
+            //    this.inventory.
+            //else
+                this.link.onUseItem(status);
+        },
+        onAttack: function(status) {
+            //if(this.inventory.visible)
+            //    this.inventory.onSelect(status);
+            //else
+                this.link.onAttack(status);
         }
     });
 

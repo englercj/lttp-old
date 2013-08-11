@@ -10,9 +10,6 @@ define([
         //current health of this entity
         this.health = 3;
 
-        //loot of the entity that is dropped when it dies
-        this.loot = [];
-
         //moveSpeed the ent moves at
         this.moveSpeed = 75;
 
@@ -25,6 +22,21 @@ define([
     };
 
     gf.inherits(Entity, gf.AnimatedSprite, {
+        damage: function(num) {
+            this.health -= num;
+
+            if(this.health < 0)
+                this.health = 0;
+
+            if(!this.health)
+                this.emit('die');
+        },
+        heal: function(num) {
+            this.health += num;
+
+            if(this.health > this.maxHealth)
+                this.health = this.maxHealth;
+        },
         _addDirectionalFrames: function(type, num, speed, loop) {
             this._addFrames([
                 type + '_left',

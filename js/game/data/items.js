@@ -69,112 +69,134 @@ define([
                     return 'items/bow.png';
             },
             _icon: 'items/bow.png',
-            position: [32, 32]
+            position: [32, 32],
+            grid: [0, 0]
         },
         {
             name: 'boomerang',
             icon: 'items/boomerang%d.png',
-            position: [56, 32]
+            position: [56, 32],
+            grid: [1, 0]
         },
         {
             name: 'hookshot',
             icon: 'items/hookshot.png',
-            position: [80, 32]
+            position: [80, 32],
+            grid: [2, 0]
         },
         {
             name: 'bombs',
             icon: 'items/bomb.png',
-            position: [104, 32]
+            position: [104, 32],
+            grid: [3, 0]
         },
         {
             name: 'mushroom',
             icon: 'items/mushroom.png',
-            position: [128, 32]
+            position: [128, 32],
+            grid: [4, 0]
         },
         {
             name: 'powder',
             icon: 'items/magic_powder.png',
-            position: [128, 32]
+            position: [128, 32],
+            grid: [4, 0]
         },
         {
             name: 'firerod',
             icon: 'items/firerod.png',
-            position: [32, 56]
+            position: [32, 56],
+            grid: [0, 1]
         },
         {
             name: 'icerod',
             icon: 'items/icerod.png',
-            position: [56, 56]
+            position: [56, 56],
+            grid: [1, 1]
         },
         {
             name: 'bombos',
             icon: 'items/bombos.png',
-            position: [80, 56]
+            position: [80, 56],
+            grid: [2, 1]
         },
         {
             name: 'ether',
             icon: 'items/ether.png',
-            position: [104, 56]
+            position: [104, 56],
+            grid: [3, 1]
         },
         {
             name: 'quake',
             icon: 'items/quake.png',
-            position: [128, 56]
+            position: [128, 56],
+            grid: [4, 1]
         },
         {
             name: 'lantern',
             icon: 'items/lantern.png',
-            position: [32, 80]
+            position: [32, 80],
+            grid: [0, 2]
         },
         {
             name: 'hammer',
             icon: 'items/hammer.png',
-            position: [56, 80]
+            position: [56, 80],
+            grid: [1, 2]
         },
         {
             name: 'shovel',
             icon: 'items/shovel.png',
-            position: [80, 80]
+            position: [80, 80],
+            grid: [2, 2]
         },
         {
             name: 'flute',
             icon: 'items/flute.png',
-            position: [80, 80]
+            position: [80, 80],
+            grid: [2, 2]
         },
         {
             name: 'net',
             icon: 'items/net.png',
-            position: [104, 80]
+            position: [104, 80],
+            grid: [3, 2]
         },
         {
             name: 'book',
             icon: 'items/book_of_mudora.png',
-            position: [128, 80]
+            position: [128, 80],
+            grid: [4, 2]
         },
         {
             name: 'bottle',
             icon: 'items/bottle_empty.png', ///hmmmm..
-            position: [32, 104]
+            position: [32, 104],
+            grid: [0, 3]
         },
         {
             name: 'somaria',
             icon: 'items/cane_of_somaria.png',
-            position: [56, 104]
+            position: [56, 104],
+            grid: [1, 3]
         },
         {
             name: 'byrna',
             icon: 'items/cane_of_byrna.png',
-            position: [80, 104]
+            position: [80, 104],
+            grid: [2, 3]
         },
         {
             name: 'cape',
             icon: 'items/magic_cape.png',
-            position: [104, 104]
+            position: [104, 104],
+            grid: [3, 3]
         },
         {
             name: 'mirror',
             icon: 'items/magic_mirror.png',
-            position: [128, 104]
+            position: [128, 104],
+            grid: [4, 3]
         }
     ];
 });

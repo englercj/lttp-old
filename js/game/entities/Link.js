@@ -1,8 +1,9 @@
 define([
     'game/data/constants',
     'game/entities/Entity',
-    'game/entities/misc/Smash'
-], function(C, Entity, Smash) {
+    'game/entities/misc/Smash',
+    'game/entities/items/WorldItem'
+], function(C, Entity, Smash, WorldItem) {
     var Link = function(spritesheet) {
         Entity.call(this, spritesheet);
 
@@ -80,7 +81,8 @@ define([
         this.sounds = {
             lift: gf.assetCache.effect_lift,
             throw: gf.assetCache.effect_throw,
-            openChest: gf.assetCache.effect_open_chest
+            openChest: gf.assetCache.effect_chest,
+            itemFanfaire: gf.assetCache.effect_item_fanfaire
         };
 
         for(var s in this.sounds) {
@@ -88,8 +90,6 @@ define([
             lttp.play.audio.attach(this.sounds[s]);
         }
 
-        this.bindKeys();
-        this.bindGamepad();
         this.addAnimations();
 
         this.anchor.x = this.anchor.y = 0.5;
@@ -100,34 +100,13 @@ define([
         window.link = this;
 
         this.skipExit = false;
+
+        this.itempool = new gf.ObjectPool(WorldItem);
+
+        this.equipted = null;
     };
 
     gf.inherits(Link, Entity, {
-        bindKeys: function() {
-            //bind the keyboard
-            lttp.game.input.keyboard.on(gf.input.KEY.W, this.onWalk.bind(this, 'up'));
-            lttp.game.input.keyboard.on(gf.input.KEY.S, this.onWalk.bind(this, 'down'));
-            lttp.game.input.keyboard.on(gf.input.KEY.A, this.onWalk.bind(this, 'left'));
-            lttp.game.input.keyboard.on(gf.input.KEY.D, this.onWalk.bind(this, 'right'));
-
-            lttp.game.input.keyboard.on(gf.input.KEY.E, this.onUse.bind(this));
-            lttp.game.input.keyboard.on(gf.input.KEY.SPACE, this.onAttack.bind(this));
-        },
-        bindGamepad: function() {
-            //bind the gamepad
-            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this.onGpWalk.bind(this));
-            lttp.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this.onGpWalk.bind(this));
-            lttp.game.input.gamepad.sticks.threshold = 0.35;
-
-            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_TOP, this.onWalk.bind(this, 'up'));
-            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_BOTTOM, this.onWalk.bind(this, 'down'));
-            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_LEFT, this.onWalk.bind(this, 'left'));
-            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_RIGHT, this.onWalk.bind(this, 'right'));
-
-            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, this.onUse.bind(this));
-            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, this.onAttack.bind(this));
-            lttp.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_4, this.onUseItem.bind(this));
-        },
         addAnimations: function() {
             //add walking animations
             this._addDirectionalFrames('walk', 8, 0.4, true);
@@ -338,15 +317,66 @@ define([
         },
         //Uses the currently equipted item
         onUseItem: function() {
+            //TODO: Use item somehow...maybe via items[eqipted].use() or something?
+        },
+        dropLoot: function(item) {
+            if(!item.properties.loot) return;
 
+            var obj = this.itempool.create();
+
+            obj.setup(item, this._psystem);
+            this.parent.addChild(obj);
+        },
+        collectLoot: function(obj) {
+            switch(obj.type) {
+                case 'heart':
+                    this.heal(1);
+                    break;
+
+                case 'arrows':
+                case 'bombs':
+                case 'rupees':
+                    this.inventory[obj.type] += obj.value;
+                    break;
+            }
+
+            obj.pickup();
+            this.itempool.free(obj);
+            lttp.play.hud.updateValues(this);
         },
         openChest: function(chest) {
-            var loot = chest.properties.loot;
+            this.lock();
 
-            chest.setTexture(gf.assetCache.sprite_worlditems['slice25_25.png']);
+            //open chest
+            chest.setTexture(gf.assetCache.sprite_worlditems['dungeon/chest_open.png']);
             this.sounds.openChest.play();
 
-            //TODO: GIVE LOOT
+            //show loot
+            var obj = this.itempool.create();
+            this.parent.addChild(obj);
+            obj.setup(chest);
+            obj.position.y -= 5;
+
+            //small animation
+            var self = this;
+            setTimeout(function() {
+                self.sounds.itemFanfaire.play();
+            }, 100);
+            TweenLite.to(obj.position, 1.5, {
+                y: '-=5',
+                ease: Linear.easenone,
+                onComplete: function() {
+                    //TODO: SHOW DIALOG
+                    self.unlock();
+                    self.itempool.free(obj);
+                    obj.visible = false;
+                }
+            })
+
+            //update hud
+            this.inventory[chest.properties.loot]++;
+            lttp.play.hud.updateValues(this);
+            lttp.play.inventory.updateValues(this);
         },
         readSign: function(sign) {
 
@@ -362,7 +392,11 @@ define([
 
             //make it on top
             item.parent.removeChild(item);
-            lttp.play.addChild(item);
+            this.parent.addChild(item);
+
+            if(item.properties.loot) {
+                this.dropLoot(item);
+            }
 
             this.gotoAndPlay('lift_' + this.lastDir);
             this.sounds.lift.play();
@@ -629,9 +663,17 @@ define([
                     this.skipExit = false;
                 else
                     lttp.play.gotoWorld(obj, vec);
-            } else if(!obj.sensor) {
+            }
+            //colliding with a blocking object
+            else if(!obj.sensor) {
                 this.colliding.push(obj);
                 //this._doBlockedAnim();
+            }
+            //colliding with a sensor object
+            else {
+                //pickup some loot
+                if(obj.loot)
+                    this.collectLoot(obj);
             }
         },
         _separate: function(obj, colShape, myShape) {

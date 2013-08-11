@@ -24,7 +24,7 @@ define([], function() {
         },
         {
             name: 'sprite_worlditems',
-            src: 'assets/worlds/shared_tiles/overworlditems.json'
+            src: 'assets/sprites/misc/overworlditems.json'
         },
         {
             name: 'sprite_intro',
@@ -89,12 +89,6 @@ define([], function() {
             ]
         },
         {
-            name: 'effect_open_chest',
-            src: [
-                'assets/audio/effects/LTTP_Chest.lite.ogg'
-            ]
-        },
-        {
             name: 'effect_smash',
             src: [
                 'assets/audio/effects/LTTP_Shatter.lite.ogg'
@@ -146,6 +140,43 @@ define([], function() {
             name: 'effect_pause_close',
             src: [
                 'assets/audio/effects/LTTP_Pause_Close.lite.ogg'
+            ]
+        },
+        // Item effects
+        {
+            name: 'effect_chest',
+            src: [
+                'assets/audio/effects/LTTP_Chest.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_chest_appear',
+            src: [
+                'assets/audio/effects/LTTP_Chest_Appears.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_item',
+            src: [
+                'assets/audio/effects/LTTP_Item.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_item_fanfaire',
+            src: [
+                'assets/audio/effects/LTTP_ItemFanfare_Stereo.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_rupee1',
+            src: [
+                'assets/audio/effects/LTTP_Rupee1.lite.ogg'
+            ]
+        },
+        {
+            name: 'effect_rupee2',
+            src: [
+                'assets/audio/effects/LTTP_Rupee2.lite.ogg'
             ]
         },
         // HUD

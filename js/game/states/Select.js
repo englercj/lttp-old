@@ -4,7 +4,7 @@ define([
     'game/utility/storage',
     'game/data/constants',
     'game/states/State',
-    'game/fonts/ReturnOfGanon',
+    'game/fonts/ReturnOfGanon'
 ], function(store, C, State, ReturnOfGanonFont) {
     var Select = function(game) {
         State.call(this, 'mainmenu', game);
@@ -58,7 +58,6 @@ define([
         this.activate('select');
         this.selected = 0;
 
-        this.ignore = true;
         this.pnameI = 0;
     };
 
@@ -92,7 +91,7 @@ define([
         stop: function() {
             State.prototype.stop.call(this);
 
-            this.input.keyboard.off(gf.input.KEY.DOWN, this._boundMoveDown);
+            this.game.input.keyboard.off(gf.input.KEY.DOWN, this._boundMoveDown);
             this.game.input.keyboard.off(gf.input.KEY.UP, this._boundMoveUp);
             this.game.input.keyboard.off(gf.input.KEY.LEFT, this._boundMoveLeft);
             this.game.input.keyboard.off(gf.input.KEY.RIGHT, this._boundMoveRight);
@@ -209,11 +208,6 @@ define([
         onSelect: function(status) {
             if(!status.down)
                 return;
-
-            if(this.ignore) {
-                this.ignore = false;
-                return;
-            }
 
             if(this.active === 'select') {
                 if(this.selected <= 2) {
