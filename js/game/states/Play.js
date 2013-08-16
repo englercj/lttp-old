@@ -194,7 +194,12 @@ define([
                     self.worlds[exit.name] = self.world;
                 }
 
-                self.world.addChildAt(self.link, self.world.children.length - 1);
+                var player = self.world.findLayer('player');
+                if(player)
+                    player.addChild(self.link);
+                else
+                    self.world.addChild(self.link);
+
                 self.lastExit = exit;
 
                 if(self.music)
