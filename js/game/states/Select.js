@@ -1,11 +1,11 @@
 var TEXT_SCALE = 1.5;
 
 define([
-    'game/utility/storage',
     'game/data/constants',
     'game/states/State',
-    'game/fonts/ReturnOfGanon'
-], function(store, C, State, ReturnOfGanonFont) {
+    'game/fonts/ReturnOfGanon',
+    'game/utility/saves/LinkSave'
+], function(C, State, ReturnOfGanonFont, LinkSave) {
     var Select = function(game) {
         State.call(this, 'mainmenu', game);
 
@@ -211,10 +211,10 @@ define([
 
             if(this.active === 'select') {
                 if(this.selected <= 2) {
-                    if(!this.saves[this.selected]) {
+                    if(!this.saves[this.selected].data) {
                         this.activate('register');
                     } else {
-                        this.emit('select', this.saves[this.selected]);
+                        this.emit('select', this.saves[this.selected].data);
                     }
                 } else if(this.selected === 3) {
                     this.sounds.error.play();
@@ -234,8 +234,8 @@ define([
                     if(!n.trim()) {
                         return this.activate('select')
                     } else {
-                        //save new file for name
-                        store.save(this.selected, n.split('').filter(function(ch, i) { return (i % 2 === 0); }).join(''));
+                        var ls = new LinkSave(this.selected, n.split('').filter(function(ch, i) { return (i % 2 === 0); }).join(''));
+                        ls.save();
                         this.sounds.select.play();
                         return this.activate('select');
                     }
@@ -293,13 +293,19 @@ define([
             }
 
             if(name === 'select') {
-                var s = this.saves = store.loadAll();
+                var s = this.saves = [
+                    new LinkSave(0),
+                    new LinkSave(1),
+                    new LinkSave(2)
+                ];
 
                 for(var i = 0; i < s.length; ++i) {
                     var n = i + 1,
                         sv = s[i];
 
-                    this['slot' + n].setText(n + '.' + (sv ? sv.name : ''));
+                    sv.load();
+
+                    this['slot' + n].setText(n + '.' + (sv.data ? sv.data.name : ''));
                     //TODO: set hearts
                     //TODO: link icon
                 }

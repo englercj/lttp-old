@@ -1,11 +1,11 @@
 define([
-    'game/utility/storage',
     'game/data/constants',
     'game/states/State',
     'game/entities/Link',
     'game/gui/Hud',
-    'game/gui/Inventory'
-], function(store, C, State, Link, Hud, Inventory) {
+    'game/gui/Inventory',
+    'game/utility/saves/LinkSave'
+], function(C, State, Link, Hud, Inventory, LinkSave) {
     var Play = function(game) {
         State.call(this, 'play', game);
 
@@ -102,12 +102,13 @@ define([
 
         },
         save: function() {
-            store.save(
+            var sv = new LinkSave(
                 this.lastLoad.slot,
                 this.lastLoad.name,
                 this.lastExit.name,
                 this.lastExit.properties.loc
             );
+            sv.save();
         },
         onToggleSaveMenu: function() {},
         onToggleMap: function() {},
