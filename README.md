@@ -49,13 +49,8 @@ and misc details of the game:
 
 Below is the current TODO list for the project:
 
-* Zone Confinement
-* Collision Edge Rolling
-* Zone entities
 * Entity Interaction (lifting, pushing, cutting, opening chests, etc)
-* Entity Collisions
 * Item Management
-* Combat
 * Dialog
 * Cutscenes
 * First Dungeon (palace)
