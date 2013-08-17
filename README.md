@@ -49,20 +49,15 @@ and misc details of the game:
 
 Below is the current TODO list for the project:
 
-* Zone Confinement
-* Collision Edge Rolling
-* Zone entities
 * Entity Interaction (lifting, pushing, cutting, opening chests, etc)
-* Entity Collisions
 * Item Management
-* Combat
 * Dialog
 * Cutscenes
 * First Dungeon (palace)
 
 ### License and Legal
 
-This code-base is released under the [Mozilla Public License 2.0](http://www.mozilla.org/MPL/2.0/).
+This code-base is released under the [MIT License](http://opensource.org/licenses/MIT).
 
 All dependencies are released under their own respective licenses.
 
