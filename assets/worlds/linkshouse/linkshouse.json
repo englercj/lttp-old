@@ -139,9 +139,9 @@
                  "rotation":0,
                  "type":"exit",
                  "visible":true,
-                 "width":16,
-                 "x":120,
-                 "y":180
+                 "width":28,
+                 "x":115,
+                 "y":187
                 }],
          "opacity":1,
          "type":"objectgroup",

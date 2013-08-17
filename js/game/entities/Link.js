@@ -346,6 +346,7 @@ define([
         },
         openChest: function(chest) {
             this.lock();
+            this.gotoAndStop('lift_walk_down');
 
             //open chest
             chest.setTexture(gf.assetCache.sprite_worlditems['dungeon/chest_open.png']);
@@ -529,8 +530,8 @@ define([
             this._setMoveAnimation();
             this.setVelocity(this.movement);
         },
-        _setMoveAnimation: function() {
-            var anim = (this.movement.x || this.movement.y) ? 'walk' : 'idle';
+        _setMoveAnimation: function(force) {
+            var anim = force || ((this.movement.x || this.movement.y) ? 'walk' : 'idle');
             //clearTimeout(this._toBlockedAnim);
 
             if(this.carrying) {

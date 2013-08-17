@@ -123,6 +123,21 @@ define([
                 }
             });
         },
+        _selectItem: function(name) {
+            var x, y;
+
+            for(x = 0; x < this.grid.length; ++x) {
+                for(y = 0; y < this.grid[x].length; ++y) {
+                    if(this.grid[x][y].item.name === name) {
+                        this.selected.x = x;
+                        this.selected.y = y;
+                        break;
+                    }
+                }
+            }
+
+            this._moveSelector();
+        },
         _setup: function() {
             //add background
             this.addChild(new gf.Sprite(gf.assetCache.sprite_gui['inventory.png']));
