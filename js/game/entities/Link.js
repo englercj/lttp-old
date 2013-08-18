@@ -220,7 +220,7 @@ define([
         },
         //when attack key is pressed
         onAttack: function(e) {
-            if(!this.inventory.sword)
+            if(!this.inventory.sword || this.carrying)
                 return;
 
             if(e.originalEvent)
