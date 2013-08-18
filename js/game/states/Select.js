@@ -72,6 +72,11 @@ define([
             this.game.input.keyboard.on(gf.input.KEY.LEFT, this._boundMoveLeft = this.onMove.bind(this, 'left'));
             this.game.input.keyboard.on(gf.input.KEY.RIGHT, this._boundMoveRight = this.onMove.bind(this, 'right'));
 
+            this.game.input.keyboard.on(gf.input.KEY.S, this._boundMoveDownS = this.onMove.bind(this, 'down'));
+            this.game.input.keyboard.on(gf.input.KEY.W, this._boundMoveUpW = this.onMove.bind(this, 'up'));
+            this.game.input.keyboard.on(gf.input.KEY.A, this._boundMoveLeftA = this.onMove.bind(this, 'left'));
+            this.game.input.keyboard.on(gf.input.KEY.D, this._boundMoveRightD = this.onMove.bind(this, 'right'));
+
             this.game.input.keyboard.on(gf.input.KEY.ENTER, this._boundSelect1 = this.onSelect.bind(this));
             this.game.input.keyboard.on(gf.input.KEY.SPACE, this._boundSelect2 = this.onSelect.bind(this));
 
@@ -95,6 +100,11 @@ define([
             this.game.input.keyboard.off(gf.input.KEY.UP, this._boundMoveUp);
             this.game.input.keyboard.off(gf.input.KEY.LEFT, this._boundMoveLeft);
             this.game.input.keyboard.off(gf.input.KEY.RIGHT, this._boundMoveRight);
+
+            this.game.input.keyboard.off(gf.input.KEY.S, this._boundMoveDownS);
+            this.game.input.keyboard.off(gf.input.KEY.W, this._boundMoveUpW);
+            this.game.input.keyboard.off(gf.input.KEY.A, this._boundMoveLeftA);
+            this.game.input.keyboard.off(gf.input.KEY.D, this._boundMoveRightD);
 
             this.game.input.keyboard.off(gf.input.KEY.ENTER, this._boundSelect1);
             this.game.input.keyboard.off(gf.input.KEY.SPACE, this._boundSelect2);
