@@ -5,6 +5,7 @@ define([
         ':': 'colon',
         ';': 'semicolon',
 
+        "'": 'comma',
         ',': 'comma',
         '-': 'dash',
         '!': 'exclamation',
@@ -23,19 +24,25 @@ define([
         map[c] = {
             yoffset: 4,
             name: map[c]
-        }
+        };
     });
 
     '<>'.split('').forEach(function(c) {
         map[c] = {
             yoffset: -4,
             name: map[c]
-        }
+        };
     });
+
+    map["'"] = {
+        yoffset: -16,
+        name: map["'"]
+    };
 
     var ReturnOfGanon = function() {
         gf.TextureFont.call(this, 'font_retofganon', { ext: '.png', map: map });
-        this.lineWidth = 1.35;
+        this.lineWidth = 1;
+        this.lineHeight = 1.25;
         this.spaceSize = 10;
     };
 

@@ -4,8 +4,10 @@ define([
     'game/entities/Link',
     'game/gui/Hud',
     'game/gui/Inventory',
-    'game/utility/saves/LinkSave'
-], function(C, State, Link, Hud, Inventory, LinkSave) {
+    'game/gui/Dialog',
+    'game/utility/saves/LinkSave',
+    'game/utility/saves/ZoneSave'
+], function(C, State, Link, Hud, Inventory, Dialog, LinkSave, ZoneSave) {
     var Play = function(game) {
         State.call(this, 'play', game);
 
@@ -31,38 +33,41 @@ define([
         start: function(save) {
             State.prototype.start.call(this);
 
-            this.lastLoad = save;
+            this.linkSave = save;
+
+            var data = this.lastLoad = save.data;
 
             //create link
             this.link = this.createLink();
 
             //set inventory
-            for(var k in save.inventory) {
-                this.link.inventory[k] = save.inventory[k];
+            for(var k in data.inventory) {
+                this.link.inventory[k] = data.inventory[k];
             }
 
             //set health
-            this.link.health = save.health;
-            this.link.maxHealth = save.maxHealth;
+            this.link.health = data.health;
+            this.link.maxHealth = data.maxHealth;
 
             //set magic
-            this.link.magic = save.magic;
-            this.link.maxMagic = save.maxMagic;
+            this.link.magic = data.magic;
+            this.link.maxMagic = data.maxMagic;
 
             //equipted item
-            this.link.equipted = save.equipted;
+            this.link.equipted = data.equipted;
 
             //initialize HUD objects
             this.addChild(this.hud = new Hud());
             this.addChild(this.inventory = new Inventory());
+            this.addChild(this.dialog = new Dialog());
 
             this.hud.updateValues(this.link);
             this.inventory.updateValues(this.link);
 
             this.gotoWorld({
-                name: save.world,
+                name: data.world,
                 properties: {
-                    loc: save.position
+                    loc: data.position
                 }
             });
         },
@@ -98,18 +103,6 @@ define([
             this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.SELECT, this._boundGpToggleSaveMenu);
             this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, this._boundGpToggleInventory);
         },
-        activateWorld: function() {
-
-        },
-        save: function() {
-            var sv = new LinkSave(
-                this.lastLoad.slot,
-                this.lastLoad.name,
-                this.lastExit.name,
-                this.lastExit.properties.loc
-            );
-            sv.save();
-        },
         onToggleSaveMenu: function() {},
         onToggleMap: function() {},
         onToggleInventory: function(status) {
@@ -138,6 +131,16 @@ define([
             else
                 this.audio.mute();
         },
+        showDialog: function(text) {
+            this.dialog.setText(text);
+            this.pause();
+
+            var self = this;
+            this.dialog.show(function() {
+                self.dialog.hide();
+                self.resume();
+            });
+        },
         pause: function() {
             //render the current world onto a texture (excluding camera)
             this.camera.visible = false;
@@ -156,6 +159,14 @@ define([
             this._bgspr.visible = false;
             this.physics.resume();
             this.world.visible = true;
+        },
+        _saveZoneState: function(zone) {
+            //save zone state
+            var zsv = new ZoneSave(this.lastLoad.slot, zone);
+            zsv.save();
+
+            //update link save as well
+            this.linkSave.save(this.link, this.lastExit.name, this.lastExit.properties.loc);
         },
         gotoWorld: function(exit, vec) {
             if(typeof exit === 'string')
@@ -179,6 +190,7 @@ define([
 
             if(this.world) {
                 this.world.visible = false;
+                this._saveZoneState(this.activeLayer);
                 this.world.despawnObjects();
             }
 
@@ -242,6 +254,10 @@ define([
             this.activeLayer = this.world.findLayer(zone.name);
             this.activeLayer.spawn();
 
+            //load saved layer info
+            var zsv = new ZoneSave(this.lastLoad.slot, this.activeLayer);
+            zsv.load();
+
             this.camera.unfollow();
             this.camera.unconstrain();
             if(!this.firstZone) {
@@ -269,8 +285,10 @@ define([
             }
         },
         _zoneReady: function() {
-            if(this.oldLayer)
+            if(this.oldLayer) {
+                this._saveZoneState(this.oldLayer);
                 this.oldLayer.despawn();
+            }
 
             var zone = this.activeZone;
 
@@ -302,7 +320,8 @@ define([
             if(this.link)
                 return this.link;
 
-            var l = new Link(gf.assetCache['sprite_link']);
+            var l = new Link(gf.assetCache['sprite_link']),
+                self = this;
 
             l.mass = 1;
             l.inertia = Infinity;
@@ -323,6 +342,23 @@ define([
 
             l.enablePhysics(this.physics);
             l.addAttackSensor(this.physics);
+
+            l.on('updateHud', function() {
+                self.hud.updateValues(l);
+                self.inventory.updateValues(l);
+            });
+
+            l.on('zone', function(obj, vec) {
+                self.gotoZone(obj, vec);
+            });
+
+            l.on('exit', function(obj, vec) {
+                self.gotoWorld(obj, vec);
+            });
+
+            l.on('readSign', function(sign) {
+                self.showDialog(sign.properties.text);
+            });
 
             //bind the keyboard
             this.game.input.keyboard.on(gf.input.KEY.W, this._boundMoveUp = this.onMove.bind(this, 'up'));
@@ -363,21 +399,21 @@ define([
                 this.link.onGpWalk(status);
         },
         onUse: function(status) {
-            //if(this.inventory.visible)
-            //    this.inventory.onSelect(status);
-            //else
+            if(this.dialog.visible)
+                this.dialog.onAdvance(status);
+            else
                 this.link.onUse(status);
         },
         onUseItem: function(status) {
-            //if(this.inventory.visible)
-            //    this.inventory.
-            //else
+            if(this.dialog.visible)
+                this.dialog.onAdvance(status);
+            else
                 this.link.onUseItem(status);
         },
         onAttack: function(status) {
-            //if(this.inventory.visible)
-            //    this.inventory.onSelect(status);
-            //else
+            if(this.dialog.visible)
+                this.dialog.onAdvance(status);
+            else
                 this.link.onAttack(status);
         }
     });

@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-08-10
+ * Compiled: 2013-08-18
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -24936,6 +24936,7 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
                 if(k !== 'tileprops')
                     obj.properties[k] = props[k];
 
+            obj._objIndex = i;
             this.addChild(obj);
         }
 
@@ -25031,6 +25032,8 @@ gf.inherits(gf.ObjectPool, Object, {
                 this.parent.addChild(o);
         }
 
+        o.__allocated = true;
+
         return o;
     },
     /**
@@ -25039,7 +25042,11 @@ gf.inherits(gf.ObjectPool, Object, {
      * @method free
      */
     free: function(o) {
-        this.pool.push(o);
+        //don't free something twice
+        if(o.__allocated) {
+            o.__allocated = false;
+            this.pool.push(o);
+        }
     },
     //have to do this hack around to be able to use
     //apply and new together

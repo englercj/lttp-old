@@ -214,7 +214,7 @@ define([
                     if(!this.saves[this.selected].data) {
                         this.activate('register');
                     } else {
-                        this.emit('select', this.saves[this.selected].data);
+                        this.emit('select', this.saves[this.selected]);
                     }
                 } else if(this.selected === 3) {
                     this.sounds.error.play();

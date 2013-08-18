@@ -10,5 +10,8 @@ define({
         } catch(e) {}
 
         return val;
+    },
+    remove: function(key) {
+        localStorage.removeItem(key);   
     }
 })

@@ -11149,7 +11149,7 @@
                  "name":"",
                  "properties":
                     {
-
+                     "text":"I will give 100 Rupees to the man who finds the descendants of the wise men.   THE KING"
                     },
                  "rotation":0,
                  "type":"",
@@ -15836,7 +15836,7 @@
                  "name":"world_linkshouse",
                  "properties":
                     {
-                     "loc":"[105,161]"
+                     "loc":"[120,168]"
                     },
                  "rotation":0,
                  "type":"exit",

@@ -12,7 +12,10 @@ define([
         },
         load: function() {
             return this.data = store.load(this.key);
-        } 
+        },
+        remove: function() {
+            store.remove(this.key);
+        }
     });
 
     return Save;

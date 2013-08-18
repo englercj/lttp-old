@@ -96,11 +96,6 @@ define([
 
         this.on('physUpdate', this._physUpdate.bind(this));
 
-        //make the camera track this entity
-        window.link = this;
-
-        this.skipExit = false;
-
         this.itempool = new gf.ObjectPool(WorldItem);
 
         this.equipted = null;
@@ -305,7 +300,6 @@ define([
 
                         case 'grass':
                         case 'pot':
-                            //TODO: DO DROP
                             this.liftItem(e);
                             break;
                     }
@@ -326,6 +320,8 @@ define([
 
             obj.setup(item, this._psystem);
             this.parent.addChild(obj);
+
+            this._markEmpty(item);
         },
         collectLoot: function(obj) {
             switch(obj.type) {
@@ -342,9 +338,12 @@ define([
 
             obj.pickup();
             this.itempool.free(obj);
-            lttp.play.hud.updateValues(this);
+            this.emit('updateHud');
         },
         openChest: function(chest) {
+            if(!chest.properties.loot)
+                return;
+
             this.lock();
             this.gotoAndStop('lift_walk_down');
 
@@ -376,11 +375,13 @@ define([
 
             //update hud
             this.inventory[chest.properties.loot]++;
-            lttp.play.hud.updateValues(this);
-            lttp.play.inventory.updateValues(this);
+            this.emit('updateHud');
+
+            //remove loot for next time
+            this._markEmpty(chest);
         },
         readSign: function(sign) {
-
+            this.emit('readSign', sign);
         },
         liftItem: function(item) {
             //Do lifting of the object
@@ -391,13 +392,14 @@ define([
             item.sensor = true;
             item.enablePhysics();
 
-            //make it on top
-            item.parent.removeChild(item);
-            this.parent.addChild(item);
-
+            //drop the loot
             if(item.properties.loot) {
                 this.dropLoot(item);
             }
+
+            //make it on top
+            item.parent.removeChild(item);
+            this.parent.addChild(item);
 
             this.gotoAndPlay('lift_' + this.lastDir);
             this.sounds.lift.play();
@@ -434,6 +436,13 @@ define([
             });
 
             this._setMoveAnimation();
+        },
+        _markEmpty: function(item) {
+            //mark as empty
+            if(item.parent)
+                item.parent.objects[item._objIndex].properties.loot = null;
+
+            item.properties.loot = null;
         },
         _destroyObject: function(o) {
             var t = o.properties.type,
@@ -656,14 +665,11 @@ define([
             }
             //colliding with a new zone
             else if(obj.type === 'zone') {
-                lttp.play.gotoZone(obj, vec);
+                this.emit('zone', obj, vec);
             }
             //collide with an exit
             else if(obj.type === 'exit') {
-                if(this.skipExit)
-                    this.skipExit = false;
-                else
-                    lttp.play.gotoWorld(obj, vec);
+                this.emit('exit', obj, vec);
             }
             //colliding with a blocking object
             else if(!obj.sensor) {
