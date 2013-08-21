@@ -19,6 +19,10 @@ define([], function() {
             src: 'assets/sprites/entities/link.json'
         },
         {
+            name: 'sprite_torch',
+            src: 'assets/sprites/entities/torch.json'
+        },
+        {
             name: 'sprite_smash',
             src: 'assets/sprites/misc/smash.json'
         },

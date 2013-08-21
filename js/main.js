@@ -2,8 +2,9 @@ require([
     'game/data/resources',
     'game/states/Title',
     'game/states/Select',
-    'game/states/Play'
-], function(resources, TitleState, SelectState, PlayState) {
+    'game/states/Play',
+    'game/entities/misc/Torch'
+], function(resources, TitleState, SelectState, PlayState, Torch) {
     var $game, game, muted;
 
     window.lttp = {
@@ -20,6 +21,8 @@ require([
             height: $game.height(),
             transparent: true
         });
+
+        game.spritepool.add('torch', Torch);
 
         game.loader.on('progress', function(e) {
         });

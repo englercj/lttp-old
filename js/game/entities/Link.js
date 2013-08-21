@@ -1,9 +1,11 @@
 define([
     'game/data/constants',
+    'game/data/items',
     'game/entities/Entity',
     'game/entities/misc/Smash',
+    'game/entities/misc/Particle',
     'game/entities/items/WorldItem'
-], function(C, Entity, Smash, WorldItem) {
+], function(C, ITEMS, Entity, Smash, Particle, WorldItem) {
     var Link = function(spritesheet) {
         Entity.call(this, spritesheet);
 
@@ -63,7 +65,13 @@ define([
         this.colliding = [];
 
         //a pool of sprite to do smashing animations
-        this.smashPool = new gf.ObjectPool(Smash, lttp.game);
+        this.smashpool = new gf.ObjectPool(Smash, lttp.game);
+
+        //a pool of world items to be dropped
+        this.itempool = new gf.ObjectPool(WorldItem);
+
+        //a pool of particles to throw around
+        this.particlepool = new gf.ObjectPool(Particle, this);
 
         //moveSpeed the ent moves at
         this.moveSpeed = 87;
@@ -95,8 +103,6 @@ define([
         this.anchor.x = this.anchor.y = 0.5;
 
         this.on('physUpdate', this._physUpdate.bind(this));
-
-        this.itempool = new gf.ObjectPool(WorldItem);
 
         this.equipted = null;
     };
@@ -312,6 +318,13 @@ define([
         //Uses the currently equipted item
         onUseItem: function() {
             //TODO: Use item somehow...maybe via items[eqipted].use() or something?
+            var item = ITEMS[this.equipted],
+                particle = this.particlepool.create();
+
+            particle.setup(item, this._psystem);
+            particle.fire();
+
+
         },
         dropLoot: function(item) {
             if(!item.properties.loot) return;
@@ -457,7 +470,7 @@ define([
         },
         _destroyObject: function(o) {
             var t = o.properties.type,
-                spr = this.smashPool.create();
+                spr = this.smashpool.create();
 
             spr.gotoAndPlay(t);
             spr.visible = true;
