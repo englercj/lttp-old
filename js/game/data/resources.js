@@ -10,8 +10,8 @@ define([], function() {
             src: 'assets/worlds/linkshouse/linkshouse.json'
         },
         {
-            name: 'world_darkworld',
-            src: 'assets/worlds/darkworld/darkworld.json'
+            name: 'cave-034', //hyrule castle secret entrance
+            src: 'assets/worlds/cave-034/cave-034.json'
         },
         // Sprites
         {

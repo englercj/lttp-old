@@ -174,9 +174,12 @@ define([
 
             var tx = this.textures['items/' + val + '.png'];
 
-            //add the sprite
-            this.children[1].setTexture(tx);
-            this.children[1].visible = true;
+            if(!tx) {
+                this.children[1].visible = false;
+            } else {
+                this.children[1].setTexture(tx);
+                this.children[1].visible = true;
+            }
 
             return this;
         }

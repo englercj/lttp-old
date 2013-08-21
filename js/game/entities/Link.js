@@ -344,6 +344,17 @@ define([
             if(!chest.properties.loot)
                 return;
 
+            //conditional loot based on inventory
+            var loot = chest.properties.loot.split(','),
+                i = 0;
+
+            //find the first loot item they don't have already
+            while(i < loot.length - 1 && this.inventory[loot[i]])
+                ++i;
+
+            //use this loot
+            loot = loot[i];
+
             this.lock();
             this.gotoAndStop('lift_walk_down');
 
@@ -354,7 +365,7 @@ define([
             //show loot
             var obj = this.itempool.create();
             this.parent.addChild(obj);
-            obj.setup(chest);
+            obj.setup(chest, null, loot);
             obj.position.y -= 5;
 
             //small animation
@@ -374,7 +385,7 @@ define([
             })
 
             //update hud
-            this.inventory[chest.properties.loot]++;
+            this.inventory[loot]++;
             this.emit('updateHud');
 
             //remove loot for next time

@@ -15847,10 +15847,10 @@
                 }, 
                 {
                  "height":8,
-                 "name":"",
+                 "name":"cave-034",
                  "properties":
                     {
-
+                     "loc":"[416, 144]"
                     },
                  "rotation":0,
                  "type":"exit",

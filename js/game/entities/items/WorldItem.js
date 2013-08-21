@@ -37,8 +37,8 @@ define([
     };
 
     gf.inherits(WorldItem, Entity, {
-        setup: function(item, psys) {
-            var loot = item.properties.loot,
+        setup: function(item, psys, forceLoot) {
+            var loot = forceLoot || item.properties.loot,
                 type = loot.split('_')[0],
                 value = parseInt(loot.split('_')[1], 10),
                 tx = this.textureKeys[type] || 'items/' + type + '.png';

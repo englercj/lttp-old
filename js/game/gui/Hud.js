@@ -25,8 +25,7 @@ define([
 
     gf.inherits(Hud, gf.Gui, {
         updateValues: function(link) {
-            if(link.equipted)
-                this.items.equipted.set(link.equipted);
+            this.items.equipted.set(link.equipted);
             this.items.rupees.set(link.inventory.rupees);
             this.items.bombs.set(link.inventory.bombs);
             this.items.arrows.set(link.inventory.arrows);

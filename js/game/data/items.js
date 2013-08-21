@@ -135,6 +135,8 @@ define([
         {
             name: 'lantern',
             icon: 'items/lantern.png',
+            cost: 0.5,
+            particle: ['fire/fire', 3, '.png'],
             position: [32, 80],
             grid: [0, 2]
         },
