@@ -23,7 +23,7 @@ define([
     };
 
     gf.inherits(Torch, Entity, {
-        light: function() {
+        lite: function() {
             if(this.type !== 'torch') return;
 
             this.gotoAndPlay('torch_lit');

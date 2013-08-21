@@ -10,6 +10,7 @@ define({
         ENEMY: 'enemy',
         FRIENDLY: 'friendly',
         NEUTRAL: 'neutral',
+        TILE: 'tile',
         COLLECTABLE: 'collectable'
     },
 

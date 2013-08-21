@@ -90,7 +90,8 @@ define([
             lift: gf.assetCache.effect_lift,
             throw: gf.assetCache.effect_throw,
             openChest: gf.assetCache.effect_chest,
-            itemFanfaire: gf.assetCache.effect_item_fanfaire
+            itemFanfaire: gf.assetCache.effect_item_fanfaire,
+            error: gf.assetCache.effect_error
         };
 
         for(var s in this.sounds) {
@@ -317,14 +318,24 @@ define([
         },
         //Uses the currently equipted item
         onUseItem: function() {
-            //TODO: Use item somehow...maybe via items[eqipted].use() or something?
             var item = ITEMS[this.equipted],
-                particle = this.particlepool.create();
+                particle;
 
-            particle.setup(item, this._psystem);
-            particle.fire();
+            //check magic
+            if(this.magic < item.cost) {
+                //show error
+                this.sounds.error.play();
+                return;
+            }
 
+            //take out magic cost
+            this.magic -= item.cost;
 
+            //create the item particle
+            particle = this.particlepool.create();
+            particle.run(item, this._psystem);
+
+            this.emit('updateHud');
         },
         dropLoot: function(item) {
             if(!item.properties.loot) return;
