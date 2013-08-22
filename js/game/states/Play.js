@@ -173,15 +173,49 @@ define([
                 exit = { name: exit };
 
             var self = this;
-            /*if(this.world) {
-                this.camera.close('ellipse', 2000, this.link.position, function() {
-                    self._doGotoWorld(exit, vec);
-                });
-            } else {*/
+            if(this.world) {
+                if(exit.animation) {
+                    this.link.on('complete', function() {
+                        self._doWorldTransition(exit, vec);
+                        self.link.unlock();
+                    });
+                    this.link.lock();
+                    this.link.gotoAndPlay(exit.animation);
+                }
+            } else {
                 this._doGotoWorld(exit, vec);
-            //}
+            }
         },
-        _doGotoWorld: function(exit, vec) {
+        _doWorldTransition: function(exit, vect) {
+            var animTime = 500,
+                self = this;
+
+            switch(exit.properties.transition) {
+                case 'none':
+                    this._doGotoWorld(exit, vec);
+                    break;
+
+                case 'close':
+                    this.camera.close('ellipse', 2000, this.link.position, function() {
+                        self._doGotoWorld(exit, vec);
+                    });
+
+                case 'fade':
+                default:
+                    TweenLite.to(this.world, animTime, {
+                        alpha: 0,
+                        ease: Linear.easeNone,
+                        onComplete: function() {
+                            self._doGotoWorld(exit, vec, function() {
+                                //fade in the world again
+                                TweenLite.to(self.world, animTime, { alpha: 1 });
+                            });
+                        }
+                    });
+                    break;
+            }
+        },
+        _doGotoWorld: function(exit, vec, cb) {
             var self = this;
 
             //remove the player so he isn't destroyed by the world
@@ -242,6 +276,8 @@ define([
                 );
                 self.camera.follow(self.link, gf.Camera.FOLLOW.LOCKON);
                 //self.link.reindex();
+
+                if(cb) cb();
             });
         },
         gotoZone: function(zone, vec) {
@@ -261,27 +297,79 @@ define([
             this.camera.unfollow();
             this.camera.unconstrain();
             if(!this.firstZone) {
-                var p = vec.x ? 'x' : 'y',
-                    last = 0,
-                    self = this;
-
-                $({v:0}).animate({v:this.camera.size[p]+10}, {
-                    duration: 500,
-                    easing: 'swing',
-                    step: function(now, tween) {
-                        var n = now - last;
-
-                        self.camera.pan(
-                            n * vec.x,
-                            n * vec.y
-                        );
-
-                        last = now;
-                    },
-                    done: this._zoneReady.bind(this)
-                });
+                this._zoneTransition();
             } else {
                 this._zoneReady();
+            }
+        },
+        _zoneTransition: function() {
+            var p = vec.x ? 'x' : 'y',
+                last = 0,
+                space = 10,
+                animTime = 500,
+                zone = this.activeZone,
+                self = this;
+
+            switch(zone.properties.transition) {
+                case 'fade':
+                    TweenLite.to(this.world, animTime, {
+                        alpha: 0,
+                        ease: Linear.easeNone,
+                        onComplete: function() {
+                            //pan camera
+                            self.camera.pan(
+                                (self.camera.size.x + space) * vec.x,
+                                (self.camera.size.y + space) * vec.y
+                            );
+                            //set link position
+                            self.link.position[p] += space;
+                            self.link.setPosition(
+                                self.link.position.x,
+                                self.link.position.y
+                            );
+                            //zone ready
+                            self._zoneReady();
+                            //fade in the world again
+                            TweenLite.to(self.world, animTime, { alpha: 1 });
+                        }
+                    });
+                    break;
+
+                case 'none':
+                    //pan camera
+                    self.camera.pan(
+                        (self.camera.size.x + space) * vec.x,
+                        (self.camera.size.y + space) * vec.y
+                    );
+                    //set link position
+                    self.link.position[p] += space;
+                    self.link.setPosition(
+                        self.link.position.x,
+                        self.link.position.y
+                    );
+                    //zone ready
+                    self._zoneReady();
+                    break;
+
+                case 'slide':
+                default:
+                    //tweenlite doesn't have a step callback like jq :(
+                    $({v:0}).animate({v:this.camera.size[p] + space}, {
+                        duration: animTime,
+                        easing: 'swing',
+                        step: function(now, tween) {
+                            var n = now - last;
+
+                            self.camera.pan(
+                                n * vec.x,
+                                n * vec.y
+                            );
+
+                            last = now;
+                        },
+                        done: this._zoneReady.bind(this)
+                    });
+                    break;
             }
         },
         _zoneReady: function() {
