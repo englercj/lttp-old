@@ -16,6 +16,7 @@ define([
             heart: 'hearts/heart.png',
             bombs: 'inventory/bombs_%d.png',
             arrows: 'inventory/arrows_%d.png',
+            magic: 'magic/magic_%d.png',
             rupees: 'rupees_%d'
         };
 
@@ -40,8 +41,8 @@ define([
         setup: function(item, psys, forceLoot) {
             var loot = forceLoot || item.properties.loot,
                 type = loot.split('_')[0],
-                value = parseInt(loot.split('_')[1], 10),
-                tx = this.textureKeys[type] || 'items/' + type + '.png';
+                value = parseInt(loot.split('_')[1], 10) || 1,
+                tx = this.textureKeys[type] || 'items/' + loot + '.png';
 
             if(value)
                 tx = tx.replace('%d', value);

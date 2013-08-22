@@ -4,10 +4,11 @@ define([
 ], function(C, Entity) {
     var Particle = function() {
         this.sensor = true;
-        this.anchor.x = 0;
-        this.anchor.y = 0;
 
         Entity.call(this, gf.assetCache['sprite_particles'], 0.1);
+
+        this.anchor.x = 0;
+        this.anchor.y = 0;
 
         this.on('complete', this.expire.bind(this));
     };
@@ -24,7 +25,7 @@ define([
                 var frames = [];
 
                 for(var i = 0; i < cfg.num; ++i) {
-                    frames.push(this.spritesheet[cfg.path + i + cfg.ext].frames[0]);
+                    frames.push(this.spritesheet[cfg.path + (i+1) + cfg.ext].frames[0]);
                 }
 
                 this.addAnimation(item.name, frames, cfg.speed, cfg.loop);
@@ -38,21 +39,21 @@ define([
             this.gotoAndPlay(item.name);
 
             //set position
-            var p = this.parent.position,
+            var p = this.parent,
                 space = cfg.spacing;
 
             switch(this.parent.lastDir) {
                 case 'up':
-                    this.setPosition(p.x, p.y - space);
+                    this.setPosition(0, -space);
                     break;
                 case 'down':
-                    this.setPosition(p.x, p.y + space);
+                    this.setPosition(0, space);
                     break;
                 case 'left':
-                    this.setPosition(p.x - space, p.y);
+                    this.setPosition(-space, 0);
                     break;
                 case 'right':
-                    this.setPosition(p.x + space, p.y);
+                    this.setPosition(space, 0);
                     break;
             }
 

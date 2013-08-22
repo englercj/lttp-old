@@ -141,10 +141,10 @@ define([
                 ext: '.png',
                 type: 'fire',
                 num: 3,
-                speed: 0. 025,
+                speed: 0.025,
                 loop: false,
                 spacing: 10,
-                hitArea: new Rectangle(0, 8, 8, 8)
+                hitArea: new gf.Rectangle(0, 8, 8, 8)
             },
             position: [32, 80],
             grid: [0, 2]

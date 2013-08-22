@@ -19,7 +19,7 @@ define([
         this.maxMagic = 10;
 
         //current magic of this entity
-        this.magic = 10;
+        this.magic = 0;
 
         //current inventory of the entity
         this.inventory = {
@@ -317,8 +317,11 @@ define([
             }
         },
         //Uses the currently equipted item
-        onUseItem: function() {
-            var item = ITEMS[this.equipted],
+        onUseItem: function(status) {
+            if(status.down)
+                return;
+
+            var item = this._findItem(this.equipted),
                 particle;
 
             //check magic
@@ -337,6 +340,11 @@ define([
 
             this.emit('updateHud');
         },
+        _findItem: function(name) {
+            for(var i = 0; i < ITEMS.length; ++i)
+                if(ITEMS[i].name === name)
+                    return ITEMS[i];
+        },
         dropLoot: function(item) {
             if(!item.properties.loot) return;
 
@@ -351,6 +359,12 @@ define([
             switch(obj.type) {
                 case 'heart':
                     this.heal(1);
+                    break;
+
+                case 'magic':
+                    this.magic += obj.value;
+                    if(this.magic > this.maxMagic)
+                        this.magic = this.maxMagic;
                     break;
 
                 case 'arrows':
@@ -404,13 +418,13 @@ define([
                     //TODO: SHOW DIALOG
                     self.unlock();
                     self.itempool.free(obj);
-                    obj.visible = false;
+                    obj.pickup();
+
+                    //update hud
+                    self.inventory[obj.type] += obj.value;
+                    self.emit('updateHud');
                 }
             })
-
-            //update hud
-            this.inventory[loot]++;
-            this.emit('updateHud');
 
             //remove loot for next time
             this._markEmpty(chest);

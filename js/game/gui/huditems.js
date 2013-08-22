@@ -41,7 +41,7 @@ define([
             HudItem.prototype.set.call(this, val);
 
             this.sprValue.height = this.maxHeight * val;
-            this.sprValue.position.y = (this.maxHeight - this.sprValue.height) + 8;
+            this.sprValue.position.y = (this.maxHeight - this.sprValue.height) + (8 * this.sprValue.scale.y);
 
             return this;
         }
