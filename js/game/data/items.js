@@ -141,9 +141,9 @@ define([
                 ext: '.png',
                 type: 'fire',
                 num: 3,
-                speed: 0.025,
+                speed: 0.15,
                 loop: false,
-                spacing: 10,
+                spacing: 2,
                 hitArea: new gf.Rectangle(0, 8, 8, 8)
             },
             position: [32, 80],

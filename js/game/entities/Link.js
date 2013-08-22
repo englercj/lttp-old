@@ -71,7 +71,7 @@ define([
         this.itempool = new gf.ObjectPool(WorldItem);
 
         //a pool of particles to throw around
-        this.particlepool = new gf.ObjectPool(Particle, this);
+        this.particlepool = new gf.ObjectPool(Particle, lttp.game);
 
         //moveSpeed the ent moves at
         this.moveSpeed = 87;

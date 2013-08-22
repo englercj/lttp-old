@@ -8,7 +8,7 @@ define([
         Entity.call(this, gf.assetCache['sprite_particles'], 0.1);
 
         this.anchor.x = 0;
-        this.anchor.y = 0;
+        this.anchor.y = 1;
 
         this.on('complete', this.expire.bind(this));
     };
@@ -19,7 +19,6 @@ define([
 
             this.visible = true;
             this.hitArea = cfg.hitArea || new Rectangle(0, 8, 8, 8);
-            this.enablePhysics(phys);
 
             if(!this.animations[item.name]) {
                 var frames = [];
@@ -32,28 +31,42 @@ define([
             }
 
             //set type
-            this.name = cfg.name;
+            this.name = item.name;
             this.type = cfg.type;
 
             //play animation for this item
             this.gotoAndPlay(item.name);
+            this.enablePhysics(phys);
 
             //set position
-            var p = this.parent,
+            var link = lttp.play.link,
+                p = link.position,
                 space = cfg.spacing;
 
-            switch(this.parent.lastDir) {
+            switch(lttp.play.link.lastDir) {
                 case 'up':
-                    this.setPosition(0, -space);
+                    this.setPosition(
+                        p.x + (link.width / 2) - (this.width / 2),
+                        p.y - space - link.height
+                    );
                     break;
                 case 'down':
-                    this.setPosition(0, space);
+                    this.setPosition(
+                        p.x + (link.width / 2) - (this.width / 2),
+                        p.y + space + this.height
+                    );
                     break;
                 case 'left':
-                    this.setPosition(-space, 0);
+                    this.setPosition(
+                        p.x - space - this.width,
+                        p.y - 3
+                    );
                     break;
                 case 'right':
-                    this.setPosition(space, 0);
+                    this.setPosition(
+                        p.x + space + link.width,
+                        p.y - 3
+                    );
                     break;
             }
 
@@ -89,20 +102,20 @@ define([
         },
         _collide: function(obj, vec, colShape, myShape) {
             //fire particle
-            if(this.name === 'lantern' || this.name === 'firerod') {
-                //check the type of collider
-                switch(obj.type) {
-                    //lite the torch up
-                    case 'torch':
-                        obj.lite();
-                        /* falls through */
-
-                    //hit a wall, just DIE
-                    case C.ENTITY.TILE:
-                        this.expire();
-                        break;
+            if(this.type === 'fire') {
+                if(obj.lite) {
+                    obj.lite();
                 }
-            } else if(this.name === 'boomerang') {
+            }
+
+            //firerod hitting wall
+            if(this.name === 'firerod') {
+                if(obj.type === C.ENTITY.TILE) {
+                    this.expire();
+                }
+            }
+            //boomerang hitting stuff
+            else if(this.name === 'boomerang') {
                 switch(obj.type) {
                     //reverse the velocity back to the player
                     case C.ENTITY.TILE:

@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-08-21
+ * Compiled: 2013-08-22
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -24791,6 +24791,7 @@ gf.inherits(gf.TiledObjectGroup, gf.Layer, {
             }
 
             o.name = o.name || props.name || props.tileprops.name;
+            o.type = o.type || props.type || props.tileprops.type;
 
             //a manually specified string texture
             if(typeof props.texture === 'string') {

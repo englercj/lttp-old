@@ -20,6 +20,8 @@ define([
             this.spritesheet['wall_torch2.png'].frames[0],
             this.spritesheet['wall_torch3.png'].frames[0]
         ], 0.09, true);
+
+        this.light = 0.25;
     };
 
     gf.inherits(Torch, Entity, {
@@ -28,11 +30,17 @@ define([
 
             this.gotoAndPlay('torch_lit');
             setTimeout(this.extinguish.bind(this), 5000);
+
+            //light up dat world
+            lttp.play.world.findLayer('darkness').alpha -= this.light;
         },
         extinguish: function() {
             if(this.type !== 'torch') return;
 
             this.gotoAndStop('torch');
+
+            //darken dat world
+            lttp.play.world.findLayer('darkness').alpha += this.light;
         }
     });
 
