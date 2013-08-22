@@ -13,10 +13,12 @@ define([
 
     gf.inherits(LinkSave, Object, {
         save: function(link, world, pos) {
+            link = link || {};
+
             this.data.inventory = link.inventory || {};
             this.data.health = link.health || 3;
             this.data.maxHealth = link.maxHealth || 3;
-            this.data.magic = link.magic !== undefined ? link.magic : 10;
+            this.data.magic = link.magic !== undefined ? link.magic : 0;
             this.data.maxMagic = link.maxMagic || 10;
             this.data.equipted = link.equipted || null;
 

@@ -325,7 +325,7 @@ define([
                 particle;
 
             //check magic
-            if(this.magic < item.cost) {
+            if(!item || this.magic < item.cost) {
                 //show error
                 this.sounds.error.play();
                 return;
