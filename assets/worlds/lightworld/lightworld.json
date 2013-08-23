@@ -15851,6 +15851,7 @@
                  "name":"cave-034",
                  "properties":
                     {
+                     "animation":"fall_in_hole",
                      "loc":"[416, 144]"
                     },
                  "rotation":0,

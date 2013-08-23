@@ -102,6 +102,8 @@ define([
 
             this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.SELECT, this._boundGpToggleSaveMenu);
             this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, this._boundGpToggleInventory);
+
+            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.LEFT_TRIGGER, this._boundGpROCKET);
         },
         onToggleSaveMenu: function() {},
         onToggleMap: function() {},
@@ -174,13 +176,13 @@ define([
 
             var self = this;
             if(this.world) {
-                if(exit.animation) {
+                if(exit.properties.animation) {
                     this.link.on('complete', function() {
                         self._doWorldTransition(exit, vec);
                         self.link.unlock();
                     });
                     this.link.lock();
-                    this.link.gotoAndPlay(exit.animation);
+                    this.link.gotoAndPlay(exit.properties.animation);
 
                     return;
                 }
@@ -301,12 +303,12 @@ define([
             this.camera.unfollow();
             this.camera.unconstrain();
             if(!this.firstZone) {
-                this._zoneTransition();
+                this._zoneTransition(zone, vec);
             } else {
                 this._zoneReady();
             }
         },
-        _zoneTransition: function() {
+        _zoneTransition: function(zone, vec) {
             var p = vec.x ? 'x' : 'y',
                 last = 0,
                 space = 10,
@@ -493,6 +495,8 @@ define([
             this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, this._boundGpAttack = this.onAttack.bind(this));
             this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_4, this._boundGpUseItem = this.onUseItem.bind(this));
 
+            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.LEFT_TRIGGER, this._boundGpROCKET = this.onROCKET.bind(this));
+
             return l;
         },
         onMove: function(dir, status) {
@@ -524,6 +528,15 @@ define([
                 this.dialog.onAdvance(status);
             else
                 this.link.onAttack(status);
+        },
+        onROCKET: function(status) {
+            if(status.down) {
+                this.link.moveSpeed = 400;
+            } else {
+                this.link.moveSpeed = 87;
+            }
+
+            this.link._checkMovement();
         }
     });
 

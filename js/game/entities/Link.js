@@ -142,7 +142,7 @@ define([
             this._addDirectionalFrames('attack_tap', 3, 0.4);
 
             //add fall in hole animations
-            this._addFrames('fall_in_hole', 4, 0.4);
+            this._addFrames('fall_in_hole', 4, 0.05);
 
             //add lifting animations
             this._addDirectionalFrames('lift', 4, 0.4);
