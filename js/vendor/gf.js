@@ -20926,21 +20926,33 @@ gf.Camera.fx.Effect = function() {
 
     this.addChild(this.gfx = new PIXI.Graphics());
     this.gfx.visible = false;
+
+    this.done = true;
 };
 
 gf.inherits(gf.Camera.fx.Effect, gf.DisplayObjectContainer, {
     start: function() {
+        this.done = false;
         return this;
     },
     stop: function() {
+        this.done = true;
         return this;
     },
     update: function() {
         return this;
     },
     _complete: function() {
-        if(typeof this.cb === 'function')
-            this.cb();
+        this.done = true;
+
+        if(typeof this.cb === 'function') {
+            var ret = this.cb();
+
+            if(ret !== false)
+                this.stop();
+        } else {
+            this.stop();
+        }
     }
 });
 gf.Camera.fx.Close = function() {
@@ -21006,8 +21018,7 @@ gf.inherits(gf.Camera.fx.Close, gf.Camera.fx.Effect, {
         return this;
     },
     update: function(dt) {
-        if(!this.gfx.visible)
-            return;
+        if(this.done) return;
 
         var part = (dt * 1000) / this.duration;
 
@@ -21020,7 +21031,6 @@ gf.inherits(gf.Camera.fx.Close, gf.Camera.fx.Effect, {
                 this.radius -= (part * this.maxRadius);
 
                 if(this.radius <= 0) {
-                    this.stop();
                     this._complete();
                 } else {
                     this.gfx.drawCircle(0, 0, this.radius);
@@ -21033,7 +21043,6 @@ gf.inherits(gf.Camera.fx.Close, gf.Camera.fx.Effect, {
                 this.h -= (part * this.my);
 
                 if(this.w <= 0) {
-                    this.stop();
                     this._complete();
                 } else {
                     this.gfx.drawRect(-(this.w / 2), -(this.h / 2), this.w, this.h);
@@ -21093,11 +21102,12 @@ gf.inherits(gf.Camera.fx.Fade, gf.Camera.fx.Effect, {
         return this;
     },
     update: function(dt) {
+        if(this.done) return;
+
         if(this.gfx.alpha < this.goal) {
             this.gfx.alpha += (dt * 1000) / this.duration;
 
             if(this.gfx.alpha >= this.goal) {
-                this.stop();
                 this._complete();
             }
         }
@@ -21153,11 +21163,12 @@ gf.inherits(gf.Camera.fx.Flash, gf.Camera.fx.Effect, {
         return this;
     },
     update: function(dt) {
+        if(this.done) return;
+
         if(this.gfx.alpha > 0) {
             this.gfx.alpha -= (dt * 1000) / this.duration;
 
             if(this.gfx.alpha <= 0) {
-                this.stop();
                 this._complete();
             }
         }
@@ -21254,31 +21265,29 @@ gf.inherits(gf.Camera.fx.Shake, gf.Camera.fx.Effect, {
         return this;
     },
     update: function(dt) {
-        //update shake effect
-        if(this.duration > 0) {
-            this.duration -= (dt * 1000);
+        if(this.done) return;
 
-            //pan back to the original position
-            this.offset.x = -this.offset.x;
-            this.offset.y = -this.offset.y;
+        this.duration -= (dt * 1000);
+
+        //pan back to the original position
+        this.offset.x = -this.offset.x;
+        this.offset.y = -this.offset.y;
+        this.parent.pan(this.offset.x, this.offset.y);
+
+        //check if we are complete
+        if(this.duration <= 0) {
+            this._complete();
+        }
+        //otherwise do the shake
+        else {
+            //pan to a random offset
+            if((this.direction === gf.Camera.fx.DIRECTION.BOTH) || (this.direction === gf.Camera.fx.DIRECTION.HORIZONTAL))
+                this.offset.x = gf.math.round(Math.random() * this.intensity * this.parent.size.x * 2 - this.intensity * this.parent.size.x);
+
+            if ((this.direction === gf.Camera.fx.DIRECTION.BOTH) || (this.direction === gf.Camera.fx.DIRECTION.VERTICAL))
+                this.offset.y = gf.math.round(Math.random() * this.intensity * this.parent.size.y * 2 - this.intensity * this.parent.size.y);
+
             this.parent.pan(this.offset.x, this.offset.y);
-
-            //check if we are complete
-            if(this.duration <= 0) {
-                this.stop();
-                this._complete();
-            }
-            //otherwise do the shake
-            else {
-                //pan to a random offset
-                if((this.direction === gf.Camera.fx.DIRECTION.BOTH) || (this.direction === gf.Camera.fx.DIRECTION.HORIZONTAL))
-                    this.offset.x = gf.math.round(Math.random() * this.intensity * this.parent.size.x * 2 - this.intensity * this.parent.size.x);
-
-                if ((this.direction === gf.Camera.fx.DIRECTION.BOTH) || (this.direction === gf.Camera.fx.DIRECTION.VERTICAL))
-                    this.offset.y = gf.math.round(Math.random() * this.intensity * this.parent.size.y * 2 - this.intensity * this.parent.size.y);
-
-                this.parent.pan(this.offset.x, this.offset.y);
-            }
         }
     }
 });

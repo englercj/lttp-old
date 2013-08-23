@@ -181,13 +181,18 @@ define([
                     });
                     this.link.lock();
                     this.link.gotoAndPlay(exit.animation);
+
+                    return;
                 }
-            } else {
-                this._doGotoWorld(exit, vec);
             }
+
+            this._doWorldTransition(exit, vec);
         },
-        _doWorldTransition: function(exit, vect) {
-            var animTime = 500,
+        _doWorldTransition: function(exit, vec) {
+            if(!this.world)
+                return this._doGotoWorld(exit, vec);
+
+            var animTime = 250,
                 self = this;
 
             switch(exit.properties.transition) {
@@ -202,15 +207,14 @@ define([
 
                 case 'fade':
                 default:
-                    TweenLite.to(this.world, animTime, {
-                        alpha: 0,
-                        ease: Linear.easeNone,
-                        onComplete: function() {
-                            self._doGotoWorld(exit, vec, function() {
-                                //fade in the world again
-                                TweenLite.to(self.world, animTime, { alpha: 1 });
-                            });
-                        }
+                    var fade = this.camera.fade(0x000000, animTime, 1, function() {
+                        self._doGotoWorld(exit, vec, function() {
+                            self.camera.flash(0x000000, animTime);
+                            fade.stop();
+                        });
+
+                        //do not remove fade when done
+                        return false;
                     });
                     break;
             }
@@ -312,7 +316,23 @@ define([
 
             switch(zone.properties.transition) {
                 case 'fade':
-                    TweenLite.to(this.world, animTime, {
+                    this.camera.fade(0x000000, animTime, 1, function() {
+                        //pan camera
+                        self.camera.pan(
+                            (self.camera.size.x + space) * vec.x,
+                            (self.camera.size.y + space) * vec.y
+                        );
+                        //set link position
+                        self.link.position[p] += space;
+                        self.link.setPosition(
+                            self.link.position.x,
+                            self.link.position.y
+                        );
+                        //zone ready
+                        self._zoneReady();
+                    });
+                    /*
+                    TweenLite.to(this.world, animTime / 1000, {
                         alpha: 0,
                         ease: Linear.easeNone,
                         onComplete: function() {
@@ -330,9 +350,10 @@ define([
                             //zone ready
                             self._zoneReady();
                             //fade in the world again
-                            TweenLite.to(self.world, animTime, { alpha: 1 });
+                            TweenLite.to(self.world, animTime / 1000, { alpha: 1 });
                         }
                     });
+                    */
                     break;
 
                 case 'none':

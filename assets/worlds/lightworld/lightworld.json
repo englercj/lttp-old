@@ -15836,7 +15836,8 @@
                  "name":"world_linkshouse",
                  "properties":
                     {
-                     "loc":"[120,168]"
+                     "loc":"[120,209]",
+                     "transition":"fade"
                     },
                  "rotation":0,
                  "type":"exit",
