@@ -148,8 +148,20 @@ define([
             this._addDirectionalFrames('lift', 4, 0.4);
 
             //add lifting walking animations
-            this._addFrames(['lift_walk_left', 'lift_walk_right'], 3, 0.4, true);
-            this._addFrames(['lift_walk_down', 'lift_walk_up'], 6, 0.4, true);
+            this.addAnimation('lift_walk_left', [
+                this.spritesheet['lift_walk_left/lift_walk_left_1.png'].frames[0],
+                this.spritesheet['lift_walk_left/lift_walk_left_2.png'].frames[0],
+                this.spritesheet['lift_walk_left/lift_walk_left_3.png'].frames[0],
+                this.spritesheet['lift_walk_left/lift_walk_left_2.png'].frames[0]
+            ], 0.1, true);
+            this.addAnimation('lift_walk_right', [
+                this.spritesheet['lift_walk_right/lift_walk_right_1.png'].frames[0],
+                this.spritesheet['lift_walk_right/lift_walk_right_2.png'].frames[0],
+                this.spritesheet['lift_walk_right/lift_walk_right_3.png'].frames[0],
+                this.spritesheet['lift_walk_right/lift_walk_right_2.png'].frames[0]
+            ], 0.1, true);
+            //this._addFrames(['lift_walk_left', 'lift_walk_right'], 3, 0.2, true);
+            this._addFrames(['lift_walk_down', 'lift_walk_up'], 6, 0.2, true);
 
             //add pulling animations
             this._addDirectionalFrames('push', 5, 0.1, true);
