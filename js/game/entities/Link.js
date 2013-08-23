@@ -450,6 +450,11 @@ define([
             item.parent.removeChild(item);
             this.parent.addChild(item);
 
+            //set the correct texture
+            var tx = 'dungeon/' + item.properties.type + (item.properties.heavy ? '_heavy' : '') + '.png';
+            item.setTexture(gf.assetCache.sprite_worlditems[tx]);
+
+            //lift the item
             this.gotoAndPlay('lift_' + this.lastDir);
             this.sounds.lift.play();
 
