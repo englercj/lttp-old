@@ -19,8 +19,8 @@ define([], function() {
             src: 'assets/sprites/entities/link.json'
         },
         {
-            name: 'sprite_torch',
-            src: 'assets/sprites/entities/torch.json'
+            name: 'sprite_misc',
+            src: 'assets/sprites/entities/misc.json'
         },
         {
             name: 'sprite_smash',

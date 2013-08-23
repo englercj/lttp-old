@@ -3,22 +3,22 @@ define([
     'game/entities/Entity'
 ], function(C, Entity) {
     var Torch = function() {
-        Entity.call(this, gf.assetCache['sprite_torch'], 0.2);
+        Entity.call(this, gf.assetCache.sprite_misc, 0.2);
 
         this.addAnimation('torch', [
-            this.spritesheet['torch0.png'].frames[0]
+            this.spritesheet['torch/torch0.png'].frames[0]
         ]);
 
         this.addAnimation('torch_lit', [
-            this.spritesheet['torch1.png'].frames[0],
-            this.spritesheet['torch2.png'].frames[0],
-            this.spritesheet['torch3.png'].frames[0]
+            this.spritesheet['torch/torch1.png'].frames[0],
+            this.spritesheet['torch/torch2.png'].frames[0],
+            this.spritesheet['torch/torch3.png'].frames[0]
         ], 0.09, true);
 
         this.addAnimation('wall_torch', [
-            this.spritesheet['wall_torch1.png'].frames[0],
-            this.spritesheet['wall_torch2.png'].frames[0],
-            this.spritesheet['wall_torch3.png'].frames[0]
+            this.spritesheet['torch/wall_torch1.png'].frames[0],
+            this.spritesheet['torch/wall_torch2.png'].frames[0],
+            this.spritesheet['torch/wall_torch3.png'].frames[0]
         ], 0.09, true);
 
         this.light = 0.25;

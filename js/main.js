@@ -3,8 +3,9 @@ require([
     'game/states/Title',
     'game/states/Select',
     'game/states/Play',
-    'game/entities/misc/Torch'
-], function(resources, TitleState, SelectState, PlayState, Torch) {
+    'game/entities/misc/Torch',
+    'game/entities/misc/Flower'
+], function(resources, TitleState, SelectState, PlayState, Torch, Flower) {
     var $game, game, muted;
 
     window.lttp = {
@@ -23,6 +24,7 @@ require([
         });
 
         game.spritepool.add('torch', Torch);
+        game.spritepool.add('flower', Flower);
 
         game.loader.on('progress', function(e) {
         });

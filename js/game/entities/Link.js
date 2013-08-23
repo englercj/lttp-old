@@ -145,7 +145,7 @@ define([
             this._addFrames('fall_in_hole', 4, 0.05);
 
             //add lifting animations
-            this._addDirectionalFrames('lift', 4, 0.4);
+            this._addDirectionalFrames('lift', 4, 0.2);
 
             //add lifting walking animations
             this.addAnimation('lift_walk_left', [
