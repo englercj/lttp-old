@@ -42,6 +42,10 @@ define([], function() {
             name: 'sprite_particles',
             src: 'assets/sprites/misc/particles.json'
         },
+        {
+            name: 'sprite_enemies',
+            src: 'assets/sprites/misc/particles.json'
+        },
         // Music
         {
             name: 'music_lightworld',
