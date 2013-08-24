@@ -91,4 +91,94 @@
    <property name="type" value="solid"/>
   </properties>
  </tile>
+ <tile id="16">
+  <properties>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="17">
+  <properties>
+   <property name="hitArea" value="[0,0,8,16]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="18">
+  <properties>
+   <property name="hitArea" value="[8,0,8,16]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="19">
+  <properties>
+   <property name="hitArea" value="[0,0,16,8]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="20">
+  <properties>
+   <property name="hitArea" value="[0,8,16,8]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="21">
+  <properties>
+   <property name="hitArea" value="[16,0,16,16,0,16]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="22">
+  <properties>
+   <property name="hitArea" value="[0,0,16,16,0,16]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="23">
+  <properties>
+   <property name="hitArea" value="[0,0,16,0,16,16]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="24">
+  <properties>
+   <property name="hitArea" value="[0,0,16,0,0,16]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="25">
+  <properties>
+   <property name="hitArea" value="[0,0,8,0,8,8,16,8,16,16,0,16]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="26">
+  <properties>
+   <property name="hitArea" value="[8,0,16,0,16,16,0,16,0,8,8,8]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="27">
+  <properties>
+   <property name="hitArea" value="[0,0,0,16,16,8,8,8,8,16,0,16]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
+ <tile id="28">
+  <properties>
+   <property name="hitArea" value="[0,0,16,0,16,16,8,16,8,8,0,8]"/>
+   <property name="static" value="true"/>
+   <property name="type" value="jump"/>
+  </properties>
+ </tile>
 </tileset>

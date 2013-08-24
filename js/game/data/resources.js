@@ -146,6 +146,12 @@ define([], function() {
                 'assets/audio/effects/LTTP_Pause_Close.lite.ogg'
             ]
         },
+        {
+            name: 'effect_fall',
+            src: [
+                'assets/audio/effects/LTTP_Link_Jump.lite.ogg'
+            ]
+        },
         // Item effects
         {
             name: 'effect_chest',

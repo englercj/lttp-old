@@ -35,7 +35,10 @@ define({
     MUSIC_VOLUME: 0.25,
 
     //how long to run into something before an action takes place (blocked/jump down)
-    BLOCKED_PUSH_WAIT_TIME: 800,
+    BLOCKED_WAIT_TIME: 500,
+
+    JUMP_TIME: 500,
+    JUMP_DISTANCE: 50,
 
     //time it takes for the inventory menu to drop down, in seconds
     INVENTORY_DROP_TIME: 0.5

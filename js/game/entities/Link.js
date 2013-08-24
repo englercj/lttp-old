@@ -91,7 +91,8 @@ define([
             throw: gf.assetCache.effect_throw,
             openChest: gf.assetCache.effect_chest,
             itemFanfaire: gf.assetCache.effect_item_fanfaire,
-            error: gf.assetCache.effect_error
+            error: gf.assetCache.effect_error,
+            fall: gf.assetCache.effect_fall
         };
 
         for(var s in this.sounds) {
@@ -153,13 +154,13 @@ define([
                 this.spritesheet['lift_walk_left/lift_walk_left_2.png'].frames[0],
                 this.spritesheet['lift_walk_left/lift_walk_left_3.png'].frames[0],
                 this.spritesheet['lift_walk_left/lift_walk_left_2.png'].frames[0]
-            ], 0.1, true);
+            ], 0.25, true);
             this.addAnimation('lift_walk_right', [
                 this.spritesheet['lift_walk_right/lift_walk_right_1.png'].frames[0],
                 this.spritesheet['lift_walk_right/lift_walk_right_2.png'].frames[0],
                 this.spritesheet['lift_walk_right/lift_walk_right_3.png'].frames[0],
                 this.spritesheet['lift_walk_right/lift_walk_right_2.png'].frames[0]
-            ], 0.1, true);
+            ], 0.25, true);
             //this._addFrames(['lift_walk_left', 'lift_walk_right'], 3, 0.2, true);
             this._addFrames(['lift_walk_down', 'lift_walk_up'], 6, 0.2, true);
 
@@ -619,23 +620,11 @@ define([
                 this._setMoveDirAnimation(anim);
             }
 
-            /*console.log(this.colliding.length, this.movement);
             if(this.colliding.length && (this.movement.x || this.movement.y)) {
-                this._doBlockedAnim();
-            }*/
-        },
-        _doBlockedAnim: function() {
-            var self = this;
-            this._toBlockedAnim = setTimeout(function() {
-                var p = self.currentAnimation.indexOf('push') === -1 && 
-                        (self.movement.x || self.movement.y) &&
-                        Math.abs(self._phys.body.vx) < 0.1 &&
-                        Math.abs(self._phys.body.vy) < 0.1;
-
-                console.log(self._phys.body.vx, self._phys.body.vy);
-
-                if(p) self.gotoAndPlay('push_' + self.lastDir);
-            }, C.BLOCKED_PUSH_WAIT_TIME);
+                this._isBlocked();
+            } else {
+                this._notBlocked();
+            }
         },
         _setMoveDirAnimation: function(anim) {
             if(this.movement.x) {
@@ -717,6 +706,103 @@ define([
             });
             this.gotoAndPlay('attack_' + dir);
         },
+        jumpDown: function(vec) {
+            //TODO: Play sound
+
+            this.lock();
+            this.stop();
+            this._psystem.pause();
+
+            vec.normalize();
+
+            var last = 0,
+                jump = 2,
+                p = vec.x ? 'x' : 'y',
+                anim = { p: (C.JUMP_DISTANCE + jump) * (-vec[p]) },
+                self = this;
+
+            console.log(anim, vec);
+
+            setTimeout(function() {
+                self.sounds.fall.play();
+            }, C.JUMP_TIME / 4);
+
+            //do a small jump up if we are pointing down
+            if(vec.y < 0) {
+                $({y:0}).animate({y: '-='+jump}, {
+                    duration: C.JUMP_TIME / 4,
+                    easing: 'linear',
+                    step: function(now, tween) {
+                        var n = now - last;
+
+                        self.position[p] += n;
+                        self.setPosition(
+                            self.position.x,
+                            self.position.y
+                        );
+
+                        last = now;
+                    },
+                    //now jump down
+                    done: this._doJumpDown.bind(this, p, anim)
+                });
+            } else {
+                this._doJumpDown(p, anim);
+            }
+        },
+        _doJumpDown: function(p, anim) {
+            var self = this,
+                last = 0;
+
+            $({p: 0}).animate(anim, {
+                duration: (C.JUMP_TIME / 4) * 3,
+                easing: 'linear',
+                step: function(now, tween) {
+                    var n = now - last;
+
+                    self.position[p] += n;
+                    self.setPosition(
+                        self.position.x,
+                        self.position.y
+                    );
+
+                    last = now;
+                },
+                done: function() {
+                    self.unlock();
+                    self._psystem.resume();
+                }
+            });
+        },
+        _isBlocked: function() {
+            var self = this;
+
+            if(this._toBlockedAnim)
+                return;
+
+            this._toBlockedAnim = setTimeout(function() {
+                var need = (self.movement.x || self.movement.y);
+
+                if(!need) return;
+
+                for(var i = 0; i < self.colliding.length; ++i) {
+                    var obj = self.colliding[i];
+
+                    if(obj.collisionType === 'solid' && self.currentAnimation.indexOf('push') === -1 && !self.carrying) {
+                        self.gotoAndPlay('push_' + self.lastDir);
+                        break;
+                    }
+                    else if(obj.collisionType === 'jump') {
+                        self.jumpDown(obj.__colVec);
+                        break;
+                    }
+                }
+            }, C.BLOCKED_WAIT_TIME);
+        },
+        _notBlocked: function() {
+            clearTimeout(this._toBlockedAnim);
+            this._toBlockedAnim = null;
+        },
         //on collision
         _collide: function(obj, vec, colShape, myShape) {
             //we got into range of something to attack
@@ -739,8 +825,9 @@ define([
             }
             //colliding with a blocking object
             else if(!obj.sensor) {
+                obj.__colVec = new gf.Vector(vec.x, vec.y);
                 this.colliding.push(obj);
-                //this._doBlockedAnim();
+                this._isBlocked();
             }
             //colliding with a sensor object
             else {
@@ -763,8 +850,8 @@ define([
                     this.colliding.splice(i, 1);
                 }
 
-                //if(!this.colliding.length)
-                    //clearTimeout(this._toBlockedAnim);
+                if(!this.colliding.length)
+                    this._notBlocked();
             }
         }
     });

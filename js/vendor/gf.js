@@ -4,7 +4,7 @@
  * Copyright (c) 2012, Chad Engler
  * https://github.com/englercj/grapefruit
  *
- * Compiled: 2013-08-22
+ * Compiled: 2013-08-24
  *
  * GrapeFruit Game Engine is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -18323,10 +18323,6 @@ gf.inherits(gf.PhysicsSystem, Object, {
             spr.rotation = shape.body.a;
 
             spr.emit('physUpdate');
-
-            if(spr._showHit) {
-                spr.showPhysics();
-            }
         });
     },
     onCollisionBegin: function(arbiter) {//, space) {
@@ -18409,10 +18405,6 @@ gf.inherits(gf.PhysicsSystem, Object, {
                     }
 
                     data.spr._phys = data;
-
-                    if(data.spr._showHit) {
-                        data.spr.showPhysics();
-                    }
                     break;
 
                 case 'remove':
