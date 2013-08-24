@@ -164,7 +164,7 @@ define([
         },
         _saveZoneState: function(zone) {
             //save zone state
-            var zsv = new ZoneSave(this.lastLoad.slot, zone);
+            var zsv = new ZoneSave(this.lastLoad.slot, zone, this.lastExit.name);
             zsv.save();
 
             //update link save as well

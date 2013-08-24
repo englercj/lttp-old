@@ -1,8 +1,8 @@
 define([
     'game/utility/saves/Save'
 ], function(Save) {
-    var ZoneSave = function(slot, zone) {
-        Save.call(this, 'zone_' + slot + '_' + zone.name);
+    var ZoneSave = function(slot, zone, world) {
+        Save.call(this, 'zone_' + slot + '_' + world + '_' + zone.name);
 
         //go through each object in the zone and save the 'loot' property
         var objs = this.data.objects = [];
