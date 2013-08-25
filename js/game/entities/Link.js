@@ -110,9 +110,12 @@ define([
     };
 
     gf.inherits(Link, Entity, {
+        _addDirectionalPrefixedFrames: function(type, num, speed, loop) {
+            this._addDirectionalFrames(type + '_%s/' + type + '_%s', num, speed, loop); 
+        },
         addAnimations: function() {
             //add walking animations
-            this._addDirectionalFrames('walk', 8, 0.4, true);
+            this._addDirectionalPrefixedFrames('walk', 8, 0.4, true);
 
             //add idle shield animations
             this.addAnimation('idle_shield_left', [this.spritesheet['walk_shield_left/walk_shield_left_1.png'].frames[0]]);
@@ -131,22 +134,22 @@ define([
             this.addAnimation('lift_idle_up', [this.spritesheet['lift_walk_up/lift_walk_up_1.png'].frames[0]]);
 
             //add attack animations
-            this._addDirectionalFrames('attack', 9, 0.6);
+            this._addDirectionalPrefixedFrames('attack', 9, 0.6);
 
             //add bow attack animations
-            this._addDirectionalFrames('attack_bow', 3, 0.4);
+            this._addDirectionalPrefixedFrames('attack_bow', 3, 0.4);
 
             //add spin attack animations
-            this._addDirectionalFrames('attack_spin', 12, 0.4);
+            this._addDirectionalPrefixedFrames('attack_spin', 12, 0.4);
 
             //add attack tap animations
-            this._addDirectionalFrames('attack_tap', 3, 0.4);
+            this._addDirectionalPrefixedFrames('attack_tap', 3, 0.4);
 
             //add fall in hole animations
-            this._addFrames('fall_in_hole', 4, 0.05);
+            this._addFrames('fall_in_hole/fall_in_hole', 4, 0.05);
 
             //add lifting animations
-            this._addDirectionalFrames('lift', 4, 0.2);
+            this._addDirectionalPrefixedFrames('lift', 4, 0.2);
 
             //add lifting walking animations
             this.addAnimation('lift_walk_left', [
@@ -162,17 +165,17 @@ define([
                 this.spritesheet['lift_walk_right/lift_walk_right_2.png'].frames[0]
             ], 0.25, true);
             //this._addFrames(['lift_walk_left', 'lift_walk_right'], 3, 0.2, true);
-            this._addFrames(['lift_walk_down', 'lift_walk_up'], 6, 0.2, true);
+            this._addFrames(['lift_walk_down/lift_walk_down', 'lift_walk_up/lift_walk_up'], 6, 0.2, true);
 
             //add pulling animations
-            this._addDirectionalFrames('push', 5, 0.1, true);
+            this._addDirectionalPrefixedFrames('push', 5, 0.1, true);
 
             //add walking-attacking animations
-            this._addFrames(['walk_attack_left', 'walk_attack_right'], 3, 0.4, true);
-            this._addFrames(['walk_attack_down', 'walk_attack_up'], 6, 0.4, true);
+            this._addFrames(['walk_attack_left/walk_attack_left', 'walk_attack_right/walk_attack_right'], 3, 0.4, true);
+            this._addFrames(['walk_attack_down/walk_attack_down', 'walk_attack_up/walk_attack_up'], 6, 0.4, true);
 
             //add walking with shield animations
-            this._addDirectionalFrames('walk_shield', 8, 0.4, true);
+            this._addDirectionalPrefixedFrames('walk_shield', 8, 0.4, true);
 
             //set active
             this.lastDir = 'down';
@@ -720,8 +723,6 @@ define([
                 p = vec.x ? 'x' : 'y',
                 anim = { p: (C.JUMP_DISTANCE + jump) * (-vec[p]) },
                 self = this;
-
-            console.log(anim, vec);
 
             setTimeout(function() {
                 self.sounds.fall.play();

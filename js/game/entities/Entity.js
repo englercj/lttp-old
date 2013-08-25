@@ -38,11 +38,14 @@ define([
                 this.health = this.maxHealth;
         },
         _addDirectionalFrames: function(type, num, speed, loop) {
+            if(type.indexOf('%s') === -1)
+                type += '_%s';
+
             this._addFrames([
-                type + '_left',
-                type + '_right',
-                type + '_down',
-                type + '_up'
+                type.replace(/%s/g, 'left'),
+                type.replace(/%s/g, 'right'),
+                type.replace(/%s/g, 'down'),
+                type.replace(/%s/g, 'up')
             ], num, speed, loop);
         },
         _addFrames: function(types, num, speed, loop) {
@@ -51,12 +54,16 @@ define([
 
             for(var t = 0, tl = types.length; t < tl; ++t) {
                 var frames = [],
-                    type = types[t];
+                    type = types[t],
+                    name = type.replace(/.+\/|\.png|_%./g, '');
+
+                if(type.indexOf('%d') === -1)
+                    type += '_%d';
 
                 for(var f = 1; f <= num; ++f) {
-                    frames.push(this.spritesheet[type + '/' + type + '_' + f + '.png'].frames[0]);
+                    frames.push(this.spritesheet[type.replace(/%d/g, f) + '.png'].frames[0]);
                 }
-                this.addAnimation(type, frames, speed, loop);
+                this.addAnimation(name, frames, speed, loop);
             }
         },
         _collide: function(obj, vec, colShape, myShape) {},
