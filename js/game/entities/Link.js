@@ -782,9 +782,8 @@ define([
                 return;
 
             this._toBlockedAnim = setTimeout(function() {
-                var need = (self.movement.x || self.movement.y);
-
-                if(!need) return;
+                if(!(self.movement.x || self.movement.y) || self.actions.attack)
+                    return;
 
                 for(var i = 0; i < self.colliding.length; ++i) {
                     var obj = self.colliding[i];
