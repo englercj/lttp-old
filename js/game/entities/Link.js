@@ -536,7 +536,7 @@ define([
         _checkAttack: function() {
             for(var i = this.inAttackRange.length - 1; i > -1; --i) {
                 var e = this.inAttackRange[i],
-                    t = e.properties.type;
+                    t = e.type;
 
                 if(t.indexOf('grass') === -1)
                     continue;
@@ -808,7 +808,7 @@ define([
         _collide: function(obj, vec, colShape, myShape) {
             //we got into range of something to attack
             if(myShape === this.atkSensor) {
-                if(obj.type === C.ENTITY.ENEMY || !obj.type) {
+                if(obj.type) {
                     this.inAttackRange.push(obj);
 
                     //something new walked in while we were attacking
