@@ -21,7 +21,7 @@
          "name":"collisions",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":256,
          "x":0,
          "y":0
@@ -21982,7 +21982,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "width":256,
          "x":0,
          "y":0
@@ -22047,7 +22047,7 @@
          "name":"top",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":256,
          "x":0,
          "y":0
