@@ -457,14 +457,14 @@ define([
             item.sensor = true;
             item.enablePhysics();
 
-            //make it on top
-            item.parent.removeChild(item);
-            this.parent.addChild(item);
-
             //drop the loot
             if(item.properties.loot) {
                 this.dropLoot(item);
             }
+
+            //make it just below loot
+            item.parent.removeChild(item);
+            this.parent.addChild(item);
 
             //set the correct texture
             var tx = 'dungeon/' + item.properties.type + (item.properties.heavy ? '_heavy' : '') + '.png';
