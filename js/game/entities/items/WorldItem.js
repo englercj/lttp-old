@@ -57,11 +57,14 @@ define([
                 this.setTexture(gf.assetCache.sprite_worlditems[tx]);
             }
 
-            this.anchor.x = 0.5;
-            this.anchor.y = 0.5;
+            this.anchor.x = 0;
+            this.anchor.y = 1;
 
-            this.position.x = item.position.x + (item.width / 2);
-            this.position.y = item.position.y - (item.height / 2);
+            this.position.x = item.position.x;// + (item.width / 2);
+            this.position.y = item.position.y;// - (item.height / 2);
+
+            //smallness
+            this.hitArea = new gf.Rectangle(4, 4, 8, 8);
 
             this.visible = true;
 
