@@ -297,7 +297,7 @@ define([
             this.activeLayer.spawn();
 
             //load saved layer info
-            var zsv = new ZoneSave(this.lastLoad.slot, this.activeLayer);
+            var zsv = new ZoneSave(this.lastLoad.slot, this.activeLayer, this.lastExit.name);
             zsv.load();
 
             this.camera.unfollow();
