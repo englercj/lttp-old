@@ -88,12 +88,42 @@
                  "y":312
                 }, 
                 {
+                 "gid":675,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":144,
+                 "y":312
+                }, 
+                {
+                 "gid":675,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":80,
+                 "y":312
+                }, 
+                {
                  "gid":393,
                  "height":0,
                  "name":"",
                  "properties":
                     {
-                     "hitArea":"[0,0,16,16]",
+                     "animation":"torch",
                      "name":"torch",
                      "static":"true",
                      "type":"torch"
@@ -176,6 +206,36 @@
                  "width":0,
                  "x":304,
                  "y":88
+                }, 
+                {
+                 "gid":1073742499,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":144,
+                 "y":232
+                }, 
+                {
+                 "gid":1073742499,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":80,
+                 "y":232
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -254,78 +314,6 @@
          "name":"top",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
-         "width":32,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "height":32,
-         "name":"torches",
-         "objects":[
-                {
-                 "gid":675,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":136,
-                 "y":312
-                }, 
-                {
-                 "gid":675,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":88,
-                 "y":312
-                }, 
-                {
-                 "gid":1073742499,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":136,
-                 "y":232
-                }, 
-                {
-                 "gid":1073742499,
-                 "height":0,
-                 "name":"",
-                 "properties":
-                    {
-
-                    },
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":88,
-                 "y":232
-                }],
-         "opacity":1,
-         "type":"objectgroup",
          "visible":true,
          "width":32,
          "x":0,
