@@ -24,11 +24,10 @@ Then point your browser to [http://localhost:3001](http://localhost:3001). If yo
 
 Here is a list of external dependencies and what they are used for. Each is released under its own respective license:
 
-* [jQuery v1.8.2](http://jquery.com/) - For DOM manipulation and utility methods
-* [jQuery UI v1.8.23](http://jqueryui.com/) - For extension of jQuery's DOM manipulation methods
+* [jQuery v1.8.2](http://jquery.com/) - For animation utility methods
+* [jQuery UI v1.8.23](http://jqueryui.com/) - Custom build with only easing functions
 * [GrapeFruit](https://github.com/grapefruitjs/grapefruit) - The GameEngine used for all game logic and rendering
 * [require.js](http://requirejs.org/) - For logical code seperation and dependency management
-* [Return of Ganon Font](http://www.zone38.net/font/#ganon) - For dialog and other text
 
 All of these dependencies are included in this repository and there is no need to download or add them individually.
 Note that jQuery and jQuery-UI attempt to load from Google CDN, and fallback to the local files if that fails.
@@ -38,19 +37,19 @@ Note that jQuery and jQuery-UI attempt to load from Google CDN, and fallback to 
 Below is a list of resources I used for game content. This including sprites, sounds, technical data, walkthroughs, mob information,
 and misc details of the game:
 
-* [The Spriter's Resource](http://www.spriters-resource.com/snes/zeldalinkpast/index.html) - only used a couple sprites from here, quality isn't very good
+* [Return of Ganon Font](http://www.zone38.net/font/#ganon) - For dialog and other text
+* [The Spriter's Resource](http://www.spriters-resource.com/snes/zeldalinkpast/index.html) - Used a couple sprites from here
 * [LTTP Maps](http://ian-albert.com/games/legend_of_zelda_a_link_to_the_past_maps/) - maps of all the dungeons
 * [SNES Maps](http://vgmaps.com/Atlas/SuperNES/index.htm#LegendOfZeldaALinkToThePast) - maps of all the dungeons
 * [Zelda Wiki](http://www.zeldawiki.org/The_Legend_of_Zelda:_A_Link_to_the_Past) - Great source of information on game content and mechanics
 * [Zelda Elements](http://www.zeldaelements.net/games/c/a_link_to_the_past/) - Another good wiki-like source
-* [nes-snes-sprites.com](http://www.nes-snes-sprites.com/LegendofZeldaTheALinktothePast.html) - used for most character sprites
+* [nes-snes-sprites.com](http://www.nes-snes-sprites.com/LegendofZeldaTheALinktothePast.html) - Used for some character sprites
 
 ### Roadmap
 
 Below is the current TODO list for the project:
 
-* Entity Interaction (lifting, pushing, cutting, opening chests, etc)
-* Item Management
+* Enemies (generic npc loading from tmx)
 * Dialog
 * Cutscenes
 * First Dungeon (palace)
