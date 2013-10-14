@@ -1,26 +1,23 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/entities/Entity'
-], function(C, Entity) {
+], function(gf, C, Entity) {
     var Smash = function() {
-        Entity.call(this, gf.assetCache['sprite_smash'], 0.2);
+        Entity.call(this, lttp.game.cache.getTextures('sprite_smash'), 0.2);
 
         this._addAnimations();
 
+        var audioSettings = { volume: C.EFFECT_VOLUME };
         this.sounds = {
-            grass: gf.assetCache.effect_grass_cut,
-            smash: gf.assetCache.effect_smash
+            grass: lttp.play.audio.add('effect_grass_cut', audioSettings),
+            smash: lttp.play.audio.add('effect_smash', audioSettings)
         };
-
-        for(var s in this.sounds) {
-            this.sounds[s].volume = C.EFFECT_VOLUME;
-            lttp.play.audio.attach(this.sounds[s]);
-        }
 
         this.on('complete', this._done.bind(this));
     };
 
-    gf.inherits(Smash, Entity, {
+    gf.inherit(Smash, Entity, {
         _addAnimations: function() {
             this._addSlices('pot', 0, 0, 0, 7);
             this._addSlices('grass', 0, 8, 1, 5);

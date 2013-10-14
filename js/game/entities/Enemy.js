@@ -1,7 +1,8 @@
 define([
+    'vendor/gf',
     'game/data/types',
     'game/entities/Entity'
-], function(types, Entity) {
+], function(gf, types, Entity) {
     var Enemy = function(spritesheet) {
         Entity.call(this, spritesheet);
 
@@ -10,7 +11,7 @@ define([
         this.attacking = true;
     };
 
-    gf.inherits(Enemy, Entity, {
+    gf.inherit(Enemy, Entity, {
 
     });
 

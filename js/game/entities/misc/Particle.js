@@ -1,11 +1,12 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/entities/Entity'
-], function(C, Entity) {
+], function(gf, C, Entity) {
     var Particle = function() {
         this.sensor = true;
 
-        Entity.call(this, gf.assetCache['sprite_particles'], 0.1);
+        Entity.call(this, lttp.game.cache.getTextures('sprite_particles'), 0.1);
 
         this.anchor.x = 0;
         this.anchor.y = 1;
@@ -13,7 +14,7 @@ define([
         this.on('complete', this.expire.bind(this));
     };
 
-    gf.inherits(Particle, Entity, {
+    gf.inherit(Particle, Entity, {
         run: function(item, phys) {
             var cfg = this.cfg = item.particle;
 
@@ -45,25 +46,25 @@ define([
 
             switch(lttp.play.link.lastDir) {
                 case 'up':
-                    this.setPosition(
+                    this.position.set(
                         p.x + (link.width / 2) - (this.width / 2),
                         p.y - space - link.height
                     );
                     break;
                 case 'down':
-                    this.setPosition(
+                    this.position.set(
                         p.x + (link.width / 2) - (this.width / 2),
                         p.y + space + this.height
                     );
                     break;
                 case 'left':
-                    this.setPosition(
+                    this.position.set(
                         p.x - space - this.width,
                         p.y - 3
                     );
                     break;
                 case 'right':
-                    this.setPosition(
+                    this.position.set(
                         p.x + space + link.width,
                         p.y - 3
                     );
@@ -73,7 +74,7 @@ define([
             //if there is a velocity set it
             if(cfg.velocity) {
                 this.velocity = cfg.velocity.clone();
-                this.setVelocity(cfg.velocity);
+                this.body.velocity.copy(cfg.velocity);
 
                 if(cfg.velocityTimer) {
                     var cb;
@@ -98,7 +99,7 @@ define([
             this.velocity.x = -this.velocity.x;
             this.velocity.y = -this.velocity.y;
 
-            this.setVelocity(this.velocity);
+            this.body.velocity.copy(this.velocity);
         },
         _collide: function(obj, vec, colShape, myShape) {
             //fire particle

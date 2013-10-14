@@ -1,5 +1,6 @@
 define([
-], function() {
+    'vendor/gf'
+], function(gf) {
     var Entity = function(spritesheet, speed, startanim) {
         //is this sprite able to move?
         this.locked = false;
@@ -15,13 +16,13 @@ define([
 
         this.spritesheet = spritesheet;
 
-        gf.AnimatedSprite.call(this, spritesheet, speed, startanim);
+        gf.Sprite.call(this, spritesheet, speed, startanim);
 
         this.on('collision', this._collide.bind(this));
         this.on('separate', this._separate.bind(this));
     };
 
-    gf.inherits(Entity, gf.AnimatedSprite, {
+    gf.inherit(Entity, gf.Sprite, {
         damage: function(num) {
             this.health -= num;
 

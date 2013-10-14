@@ -1,41 +1,40 @@
 var TEXT_SCALE = 1.5;
 
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/states/State',
     'game/fonts/ReturnOfGanon',
     'game/utility/saves/LinkSave'
-], function(C, State, ReturnOfGanonFont, LinkSave) {
+], function(gf, C, State, ReturnOfGanonFont, LinkSave) {
     var Select = function(game) {
-        State.call(this, 'mainmenu', game);
+        State.call(this, game, 'mainmenu');
 
-        this.music = gf.assetCache.music_select;
+        this.music = this.audio.add('music_select');
         this.music.loop = true;
         this.music.volume = C.MUSIC_VOLUME;
         this.audio.attach(this.music);
 
+        var audioSettings = { volume: C.MUSIC_VOLUME };
         this.sounds = {
-            select: gf.assetCache.effect_menu_select,
-            cursor: gf.assetCache.effect_menu_select_cursor,
-            erase: gf.assetCache.effect_menu_select_erase,
-            error: gf.assetCache.effect_error,
-            lowhp: gf.assetCache.effect_lowhp
+            select: this.audio.add('effect_menu_select', audioSettings),
+            cursor: this.audio.add('effect_menu_select_cursor', audioSettings),
+            erase: this.audio.add('effect_menu_select_erase', audioSettings),
+            error: this.audio.add('effect_error', audioSettings),
+            lowhp: this.audio.add('effect_lowhp', audioSettings)
         };
 
-        for(var s in this.sounds) {
-            this.sounds[s].volume = C.MUSIC_VOLUME;
-            this.audio.attach(this.sounds[s]);
-        }
+        var txSelect = game.cache.getTextures('sprite_select');
 
         this.sprites = {
-            select: new gf.Sprite(gf.assetCache.sprite_select['select.png']),
-            register: new gf.Sprite(gf.assetCache.sprite_select['register.png']),
-            pointer: new gf.Sprite(gf.assetCache.sprite_select['pointer.png']),
-            fairy: new gf.AnimatedSprite({
+            select: new gf.Sprite(txSelect['select.png']),
+            register: new gf.Sprite(txSelect['register.png']),
+            pointer: new gf.Sprite(txSelect['pointer.png']),
+            fairy: new gf.Sprite({
                 flap: {
                     frames: [
-                        gf.assetCache.sprite_select['fairy1.png'],
-                        gf.assetCache.sprite_select['fairy2.png']
+                        txSelect['fairy1.png'],
+                        txSelect['fairy2.png']
                     ],
                     speed: 0.1,
                     loop: true
@@ -47,7 +46,7 @@ define([
             this.sprites[sp].scale.x = this.sprites[sp].scale.y = 3;
         }
 
-        this.fontpool = new gf.ObjectPool(ReturnOfGanonFont, this.camera);
+        this.fontpool = new gf.ObjectPool(ReturnOfGanonFont);
 
         this._setupSelect();
         this._setupRegister();
@@ -61,65 +60,65 @@ define([
         this.pnameI = 0;
     };
 
-    gf.inherits(Select, State, {
+    gf.inherit(Select, State, {
         start: function() {
             State.prototype.start.call(this);
 
             this.music.play();
 
-            this.game.input.keyboard.on(gf.input.KEY.DOWN, this._boundMoveDown = this.onMove.bind(this, 'down'));
-            this.game.input.keyboard.on(gf.input.KEY.UP, this._boundMoveUp = this.onMove.bind(this, 'up'));
-            this.game.input.keyboard.on(gf.input.KEY.LEFT, this._boundMoveLeft = this.onMove.bind(this, 'left'));
-            this.game.input.keyboard.on(gf.input.KEY.RIGHT, this._boundMoveRight = this.onMove.bind(this, 'right'));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.DOWN, this._boundMoveDown = this.onMove.bind(this, 'down'));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.UP, this._boundMoveUp = this.onMove.bind(this, 'up'));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.LEFT, this._boundMoveLeft = this.onMove.bind(this, 'left'));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.RIGHT, this._boundMoveRight = this.onMove.bind(this, 'right'));
 
-            this.game.input.keyboard.on(gf.input.KEY.S, this._boundMoveDownS = this.onMove.bind(this, 'down'));
-            this.game.input.keyboard.on(gf.input.KEY.W, this._boundMoveUpW = this.onMove.bind(this, 'up'));
-            this.game.input.keyboard.on(gf.input.KEY.A, this._boundMoveLeftA = this.onMove.bind(this, 'left'));
-            this.game.input.keyboard.on(gf.input.KEY.D, this._boundMoveRightD = this.onMove.bind(this, 'right'));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.S, this._boundMoveDownS = this.onMove.bind(this, 'down'));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.W, this._boundMoveUpW = this.onMove.bind(this, 'up'));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.A, this._boundMoveLeftA = this.onMove.bind(this, 'left'));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.D, this._boundMoveRightD = this.onMove.bind(this, 'right'));
 
-            this.game.input.keyboard.on(gf.input.KEY.ENTER, this._boundSelect1 = this.onSelect.bind(this));
-            this.game.input.keyboard.on(gf.input.KEY.SPACE, this._boundSelect2 = this.onSelect.bind(this));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.ENTER, this._boundSelect1 = this.onSelect.bind(this));
+            this.game.input.keyboard.on(gf.Keyboard.KEY.SPACE, this._boundSelect2 = this.onSelect.bind(this));
 
-            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_TOP, this._boundGpMoveUp = this.onMove.bind(this, 'up'));
-            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_BOTTOM, this._boundGpMoveDown = this.onMove.bind(this, 'down'));
-            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_LEFT, this._boundGpMoveLeft = this.onMove.bind(this, 'left'));
-            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_RIGHT, this._boundGpMoveRight = this.onMove.bind(this, 'right'));
+            this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.PAD_TOP, this._boundGpMoveUp = this.onMove.bind(this, 'up'));
+            this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.PAD_BOTTOM, this._boundGpMoveDown = this.onMove.bind(this, 'down'));
+            this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.PAD_LEFT, this._boundGpMoveLeft = this.onMove.bind(this, 'left'));
+            this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.PAD_RIGHT, this._boundGpMoveRight = this.onMove.bind(this, 'right'));
 
-            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, this._boundGpSelect1 = this.onSelect.bind(this));
-            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, this._boundGpSelect2 = this.onSelect.bind(this));
-            this.game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, this._boundGpSelect3 = this.onSelect.bind(this));
+            this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_1, this._boundGpSelect1 = this.onSelect.bind(this));
+            this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_2, this._boundGpSelect2 = this.onSelect.bind(this));
+            this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.START, this._boundGpSelect3 = this.onSelect.bind(this));
 
-            this.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this._boundGpMove1 = this.onGpMove.bind(this));
-            this.game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this._boundGpMove2 = this.onGpMove.bind(this));
+            this.game.input.gamepad.sticks.on(gf.GamepadSticks.AXIS.LEFT_ANALOGUE_HOR, this._boundGpMove1 = this.onGpMove.bind(this));
+            this.game.input.gamepad.sticks.on(gf.GamepadSticks.AXIS.LEFT_ANALOGUE_VERT, this._boundGpMove2 = this.onGpMove.bind(this));
             this.game.input.gamepad.sticks.threshold = 0.35;
         },
         stop: function() {
             State.prototype.stop.call(this);
 
-            this.game.input.keyboard.off(gf.input.KEY.DOWN, this._boundMoveDown);
-            this.game.input.keyboard.off(gf.input.KEY.UP, this._boundMoveUp);
-            this.game.input.keyboard.off(gf.input.KEY.LEFT, this._boundMoveLeft);
-            this.game.input.keyboard.off(gf.input.KEY.RIGHT, this._boundMoveRight);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.DOWN, this._boundMoveDown);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.UP, this._boundMoveUp);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.LEFT, this._boundMoveLeft);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.RIGHT, this._boundMoveRight);
 
-            this.game.input.keyboard.off(gf.input.KEY.S, this._boundMoveDownS);
-            this.game.input.keyboard.off(gf.input.KEY.W, this._boundMoveUpW);
-            this.game.input.keyboard.off(gf.input.KEY.A, this._boundMoveLeftA);
-            this.game.input.keyboard.off(gf.input.KEY.D, this._boundMoveRightD);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.S, this._boundMoveDownS);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.W, this._boundMoveUpW);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.A, this._boundMoveLeftA);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.D, this._boundMoveRightD);
 
-            this.game.input.keyboard.off(gf.input.KEY.ENTER, this._boundSelect1);
-            this.game.input.keyboard.off(gf.input.KEY.SPACE, this._boundSelect2);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.ENTER, this._boundSelect1);
+            this.game.input.keyboard.off(gf.Keyboard.KEY.SPACE, this._boundSelect2);
 
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_TOP, this._boundGpMoveDown);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_BOTTOM, this._boundGpMoveUp);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_LEFT, this._boundGpMoveLeft);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_RIGHT, this._boundGpMoveRight);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.PAD_TOP, this._boundGpMoveDown);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.PAD_BOTTOM, this._boundGpMoveUp);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.PAD_LEFT, this._boundGpMoveLeft);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.PAD_RIGHT, this._boundGpMoveRight);
 
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, this._boundGpSelect1);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_2, this._boundGpSelect2);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, this._boundGpSelect3);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.FACE_1, this._boundGpSelect1);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.FACE_2, this._boundGpSelect2);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.START, this._boundGpSelect3);
 
-            this.game.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this._boundGpMove1);
-            this.game.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, this._boundGpMove2);
+            this.game.input.gamepad.sticks.off(gf.GamepadSticks.AXIS.LEFT_ANALOGUE_HOR, this._boundGpMove1);
+            this.game.input.gamepad.sticks.off(gf.GamepadSticks.AXIS.LEFT_ANALOGUE_VERT, this._boundGpMove2);
         },
         onMove: function(dir, status) {
             if(!status.down)
@@ -177,7 +176,7 @@ define([
                 this.char.y = gf.math.clamp(this.char.y, 0, 3);
                 this.char.x = gf.math.clamp(this.char.x, 0, 28);
 
-                this.line.position.y = 403 + (this.char.y * (this.delta.y * TEXT_SCALE));
+                this.line.position.y = 392 + (this.char.y * (this.delta.y * TEXT_SCALE));
                 this.characters.position.x = -((this.char.x - 6) * this.delta.x);
             } else if(this.active === 'erase') {
 
@@ -275,7 +274,7 @@ define([
                 }
                 this.pnameI = (this.pnameI + 1) % 6;
 
-                this.pname.setText(n);
+                this.pname.text = n;
 
                 this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
 
@@ -296,7 +295,7 @@ define([
             this[name].visible = true;
 
             if(name === 'register') {
-                this.pname.setText('');
+                this.pname.text = '';
                 this.pnameI = 0;
                 this.sprites.pointer.position.x = 90;
                 this.line.visible = true;
@@ -315,7 +314,7 @@ define([
 
                     sv.load();
 
-                    this['slot' + n].setText(n + '.' + (sv.data ? sv.data.name : ''));
+                    this['slot' + n].text = n + '.' + (sv.data ? sv.data.name : '');
                     //TODO: set hearts
                     //TODO: link icon
                 }
@@ -324,66 +323,66 @@ define([
             this.active = name;
         },
         _setupSelect: function() {
-            this.select = new gf.DisplayObjectContainer();
+            this.select = new gf.Container();
 
             this.select.addChild(this.sprites.select);
 
             this.sprites.fairy.position.x = 80;
             this.sprites.fairy.position.y = 215;
-            this.sprites.fairy.gotoAndPlay('flap');
+            this.sprites.fairy.goto(0, 'flap').play();
             this.select.addChild(this.sprites.fairy);
 
-            var text = new gf.DisplayObjectContainer(),
+            var text = new gf.Container(),
                 title = this.fontpool.create(),
                 copy = this.fontpool.create(),
                 erase = this.fontpool.create();
 
             text.scale.x = text.scale.y = TEXT_SCALE;
 
-            title.setText('PLAYER  SELECT');
+            title.text = 'PLAYER  SELECT';
             title.position.x = 80;
-            title.position.y = 75;
+            title.position.y = 50;
             text.addChild(title);
 
             this.slot1 = this.fontpool.create();
-            this.slot1.setText('1.');
+            this.slot1.text = '1.';
             this.slot1.position.x = 145;
-            this.slot1.position.y = 170;
+            this.slot1.position.y = 145;
             text.addChild(this.slot1);
 
             this.slot2 = this.fontpool.create();
-            this.slot2.setText('2.');
+            this.slot2.text = '2.';
             this.slot2.position.x = 145;
-            this.slot2.position.y = 230;
+            this.slot2.position.y = 205;
             text.addChild(this.slot2);
  
             this.slot3 = this.fontpool.create();
-            this.slot3.setText('3.');
+            this.slot3.text = '3.';
             this.slot3.position.x = 145;
-            this.slot3.position.y = 290;
+            this.slot3.position.y = 265;
             text.addChild(this.slot3);
 
-            copy.setText('COPY  PLAYER');
+            copy.text = 'COPY  PLAYER';
             copy.position.x = 100;
-            copy.position.y = 380;
+            copy.position.y = 355;
             text.addChild(copy);
 
-            erase.setText('ERASE PLAYER');
+            erase.text = 'ERASE PLAYER';
             erase.position.x = 100;
-            erase.position.y = 410;
+            erase.position.y = 385;
             text.addChild(erase);
 
             this.select.addChild(text);
-            this.camera.addChild(this.select);
+            this.camera.add.obj(this.select);
         },
         _setupRegister: function() {
-            this.register = new gf.DisplayObjectContainer();
+            this.register = new gf.Container();
 
             this.sprites.pointer.position.x = 90;
             this.sprites.pointer.position.y = 265;
             this.register.addChild(this.sprites.pointer);
 
-            var text = new gf.DisplayObjectContainer(),
+            var text = new gf.Container(),
                 title = this.fontpool.create(),
                 self = this,
                 lines = [
@@ -395,27 +394,26 @@ define([
 
             text.scale.x = text.scale.y = TEXT_SCALE;
 
-            title.setText('REGISTER  YOUR  NAME');
+            title.text = 'REGISTER  YOUR  NAME';
             title.position.x = 80;
-            title.position.y = 107;
+            title.position.y = 80;
             text.addChild(title);
 
             this.pname = this.fontpool.create();
-            this.pname.setText('');
+            this.pname.text = '';
             this.pname.monospace = 15;
-            this.pname.lineWidth = 1;
-            this.pname.position.x = 65;
-            this.pname.position.y = 218;
+            this.pname.position.x = 62;
+            this.pname.position.y = 192;
             text.addChild(this.pname);
 
             //create all the characters
-            this.characters = new gf.DisplayObjectContainer();
+            this.characters = new gf.Container();
             this.chars = [];
-            this.delta = new gf.Point(32, 35);
-            this.char = new gf.Point(6, 0);
+            this.delta = new gf.Vector(32, 35);
+            this.char = new gf.Vector(6, 0);
 
             var sx = 65,
-                sy = 282,
+                sy = 250,
                 cx = sx,
                 cy = sy;
             for(var y = 0; y < lines.length; ++y) {
@@ -426,19 +424,19 @@ define([
                     var t = this.fontpool.create();
 
                     if(line[x] === '=') {
-                        t.setText('END');
+                        t.text = 'END';
                         t.name = 'end';
                     } else if(line[x] === '+') {
-                        t.setText(' ');
+                        t.text = ' ';
                         t.name = 'end';
                     } else if(line[x] === '<') {
-                        t.setText('<');
+                        t.text = '<';
                         t.name = 'left';
                     } else if(line[x] === '>') {
-                        t.setText('>');
+                        t.text = '>';
                         t.name = 'right';
                     } else {
-                        t.setText(line[x]);
+                        t.text = line[x];
                     }
                     t.position.x = cx;
                     t.position.y = cy;
@@ -456,12 +454,12 @@ define([
             text.addChild(this.characters);
             this.register.addChild(text);
 
-            var line = this.line = new PIXI.Graphics();
+            var line = this.line = new gf.Graphics();
             line.lineStyle(2, 0xffffff, 1);
             line.moveTo(0,0);
             line.lineTo(624, 0);
             line.position.x = 72;
-            line.position.y = 403;
+            line.position.y = 392;
             line.visible = false;
             this.register.addChild(line);
 

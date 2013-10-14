@@ -1,9 +1,10 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/entities/Entity'
-], function(C, Entity) {
+], function(gf, C, Entity) {
     var Flower = function() {
-        Entity.call(this, gf.assetCache.sprite_misc, 0.2);
+        Entity.call(this, lttp.game.cache.getTextures('sprite_misc'), 0.2);
 
         this.addAnimation('flower_1', [
             this.spritesheet['flower/flower_1_3.png'].frames[0],
@@ -18,7 +19,7 @@ define([
         ], 0.095, true);
     };
 
-    gf.inherits(Flower, Entity, {
+    gf.inherit(Flower, Entity, {
     });
 
     return Flower;

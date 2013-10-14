@@ -1,46 +1,46 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/states/State'
-], function(C, State) {
-    var Title = function(game) {
-        State.call(this, 'title', game);
+], function(gf, C, State) {
+    var Intro = function(game) {
+        State.call(this, game, 'title');
 
+        var audioSettings = { volume: C.MUSIC_VOLUME };
         this.sounds = {
-            intro: gf.assetCache.music_title,
-            sword: gf.assetCache.effect_sword1,
-            ding: gf.assetCache.effect_menu_select
+            intro: this.audio.add('music_title', audioSettings),
+            sword: this.audio.add('effect_sword1', audioSettings),
+            ding: this.audio.add('effect_menu_select', audioSettings)
         };
 
-        for(var s in this.sounds) {
-            this.sounds[s].volume = C.MUSIC_VOLUME;
-            this.audio.attach(this.sounds[s]);
-        }
+        var txIntro = game.cache.getTextures('sprite_intro'),
+            txParticles = game.cache.getTextures('sprite_particles');
 
         this.sprites = {
-            intro: new gf.AnimatedSprite(gf.assetCache.sprite_intro),
+            intro: new gf.Sprite(),
 
-            background: new gf.Sprite(gf.assetCache.sprite_intro['background.png'].frames[0]),
-            title: new gf.Sprite(gf.assetCache.sprite_intro['logo.png'].frames[0]),
-            sword: new gf.Sprite(gf.assetCache.sprite_intro['sword.png'].frames[0]),
-            zpart: new gf.Sprite(gf.assetCache.sprite_intro['zpart.png'].frames[0]),
-            shine: new gf.Sprite(gf.assetCache.sprite_particles['swordshine/shine.png']),
-            sparkle: new gf.AnimatedSprite([
-                gf.assetCache.sprite_particles['sparkle/0.png'],
-                gf.assetCache.sprite_particles['sparkle/1.png'],
-                gf.assetCache.sprite_particles['sparkle/2.png'],
-                gf.assetCache.sprite_particles['sparkle/3.png'],
-                gf.assetCache.sprite_particles['sparkle/4.png'],
-                gf.assetCache.sprite_particles['sparkle/5.png']
+            background: new gf.Sprite(txIntro['background.png']), //.frames[0]),
+            title: new gf.Sprite(txIntro['logo.png']), //.frames[0]),
+            sword: new gf.Sprite(txIntro['sword.png']), //.frames[0]),
+            zpart: new gf.Sprite(txIntro['zpart.png']), //.frames[0]),
+            shine: new gf.Sprite(txParticles['swordshine/shine.png']),
+            sparkle: new gf.Sprite([
+                txParticles['sparkle/0.png'],
+                txParticles['sparkle/1.png'],
+                txParticles['sparkle/2.png'],
+                txParticles['sparkle/3.png'],
+                txParticles['sparkle/4.png'],
+                txParticles['sparkle/5.png']
             ], 0.25)
         };
 
-        this.camera.addChild(this.sprites.background);
-        this.camera.addChild(this.sprites.intro);
-        this.camera.addChild(this.sprites.title);
-        this.camera.addChild(this.sprites.sparkle);
-        this.camera.addChild(this.sprites.sword);
-        this.camera.addChild(this.sprites.shine);
-        this.camera.addChild(this.sprites.zpart);
+        this.camera.add.obj(this.sprites.background);
+        this.camera.add.obj(this.sprites.intro);
+        this.camera.add.obj(this.sprites.title);
+        this.camera.add.obj(this.sprites.sparkle);
+        this.camera.add.obj(this.sprites.sword);
+        this.camera.add.obj(this.sprites.shine);
+        this.camera.add.obj(this.sprites.zpart);
 
         this.sprites.sparkle.visible = false;
         this.sprites.sparkle.anchor.x = this.sprites.sparkle.anchor.y = 0.5;
@@ -54,11 +54,11 @@ define([
         this.doPlay = true;
     };
 
-    gf.inherits(Title, State, {
+    gf.inherit(Intro, State, {
         start: function() {
             State.prototype.start.call(this);
 
-            this.sprites.intro.gotoAndPlay('intro');
+            this.sprites.intro.goto(0, 'intro').play();
 
             var self = this;
 
@@ -96,8 +96,7 @@ define([
                                         ease: Linear.easeNone,
                                         onComplete: function() {
                                             self.shine();
-                                            self.sprites.intro.gotoAndStop(0);
-                                            self.sprites.intro.visible = false;
+                                            self.sprites.intro.goto(0).stop().visible = false;
                                         }
                                     });
                                 });
@@ -169,7 +168,7 @@ define([
                     break;
             }
 
-            sp.gotoAndPlay('_default');
+            sp.goto(0, '_default').play();
             sp.once('complete', function() {
                 sp.visible = false;
 
@@ -198,13 +197,14 @@ define([
         },
         _setupIntroSprite: function() {
             var frames = [],
-                i = 0;
+                i = 0,
+                txIntro = this.game.cache.getTextures('sprite_intro');
 
             for(i = 3; i < 278; ++i) {
                 var s = i.toString();
                 while(s.length < 5) { s = '0' + s; }
 
-                frames.push(gf.assetCache.sprite_intro['Zelda - A Link to the Past_' + s + '.png'].frames[0]);
+                frames.push(txIntro['Zelda - A Link to the Past_' + s + '.png']); //.frames[0]);
             }
             this.sprites.intro.addAnimation('intro', frames, 0.5);
         },
@@ -222,5 +222,5 @@ define([
         }
     });
 
-    return Title;
+    return Intro;
 });

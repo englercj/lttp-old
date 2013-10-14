@@ -1,5 +1,6 @@
 define([
-], function() {
+    'vendor/gf'
+], function(gf) {
     return [
         //Special items
         {

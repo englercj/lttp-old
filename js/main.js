@@ -1,11 +1,12 @@
 require([
+    'vendor/gf',
     'game/data/resources',
-    'game/states/Title',
+    'game/states/Intro',
     'game/states/Select',
     'game/states/Play',
     'game/entities/misc/Torch',
     'game/entities/misc/Flower'
-], function(resources, TitleState, SelectState, PlayState, Torch, Flower) {
+], function(gf, resources, IntroState, SelectState, PlayState, Torch, Flower) {
     var $game, game, muted;
 
     window.lttp = {
@@ -22,48 +23,54 @@ require([
             height: $game.height(),
             transparent: true
         });
+        gfdebug.show(game);
 
         game.spritepool.add('torch', Torch);
         game.spritepool.add('flower', Flower);
 
-        game.loader.on('progress', function(e) {
+        resources.load(game);
+
+        game.load.on('progress', function(e) {
         });
 
-        game.loader.on('complete', function() {
+        game.load.on('complete', function() {
             //load starting states
-            lttp.intro = new TitleState(game);
+            lttp.intro = new IntroState(game);
             lttp.intro.start();
+            lttp.intro.audio.mute();
 
             //load select state
             lttp.select = new SelectState(game);
             lttp.select.on('select', loadGame);
+            lttp.select.audio.mute();
 
             //load the play state
             lttp.play = new PlayState(game);
+            lttp.play.audio.mute();
 
-            game.input.keyboard.on(gf.input.KEY.ENTER, gotoSelect);
-            game.input.keyboard.on(gf.input.KEY.SPACE, gotoSelect);
-            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, gotoSelect);
-            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, gotoSelect);
+            game.input.keyboard.on(gf.Keyboard.KEY.ENTER, gotoSelect);
+            game.input.keyboard.on(gf.Keyboard.KEY.SPACE, gotoSelect);
+            game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_1, gotoSelect);
+            game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.START, gotoSelect);
 
-            game.input.keyboard.once(gf.input.KEY.TILDE, onDebug);
-            game.input.keyboard.on(gf.input.KEY.P, onToggleAudio);
-            game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_SHOULDER, onToggleAudio);
+            game.input.keyboard.once(gf.Keyboard.KEY.TILDE, onDebug);
+            game.input.keyboard.on(gf.Keyboard.KEY.P, onToggleAudio);
+            game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.RIGHT_SHOULDER, onToggleAudio);
 
             //start render loop
             game.render();
         });
 
-        game.loader.load(resources);
+        game.load.start();
     });
 
     function gotoSelect() {
         lttp.intro.stop();
 
-        game.input.keyboard.off(gf.input.KEY.ENTER, gotoSelect);
-        game.input.keyboard.off(gf.input.KEY.SPACE, gotoSelect);
-        game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, gotoSelect);
-        game.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, gotoSelect);
+        game.input.keyboard.off(gf.Keyboard.KEY.ENTER, gotoSelect);
+        game.input.keyboard.off(gf.Keyboard.KEY.SPACE, gotoSelect);
+        game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.FACE_1, gotoSelect);
+        game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.START, gotoSelect);
 
         lttp.select.start();
     }
@@ -75,7 +82,7 @@ require([
     }
 
     function onDebug() {
-        gf.debug.show(game);
+        gfdebug.show(game);
     }
 
     function onToggleAudio(status) {
@@ -84,12 +91,12 @@ require([
         if(muted) {
             lttp.intro.audio.unmute();
             lttp.select.audio.unmute();
-            lttp.play.audio.unmute();
+            //lttp.play.audio.unmute();
             muted = false;
         } else {
             lttp.intro.audio.mute();
             lttp.select.audio.mute();
-            lttp.play.audio.mute();
+            //lttp.play.audio.mute();
             muted = true;
         }
     }

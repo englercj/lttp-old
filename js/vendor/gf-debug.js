@@ -1,40 +1,44 @@
 /**
  * @license
- * GrapeFruit Debug Plugin - v0.0.1
+ * GrapeFruit Debug Module - v0.0.1
  * Copyright (c) 2013, Chad Engler
  * https://github.com/grapefruitjs/gf-debug
  *
- * Compiled: 2013-08-06
+ * Compiled: 2013-10-13
  *
- * GrapeFruit Debug Plugin is licensed under the MIT License.
+ * GrapeFruit Debug Module is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  */
 (function(window, undefined) {
-    var document = window.document;
+    var document = window.document,
+        debug = {};
 
 //register the plugin to grapefruit
-gf.plugin.register({}, 'debug');
+gf.plugin.register(debug, 'debug');
+window.gfdebug = debug;
 
 //the version of this plugin. Placed in by grunt when built you can change
 //this value in the package.json (under version)
-gf.debug.version = '0.0.1';
-
-//the version of gf that is required for this plugin to function correctly.
-//Placed in by grunt when built you can change this value in the package.json (under engines.gf)
-gf.debug.gfVersion = '0.0.x';
+debug.version = '0.0.1';
 
 //on tick funciton to replace the gf.Game.prototype._tick function with
 //will call _super to run the normal tick, then tick the panels as well
-gf.debug.onTick = function() {
+debug.onTick = function() {
     this._super();
 
-    gf.debug._statsTick();
+    var dStart = debug.game.clock.now(),
+        dEnd;
 
-    if(gf.debug.panels) {
-        gf.debug.panels.map.tick();
-        gf.debug.panels.performance.tick();
-        gf.debug.panels.sprites.tick();
+    debug._statsTick();
+
+    if(debug.panels) {
+        debug.panels.map.tick();
+        debug.panels.performance.tick();
+        debug.panels.sprites.tick();
     }
+
+    dEnd = debug.game.clock.now();
+    debug.game.timings.__debugLastDiff = dEnd - dStart;
 };
 
 /**
@@ -43,9 +47,9 @@ gf.debug.onTick = function() {
  * @method show
  * @param game {gf.Game} the game to debug
  */
-gf.debug.show = function(game) {
+debug.show = function(game) {
     if(!game || !(game instanceof gf.Game))
-        throw 'Please pass a game instance to gf.debug.show!';
+        throw 'Please pass a game instance to debug.show!';
 
     if(this.game)
         throw 'Already debugging a game instance!';
@@ -53,10 +57,10 @@ gf.debug.show = function(game) {
     this.game = game;
 
     this.panels = {
-        map: new gf.debug.MapPanel(game),
-        sprites: new gf.debug.SpritesPanel(game),
-        gamepad: new gf.debug.GamepadPanel(game),
-        performance: new gf.debug.PerformancePanel(game)
+        map: new debug.MapPanel(game),
+        sprites: new debug.SpritesPanel(game),
+        gamepad: new debug.GamepadPanel(game),
+        performance: new debug.PerformancePanel(game)
     };
 
     //patch the tick method
@@ -77,16 +81,147 @@ gf.debug.show = function(game) {
  * @method logEvent
  * @param name {String} the event name to show on the graph
  */
-gf.debug.logEvent = function(name) {
+debug.logEvent = function(name) {
     if(this.panels && this.panels.performance)
         this.panels.performance.logEvent(name);
 };
 
-gf.debug._bindEvents = function() {
+/**
+ * Draws the body of a sprite
+ *
+ * @method drawBodyShape
+ * @param body {Body} The body to draw a visual representation of
+ * @param [style] {Object} The style of the line draws
+ * @param [style.size=1] {Number} The thickness of the line stroke
+ * @param [style.color=0xff2222] {Number} The color of the line stroke
+ * @param [style.alpha=1] {Number} The opacity of the line stroke [0 - 1]
+ * @param [gfx] {Graphics} The graphics object to use to draw with, if
+ *      none is passed a new one is created and added ot the world.
+ * @return {Graphics} The graphics object used to draw the shape
+ */
+debug.drawBodyShape = function(body, style, gfx) {
+    var shape = body.shape,
+        a = body.sprite.anchor,
+        ax = a !== undefined ? a.x : 0,
+        ay = a !== undefined ? a.y : 0,
+        trans = body.sprite.worldTransform,
+        px = trans[2],
+        py = trans[5],
+        sx = trans[0],
+        sy = trans[4],
+        sw = body.sprite.width * sx,
+        sh = body.sprite.height * sy,
+        game = this.game;
+
+    px -= ax * sw;
+    py -= ay * sh;
+
+    //setup gfx
+    gfx = gfx || (function() {
+                    var g = new gf.PIXI.Graphics();
+                    game.world.add.obj(g);
+                    return g;
+                })();
+
+    //setup style
+    style = style || {};
+
+    gfx.lineStyle(
+        style.size !== undefined ? style.size : 1,
+        style.color !== undefined ? style.color : 0xff2222,
+        style.alpha !== undefined ? style.alpha : 1
+    );
+
+    //draw circle
+    if(shape._shapetype === gf.SHAPE.CIRCLE) {
+        //var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
+        //    cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
+
+        gfx.drawCircle(px + (sw / 2), py + (sh / 2), shape.radius * ((sx + sy) / 2));
+    }
+    //draw polygon
+    else {
+        var pt = shape.points[0];
+
+        gfx.moveTo(
+            px + pt.x,
+            py + pt.y
+        );
+
+        for(var x = 1; x < shape.points.length; x++) {
+            gfx.lineTo(
+                px + shape.points[x].x * sx,
+                py + shape.points[x].y * sy
+            );
+        }
+
+        gfx.lineTo(
+            px + pt.x,
+            py + pt.y
+        );
+    }
+
+    return gfx;
+};
+
+/**
+ * Draws the quadtree used by physics onto the screen
+ *
+ * @method drawQuadTree
+ * @param [tree=game.physics.tree] {QuadTree} The quadtree to draw, generally this is for recursing
+ * @param [style] {Object} The style of the line draws
+ * @param [style.size=1] {Number} The thickness of the line stroke
+ * @param [style.color=0x2222ff] {Number} The color of the line stroke
+ * @param [style.alpha=1] {Number} The opacity of the line stroke [0 - 1]
+ * @param [gfx] {Graphics} The graphics object to use to draw with, if
+ *      none is passed a new one is created and added ot the world.
+ * @return {Graphics} The graphics object used to draw the tree
+ */
+debug.drawQuadTree = function(tree, style, gfx) {
+    var self = this;
+
+    //setup gfx
+    gfx = gfx || (function() {
+                    var g = new gf.PIXI.Graphics();
+                    self.game.world.add.obj(g);
+                    return g;
+                })();
+
+    tree = tree || this.game.physics.tree;
+
+    //setup style
+    style = style || {};
+
+    gfx.lineStyle(
+        style.size !== undefined ? style.size : 1,
+        style.color !== undefined ? style.color : 0x2222ff,
+        style.alpha !== undefined ? style.alpha : 1
+    );
+
+    //draw our bounds
+    gfx.drawRect(
+        tree.bounds.x,
+        tree.bounds.y,
+        tree.bounds.width,
+        tree.bounds.height
+    );
+
+    //draw each node
+    if(tree.nodes.length) {
+        for(var i = 0; i < tree.nodes.length; ++i) {
+            //recurse for children
+            this.drawQuadTree(tree.nodes[i], style, gfx);
+        }
+    }
+
+    return gfx;
+};
+
+debug._bindEvents = function() {
     var activePanel,
         self = this;
 
-    this.ui.bindDelegate(this._bar, 'click', 'gf_debug_menu_item', function(e) {
+    this.ui.delegate(this._bar, 'click', '.gf_debug_menu_item', function(e) {
         var panel = self.panels[e.target.className.replace(/gf_debug_menu_item|active/g, '').trim()];
 
         if(!panel)
@@ -102,18 +237,13 @@ gf.debug._bindEvents = function() {
             }
         }
 
-        if(panel.name === 'performance')
-            panel.active = true;
-        else
-            self.panels.performance.active = false;
-
         self.ui.addClass(e.target, 'active');
         panel.toggle();
         activePanel = panel;
     });
 };
 
-gf.debug._createElement = function() {
+debug._createElement = function() {
     var c = this._container = document.createElement('div'),
         bar = this._bar = document.createElement('div');
 
@@ -135,7 +265,7 @@ gf.debug._createElement = function() {
     return c;
 };
 
-gf.debug._createMenuHead = function() {
+debug._createMenuHead = function() {
     var div = document.createElement('div');
 
     this.ui.addClass(div, 'gf_debug_head');
@@ -144,13 +274,14 @@ gf.debug._createMenuHead = function() {
     return div;
 };
 
-gf.debug._createMenuStats = function() {
+debug._createMenuStats = function() {
     this._stats = {};
 
     var div = document.createElement('div'),
         fps = this._stats.fps = document.createElement('div'),
         ms = this._stats.ms = document.createElement('div'),
-        obj = this._stats.obj = document.createElement('div');
+        wld = this._stats.wld = document.createElement('div'),
+        cam = this._stats.cam = document.createElement('div');
 
     this.ui.addClass(div, 'gf_debug_stats');
 
@@ -162,14 +293,18 @@ gf.debug._createMenuStats = function() {
     this.ui.setHtml(fps, '<span>0</span> fps');
     div.appendChild(fps);
 
-    this.ui.addClass(obj, 'gf_debug_stats_item obj');
-    this.ui.setHtml(obj, '<span>0</span> objects');
-    div.appendChild(obj);
+    this.ui.addClass(wld, 'gf_debug_stats_item world');
+    this.ui.setHtml(wld, '<span>0</span> world objs');
+    div.appendChild(wld);
+
+    this.ui.addClass(cam, 'gf_debug_stats_item camera');
+    this.ui.setHtml(cam, '<span>0</span> camera objs');
+    div.appendChild(cam);
 
     return div;
 };
 
-gf.debug._statsTick = function() {
+debug._statsTick = function() {
     var ms = this.game.timings.tickEnd - this.game.timings.tickStart,
         fps = 1000/ms;
 
@@ -178,87 +313,87 @@ gf.debug._statsTick = function() {
     //update stats
     this.ui.setText(this._stats.ms.firstElementChild, ms.toFixed(2));
     this.ui.setText(this._stats.fps.firstElementChild, fps.toFixed(2));
+
+    //count objects in the world
+    var wld = this.game.state.active.world,
+        cam = this.game.state.active.camera,
+        wlast = wld.last._iNext,
+        clast = cam.last._iNext,
+        wcnt = 0,
+        ccnt = 0;
+
+    //count world objects
+    do {
+        wcnt++;
+        wld = wld._iNext;
+    } while(wld !== wlast);
+
+    //count camera objects
+    do {
+        ccnt++;
+        cam = cam._iNext;
+    } while(cam !== clast);
+
+    //set the element values
+    debug.ui.setText(debug._stats.wld.firstElementChild, wcnt);
+    debug.ui.setText(debug._stats.cam.firstElementChild, ccnt);
 };
 
-//update the number of sprites every couple seconds (instead of every frame)
-//since it is so expensive
-setInterval(function() {
-    if(gf.debug._stats && gf.debug._stats.obj) {
-        //count objects in active state
-        var c = 0,
-            s = gf.debug.game.activeState,
-            wld = s.world,
-            cam = s.camera;
-
-        while(wld) {
-            c++;
-            wld = wld._iNext;
-        }
-
-        while(cam) {
-            c++;
-            cam = cam._iNext;
-        }
-
-        gf.debug.ui.setText(gf.debug._stats.obj.firstElementChild, c);
-
-        //log the event to the performance graph
-        if(gf.debug.logObjectCountEvent)
-            gf.debug.logEvent('debug_count_objects');
-    }
-}, 2000);
-gf.debug.Panel = function(game) {
+debug.Panel = function(game) {
     this.game = game;
     this.name = '';
     this.title = '';
+    this.active = false;
 };
 
-gf.inherits(gf.debug.Panel, Object, {
+gf.inherit(debug.Panel, Object, {
     //builds the html for a panel
     createPanelElement: function() {
         var div = this._panel = document.createElement('div');
-        gf.debug.ui.addClass(div, 'gf_debug_panel');
-        gf.debug.ui.addClass(div, this.name);
+        debug.ui.addClass(div, 'gf_debug_panel');
+        debug.ui.addClass(div, this.name);
 
         return div;
     },
     //builds the html for this panels menu item
     createMenuElement: function() {
         var div = this._menuItem = document.createElement('div');
-        gf.debug.ui.addClass(div, 'gf_debug_menu_item ' + this.name);
-        gf.debug.ui.setText(div, this.title);
+        debug.ui.addClass(div, 'gf_debug_menu_item ' + this.name);
+        debug.ui.setText(div, this.title);
 
         return div;
     },
     toggle: function() {
-        if(this._panel.style.display === 'block')
+        if(this._panel.style.display === 'block') {
             this.hide();
-        else
+            this.active = false;
+        } else {
             this.show();
+            this.active = true;
+        }
     },
     show: function() {
-        gf.debug.ui.setStyle(this._panel, 'display', 'block');
+        debug.ui.setStyle(this._panel, 'display', 'block');
     },
     hide: function() {
-        gf.debug.ui.setStyle(this._panel, 'display', 'none');
+        debug.ui.setStyle(this._panel, 'display', 'none');
     }
 });
-gf.debug.GamepadPanel = function(game) {
-    gf.debug.Panel.call(this, game);
+debug.GamepadPanel = function(game) {
+    debug.Panel.call(this, game);
 
     this.name = 'gamepad';
     this.title = 'Gamepad';
 
-    this.gamepad = new gf.debug.Gamepad();
+    this.gamepad = new debug.Gamepad();
     this.bindEvents();
 };
 
-gf.inherits(gf.debug.GamepadPanel, gf.debug.Panel, {
+gf.inherit(debug.GamepadPanel, debug.Panel, {
     createPanelElement: function() {
-        var div = gf.debug.Panel.prototype.createPanelElement.call(this);
+        var div = debug.Panel.prototype.createPanelElement.call(this);
 
         div.appendChild(this.gamepad.element);
-        window.console.log(this.gamepad.element);
 
         return div;
     },
@@ -267,63 +402,63 @@ gf.inherits(gf.debug.GamepadPanel, gf.debug.Panel, {
             pad = this.gamepad;
 
         //bind all buttons
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_1, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_2, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_3, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.FACE_4, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.LEFT_SHOULDER, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_SHOULDER, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.LEFT_TRIGGER, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_TRIGGER, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.SELECT, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.START, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.LEFT_ANALOGUE_STICK, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.RIGHT_ANALOGUE_STICK, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_TOP, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_BOTTOM, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_LEFT, pad.updateButton.bind(pad));
-        game.input.gamepad.buttons.on(gf.input.GP_BUTTON.PAD_RIGHT, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_1, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_2, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_3, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_4, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.LEFT_SHOULDER, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.RIGHT_SHOULDER, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.LEFT_TRIGGER, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.RIGHT_TRIGGER, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.SELECT, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.START, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.LEFT_ANALOGUE_STICK, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.RIGHT_ANALOGUE_STICK, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.PAD_TOP, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.PAD_BOTTOM, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.PAD_LEFT, pad.updateButton.bind(pad));
+        game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.PAD_RIGHT, pad.updateButton.bind(pad));
 
         //bind all sticks
-        game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, pad.updateAxis.bind(pad));
-        game.input.gamepad.sticks.on(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT, pad.updateAxis.bind(pad));
-        game.input.gamepad.sticks.on(gf.input.GP_AXIS.RIGHT_ANALOGUE_HOR, pad.updateAxis.bind(pad));
-        game.input.gamepad.sticks.on(gf.input.GP_AXIS.RIGHT_ANALOGUE_VERT, pad.updateAxis.bind(pad));
+        game.input.gamepad.sticks.on(gf.GamepadSticks.AXIS.LEFT_ANALOGUE_HOR, pad.updateAxis.bind(pad));
+        game.input.gamepad.sticks.on(gf.GamepadSticks.AXIS.LEFT_ANALOGUE_VERT, pad.updateAxis.bind(pad));
+        game.input.gamepad.sticks.on(gf.GamepadSticks.AXIS.RIGHT_ANALOGUE_HOR, pad.updateAxis.bind(pad));
+        game.input.gamepad.sticks.on(gf.GamepadSticks.AXIS.RIGHT_ANALOGUE_VERT, pad.updateAxis.bind(pad));
     }
 });
-gf.debug.PerformancePanel = function(game) {
-    gf.debug.Panel.call(this, game);
+debug.PerformancePanel = function(game) {
+    debug.Panel.call(this, game);
 
     this.name = 'performance';
     this.title = 'Performance';
     this.eventQueue = [];
-    this.active = false;
 };
 
-gf.inherits(gf.debug.PerformancePanel, gf.debug.Panel, {
+gf.inherit(debug.PerformancePanel, debug.Panel, {
     createPanelElement: function() {
-        var div = gf.debug.Panel.prototype.createPanelElement.call(this);
+        var div = debug.Panel.prototype.createPanelElement.call(this);
 
-        this.graph = new gf.debug.Graph(div, window.innerWidth - 10, 250 - 5, {
+        this.graph = new debug.Graph(div, window.innerWidth - 20, 250 - 5, {
             input: 'rgba(80, 220, 80, 1)',
             camera: 'rgba(80, 80, 220, 1)',
             phys: 'rgba(80, 220, 200, 1)',
+            user: 'rgba(200, 80, 220, 1)',
             draw: 'rgba(220, 80, 80, 1)',
+            debug: 'rgba(220, 220, 80, 1)',
             event: 'rgba(200, 200, 200, 0.6)'
         });
-        this.graph.max = 50;
+        this.graph.max = 30;
 
         return div;
     },
     tick: function() {
-        if(!this.active)
-            return;
-
         var t = this.game.timings,
             o = {
                 input: t.inputEnd - t.inputStart,
                 camera: t.cameraEnd - t.cameraStart,
                 phys: t.physicsEnd - t.physicsStart,
+                user: t.userFuncsEnd - t.userFuncsStart,
+                debug: t.__debugLastDiff || 0,
                 draw: t.renderEnd - t.renderStart
             },
             evt = this.eventQueue.shift();
@@ -337,124 +472,279 @@ gf.inherits(gf.debug.PerformancePanel, gf.debug.Panel, {
         this.eventQueue.push(name);
     }
 });
-gf.debug.SpritesPanel = function(game) {
-    gf.debug.Panel.call(this, game);
+debug.SpritesPanel = function(game) {
+    debug.Panel.call(this, game);
 
     this.name = 'sprites';
     this.title = 'Sprites';
 
-    this.gfx = new PIXI.Graphics();
+    this.gfx = new gf.Graphics();
 
     this.style = {
-        _default: {
+        _defaultShape: {
             size: 1,
             color: 0xff2222,
             alpha: 1
         },
-        sensor: {
+        sensorShape: {
             size: 1,
             color: 0x22ff22,
             alpha: 1
+        },
+        tree: {
+            size: 1,
+            color: 0x2222ff,
+            alpha: 1
         }
+    };
+
+    this.showing = {
+        shapes: false,
+        tree: false
     };
 };
 
-gf.inherits(gf.debug.SpritesPanel, gf.debug.Panel, {
+gf.inherit(debug.SpritesPanel, debug.Panel, {
     createPanelElement: function() {
-        var div = gf.debug.Panel.prototype.createPanelElement.call(this),
-            pad = document.createElement('div'),
-            col = document.createElement('div');
+        var div = debug.Panel.prototype.createPanelElement.call(this),
+            pad = document.createElement('div');
 
         // Show colliders
-        gf.debug.ui.addClass(col, 'checkbox');
-        gf.debug.ui.setHtml(col,
-            '<input type="checkbox" value="None" id="gf_debug_toggleCollisions" class="gf_debug_toggleCollisions" name="check" />' +
-            '<label for="gf_debug_toggleCollisions"></label>' +
-            '<span>Show sprite colliders</span>'
+        debug.ui.setHtml(pad,
+            '<div class="checkbox">' +
+                '<input type="checkbox" value="" id="gf_debug_toggleShapes" class="gf_debug_toggleShapes" name="check" />' +
+                '<label for="gf_debug_toggleShapes"></label>' +
+            '</div>' +
+            '<span>Draw Collider Shapes</span>' +
+            '<div class="checkbox">' +
+                '<input type="checkbox" value="" id="gf_debug_toggleQuadTree" class="gf_debug_toggleQuadTree" name="check" />' +
+                '<label for="gf_debug_toggleQuadTree"></label>' +
+            '</div>' +
+            '<span>Draw QuadTree</span>'
         );
-        gf.debug.ui.bindDelegate(col, 'click', 'gf_debug_toggleCollisions', this.toggleCollisions.bind(this), 'input');
-        pad.appendChild(col);
+        debug.ui.delegate(pad, 'change', '.gf_debug_toggleShapes', this.toggleType.bind(this, 'shapes'));
+        debug.ui.delegate(pad, 'change', '.gf_debug_toggleQuadTree', this.toggleType.bind(this, 'tree'));
 
         div.appendChild(pad);
 
         return div;
     },
-    toggleCollisions: function() {
-        this.showing = !this.showing;
-
-        if(this.showing) {
-            this.game.world.addChild(this.gfx);
-            this._drawPhysics();
-        } else {
-            if(this.gfx.parent)
-                this.gfx.parent.removeChild(this.gfx);
-        }
+    toggleType: function(type) {
+        this.showing[type] = !this.showing[type];
     },
     tick: function() {
-        if(this.showing) {
-            this._drawPhysics();
+        if(this.game.world !== this.gfx.parent) {
+            if(this.gfx.parent)
+                this.gfx.parent.removeChild(this.gfx);
+
+            this.game.world.add.obj(this.gfx);
         }
-    },
-    _drawPhysics: function() {
-        var self = this,
-            g = this.gfx;
 
         this.gfx.clear();
-        this.game.physics.space.eachShape(function(shape) {
-            if(!shape.body) return;
 
-            var body = shape.body,
-                p = body.p,
-                style = shape.sensor ? self.style.sensor : self.style._default;
+        //ensure always on top
+        if(!this.showing.shapes && !this.showing.tree)
+            return this._updateGfx(true);
+        else
+            this._updateGfx();
 
-            g.lineStyle(style.size, style.color, style.alpha);
-
-            //circle
-            if(shape.type === 'circle') {
-                var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
-                    cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
-
-                g.drawCircle(cx, cy, shape.r);
+        //draw all the bodies
+        if(this.showing.shapes) {
+            var bods = this.game.physics.bodies;
+            for(var i = 0; i < bods.length; ++i) {
+                debug.drawBodyShape(
+                    bods[i],
+                    bods[i].sensor ? this.style.sensorShape : this.style._defaultShape,
+                    this.gfx
+                );
             }
-            //polygon
-            else {
-                var sx = shape.verts[0],
-                    sy = shape.verts[1];
+        }
 
-                g.moveTo(p.x + sx, p.y + sy);
-
-                for(var i = 2; i < shape.verts.length; i+=2) {
-                    g.lineTo(
-                        p.x + shape.verts[i],
-                        p.y + shape.verts[i + 1]
-                    );
-                }
-
-                g.lineTo(p.x + sx, p.y + sy);
-            }
-        });
+        //draw the quadtree
+        if(this.showing.tree) {
+            debug.drawQuadTree(
+                this.game.physics.tree,
+                this.style.tree,
+                this.gfx
+            );
+        }
+    },
+    _updateGfx: function(rm) {
+        if(rm) {
+            if(this.gfx.parent)
+                this.gfx.parent.removeChild(this.gfx);
+        } else {
+            if(!this.gfx.parent)
+                this.game.world.add.obj(this.gfx);
+        }
     }
 });
-gf.debug.MapPanel = function (game) {
-    gf.debug.Panel.call(this, game);
+
+debug.MapPanel = function (game) {
+    debug.Panel.call(this, game);
 
     this.name = 'map';
     this.title = 'Mini-Map';
+    this.map = null;
+    this.maps = {};
+
+    this._cache = {
+        numStates: 0,
+        state: null
+    };
+
+    this.fullRender = true;
 };
 
-gf.inherits(gf.debug.MapPanel, gf.debug.Panel, {
+gf.inherit(debug.MapPanel, debug.Panel, {
     createPanelElement: function() {
-        var div = gf.debug.Panel.prototype.createPanelElement.call(this);
+        var div = debug.Panel.prototype.createPanelElement.call(this);
 
-        this.minimap = new gf.debug.Minimap(div, this.game);
+        this.states = document.createElement('ul');
+        debug.ui.addClass(this.states, 'states');
+        debug.ui.delegate(this.states, 'click', 'li', this.onClickState.bind(this));
+        div.appendChild(this.states);
+
+        this.mapsui = document.createElement('ul');
+        debug.ui.addClass(this.mapsui, 'maps');
+        debug.ui.delegate(this.mapsui, 'click', 'li', this.onClickMap.bind(this));
+        div.appendChild(this.mapsui);
 
         return div;
     },
+    refresh: function() {
+        //build states list
+        this.buildStateList();
+
+        //clear maps/layers
+        debug.ui.empty(this.mapsui);
+
+        //hide current map
+        if(this.map)
+            this.map.hide();
+
+        this.map = null;
+    },
+    buildStateList: function() {
+        debug.ui.empty(this.states);
+
+        var states = this.game.state.states,
+            name, state;
+
+        for(name in states) {
+            state = states[name];
+
+            var li = this.createLi('state', name, state.visible);
+            li.dataset.name = name;
+            this.states.appendChild(li);
+
+            if(!this.maps[name])
+                this.maps[name] = new debug.Minimap(this._panel, state);
+            else
+                this.maps[name].render(true);
+        }
+    },
+    buildMapList: function(state) {
+        debug.ui.empty(this.mapsui);
+
+        //loop through each child of the selected state
+        for(var i = 0; i < state.world.children.length; ++i) {
+            var child = state.world.children[i];
+
+            //if this is a tilemap show it and all layers
+            if(child instanceof gf.Tilemap) {
+                var li = this.createLi('map', child._cachekey, child.visible);
+                li.dataset.index = i;
+
+                //if there are any children create a sublist
+                if(child.children.length) {
+                    var ul = document.createElement('ul'),
+                        add = false;
+
+                    for(var l = 0; l < child.children.length; ++l) {
+                        var layer = child.children[l];
+
+                        //only add tilelayers
+                        if(layer.type === 'tilelayer') {
+                            var lli = this.createLi('layer', layer.name, layer.visible);
+
+                            lli.dataset.mapIndex = i;
+                            lli.dataset.index = l;
+
+                            ul.appendChild(lli);
+
+                            add = true;
+                        }
+                    }
+
+                    //add the sublist to the map li
+                    if(add)
+                        li.appendChild(ul);
+                }
+
+                //add the map li to the list
+                this.mapsui.appendChild(li);
+            }
+        }
+    },
+    createLi: function(cls, text, active) {
+        var li = document.createElement('li');
+
+        debug.ui.addClass(li, cls);
+        debug.ui.setText(li, text);
+
+        if(active)
+            debug.ui.addClass(li, 'active');
+
+        return li;
+    },
+    onClickState: function(e) {
+        var data = e.target.dataset;
+
+        if(this.map)
+            this.map.hide();
+
+        this.map = this.maps[data.name];
+        this.map.show();
+        this.buildMapList(this.game.state.states[data.name]);
+    },
+    onClickMap: function(e) {
+        var data = e.target.dataset,
+            obj;
+
+        if(data.mapIndex !== undefined) {
+            obj = this._cache.state.world.children[data.mapIndex].children[data.index];
+        } else {
+            obj = this._cache.state.world.children[data.index];
+        }
+
+        //toggle visibility
+        obj.visible = !obj.visible;
+        this.fullRender = true;
+
+        if(obj.visible)
+            debug.ui.addClass(e.target, 'active');
+        else
+            debug.ui.removeClass(e.target, 'active');
+    },
     tick: function() {
-        this.minimap.render();
+        if(!this.active)
+            return;
+
+        if(this._cache.numStates !== this.game.state.count || this._cache.state !== this.game.state.active) {
+            this._cache.numStates = this.game.state.count;
+            this._cache.state = this.game.state.active;
+            this.refresh();
+            this.map = this.maps[this.game.state.active.name];
+        }
+
+        if(this.map) {
+            this.map.render(this.fullRender);
+            this.fullRender = false;
+        }
     }
 });
-gf.debug.Graph = function(container, width, height, dataStyles) {
+debug.Graph = function(container, width, height, dataStyles) {
     this.canvas = document.createElement('canvas');
     this.canvas.width = width;
     this.canvas.height = height;
@@ -501,7 +791,7 @@ gf.debug.Graph = function(container, width, height, dataStyles) {
         this.styles.event = 'gray';
 };
 
-gf.inherits(gf.debug.Graph, Object, {
+gf.inherit(debug.Graph, Object, {
     addData: function(values) {
         this.data.push(values);
 
@@ -645,7 +935,7 @@ gf.inherits(gf.debug.Graph, Object, {
         this.dataScroll[1] += lw;
     }
 });
-gf.debug.Minimap = function(container, game) {
+debug.Minimap = function(container, state) {
     this.canvas = document.createElement('canvas');
     this.prerenderCanvas = document.createElement('canvas');
 
@@ -654,104 +944,141 @@ gf.debug.Minimap = function(container, game) {
     this.ctx = this.canvas.getContext('2d');
     this.pctx = this.prerenderCanvas.getContext('2d');
 
-    this.cachedpos = new gf.Point();
-    this.mapimage = null;
-    this.game = game;
-    this.scale = 0.25;
+    this.world = state.world;
+    this.camera = state.camera;
+
+    this.scale = 1;
+
+    this._hasRendered = false;
 
     this.viewportRectColor = 'rgba(255, 0, 255, 1)';
+
+    this.active = true;
+    this.maxSize = new gf.Vector();
 };
 
-gf.inherits(gf.debug.Minimap, Object, {
-    render: function() {
-        if(!this.game.world)
+gf.inherit(debug.Minimap, Object, {
+    show: function() {
+        debug.ui.show(this.canvas);
+        this.active = true;
+    },
+    hide: function() {
+        debug.ui.hide(this.canvas);
+        this.active = false;
+    },
+    render: function(full) {
+        if(!this.active)
             return;
 
-        var world = this.game.world;
+        if(full || !this._hasRendered) {
+            //find the largest tilemap
+            for(var w = 0, wl = this.world.children.length; w < wl; ++w) {
+                var map = this.world.children[w];
 
-        //if the world changes, prerender an image for it
-        if(!this.cachedworld || this.cachedworld !== world) {
-            this.cachedworld = world;
+                if(map instanceof gf.Tilemap) {
+                    this.maxSize.x = gf.math.max(this.maxSize.x, map.size.x * map.tileSize.x);
+                    this.maxSize.y = gf.math.max(this.maxSize.y, map.size.y * map.tileSize.y);
+                }
+            }
 
-            this.canvas.width = this.prerenderCanvas.width = (world.size.x * world.tileSize.x * this.scale);
-            this.canvas.height = this.prerenderCanvas.height = (world.size.y * world.tileSize.y * this.scale);
+            if(this.maxSize.x === 0 || this.maxSize.y === 0) {
+                return;
+            }
 
+            this._hasRendered = true;
+
+            this.canvas.width = this.prerenderCanvas.width = this.maxSize.x;
+            this.canvas.height = this.prerenderCanvas.height = this.maxSize.y;
+
+            //pre renders the tilemaps to the prerenderCanvas
             this.prerender();
         }
-
-        //only render when moving
-        if(this.cachedpos && this.cachedpos.x === world.position.x && this.cachedpos === world.position.y)
-            return;
-
-        //update cached position
-        this.cachedpos.x = world.position.x;
-        this.cachedpos.y = world.position.y;
 
         //redraw
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawMap();
-        //this.drawObjects();
-        //this.drawViewport();
+        this.drawObjects();
+        this.drawViewport();
     },
     drawMap: function() {
-        //draw the prerendered map image
+        //draw the prerendered map canvas
         this.ctx.drawImage(this.prerenderCanvas, 0, 0);
-
+    },
+    drawObjects: function() {
+        // NOT YET IMPLEMENTED
+    },
+    drawViewport: function() {
         //draw the viewport
-        var w = this.game.world,
-            p = w.position,
-            c = this.game.camera,
-            s = this.scale;
+        var world = this.world,
+            pos = world.position,
+            cam = this.camera,
+            scaleX = this.scale * world.scale.x,
+            scaleY = this.scale * world.scale.y,
+            sizeX = Math.min(cam.size.x, this.maxSize.x),
+            sizeY = Math.min(cam.size.y, this.maxSize.y);
 
         this.ctx.strokeStyle = this.viewportRectColor;
         this.ctx.strokeRect(
-            (-p.x * s) / w.scale.x,
-            (-p.y * s) / w.scale.x,
-            (c.size.x * s) / w.scale.x,
-            (c.size.y * s) / w.scale.y
+            -pos.x * scaleX,
+            -pos.y * scaleY,
+            sizeX * scaleX,
+            sizeY * scaleY
         );
     },
     prerender: function() {
-        var world = this.game.world,
-            size = world.size,
-            tsx = world.tileSize.x * this.scale,
-            tsy = world.tileSize.y * this.scale;
+        var world = this.world;
 
-        for(var l = 0, ll = world.children.length; l < ll; ++l) {
-            var layer = world.children[l];
-
-            //if it is a TiledLayer
-            if(layer.tileIds && layer.visible) {
-                for(var x = 0, xl = size.x; x < xl; ++x) {
-                    for(var y = 0, yl = size.y; y < yl; ++y) {
-                        var id = (x + (y * size.x)),
-                            tid = layer.tileIds[id],
-                            set = world.getTileset(tid),
-                            tx;
-
-                        if(set) {
-                            tx = set.getTileTexture(tid);
-                            this.prerenderTile(tx, x * tsx, y * tsy);
-                        }
-                    }
-                }
+        //for each child of world, if it is visible and a tilemap, prerender it
+        for(var w = 0, wl = world.children.length; w < wl; ++w) {
+            if(world.children[w].visible && world.children[w] instanceof gf.Tilemap) {
+                this.prerenderMap(world.children[w]);
             }
         }
     },
-    prerenderTile: function(tile, x, y) {
-        var frame = tile.frame;
+    prerenderMap: function(map) {
+        for(var l = 0, ll = map.children.length; l < ll; ++l) {
+            var layer = map.children[l];
+
+            //if it is a Tilelayer and is visible
+            if(layer.tileIds && layer.visible) {
+                this.prerenderLayer(layer, map);
+            }
+        }
+    },
+    prerenderLayer: function(layer, map) {
+        var size = map.size;
+
+        //render the layer one tile at a time
+        for(var x = 0, xl = size.x; x < xl; ++x) {
+            for(var y = 0, yl = size.y; y < yl; ++y) {
+                var id = (x + (y * size.x)),
+                    tid = layer.tileIds[id];
+
+                this.prerenderTile(tid, map, x, y);
+            }
+        }
+    },
+    prerenderTile: function(tid, map, x, y) {
+        var set = map.getTileset(tid),
+            tx;
+
+        if(!set) return;
+
+        tx = set.getTileTexture(tid);
+
+        if(!tx) return;
 
         //from pixi canvas renderer
         this.pctx.drawImage(
-            tile.baseTexture.source,
-            frame.x,
-            frame.y,
-            frame.width,
-            frame.height,
-            x,
-            y,
-            frame.width * this.scale,
-            frame.height * this.scale
+            tx.baseTexture.source,
+            tx.frame.x,
+            tx.frame.y,
+            tx.frame.width,
+            tx.frame.height,
+            x * tx.frame.width,
+            y * tx.frame.height,
+            tx.frame.width * this.scale,
+            tx.frame.height * this.scale
         );
     }
 });
@@ -824,13 +1151,13 @@ template =
 '</div>' +
 '<div class="gf_debug_gp_name">Grapefruit</div>';
 
-gf.debug.Gamepad = function() {
+debug.Gamepad = function() {
     var el = this.element = document.createElement('div');
     el.classList.add('gf_debug_gp');
     el.innerHTML = template;
 };
 
-gf.inherits(gf.debug.Gamepad, Object, {
+gf.inherit(debug.Gamepad, Object, {
     updateButton: function(status) {
         var buttonEl = this.element.querySelector('[name="' + btnIds[status.code] + '"]'),
             labelEl = this.element.querySelector('label[for="' + btnIds[status.code] + '"]');
@@ -873,17 +1200,11 @@ gf.inherits(gf.debug.Gamepad, Object, {
 });
 
 //Some general dom helpers
-gf.debug.ui = {
-    bindDelegate: function(dom, evt, cls, fn, name) {
-        name = name ? name.toUpperCase() : 'DIV';
-
+debug.ui = {
+    delegate: function(dom, evt, selector, fn) {
         dom.addEventListener(evt, function(e) {
-            if(e.target && e.target.nodeName.toUpperCase() === name) {
-                var classes = e.target.className.split(' ');
-
-                if(classes && classes.indexOf(cls) !== -1) {
-                    if(fn) fn(e);
-                }
+            if(e.target && e.target.matches(selector)) {
+                if(fn) fn(e);
             }
         });
     },
@@ -921,7 +1242,44 @@ gf.debug.ui = {
                 dom.style[key] = style[key];
             }
         }
+    },
+
+    empty: function(dom) {
+        while(dom.firstChild) {
+            dom.removeChild(dom.firstChild);
+        }
+    },
+
+    show: function(dom) {
+        this.setStyle(dom, 'display', 'block');
+    },
+
+    hide: function(dom) {
+        this.setStyle(dom, 'display', 'none');
     }
 };
+
+// polyfill for matchesSelector
+if (!HTMLElement.prototype.matches) {
+    var htmlprot = HTMLElement.prototype;
+
+    htmlprot.matches =
+        htmlprot.matches ||
+        htmlprot.webkitMatchesSelector ||
+        htmlprot.mozMatchesSelector ||
+        htmlprot.msMatchesSelector ||
+        htmlprot.oMatchesSelector ||
+        function (selector) {
+            // poorman's polyfill for matchesSelector
+            var elements = this.parentElement.querySelectorAll(selector),
+                element,
+                i = 0;
+
+            while (element = elements[i++]) {
+                if (element === this) return true;
+            }
+            return false;
+        };
+}
 
 })(window);

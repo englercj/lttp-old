@@ -1,19 +1,16 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/fonts/ReturnOfGanon',
     'game/data/items'
-], function(C, ReturnOfGanonFont, items) {
+], function(gf, C, ReturnOfGanonFont, items) {
     var Inventory = function() {
-        gf.Gui.call(this);
+        gf.Container.call(this);
 
+        var audioSettings = { volume: C.MUSIC_VOLUME };
         this.sounds = {
-            open: gf.assetCache.effect_pause_close, //yup, named weird but this is the sound it makes when opening the inventory
+            open: lttp.play.audio.add('effect_pause_close'), //yup, named weird but this is the sound it makes when opening the inventory
         };
-
-        for(var s in this.sounds) {
-            this.sounds[s].volume = C.MUSIC_VOLUME;
-            lttp.play.audio.attach(this.sounds[s]);
-        }
 
         this.grid = [];
         this._setup();
@@ -26,9 +23,10 @@ define([
         this.empty = true;
     };
 
-    gf.inherits(Inventory, gf.Gui, {
+    gf.inherit(Inventory, gf.Container, {
         updateValues: function(link) {
-            var wasEmpty = this.empty;
+            var wasEmpty = this.empty,
+                guiSprite = lttp.game.cache.getTextures('sprite_gui');
 
             for(var i = 0; i < this.children.length; ++i) {
                 var spr = this.children[i],
@@ -59,7 +57,7 @@ define([
 
                     //enable item and set texture
                     spr.visible = true;
-                    spr.setTexture(gf.assetCache.sprite_gui[ico]);
+                    spr.setTexture(guiSprite[ico]);
 
                     if(item.grid)
                         this.empty = false;
@@ -70,7 +68,7 @@ define([
 
             this.txtLiftNum.visible = true;
             this.txtLiftNum.setTexture(
-                gf.assetCache.sprite_gui[
+                guiSprite[
                     this.txtLiftNum.item.icon.replace('%d', link.inventory.gloves + 1)
                 ]
             );
@@ -139,8 +137,10 @@ define([
             this._moveSelector();
         },
         _setup: function() {
+            var guiSprite = lttp.game.cache.getTextures('sprite_gui');
+
             //add background
-            this.addChild(new gf.Sprite(gf.assetCache.sprite_gui['inventory.png']));
+            this.addChild(new gf.Sprite(guiSprite['inventory.png']));
 
             //add item sprites
             for(var i = 0; i < items.length; ++i) {
@@ -148,9 +148,9 @@ define([
                     spr;
 
                 if(item._icon)
-                    spr = new gf.Sprite(gf.assetCache.sprite_gui[item._icon]);
+                    spr = new gf.Sprite(guiSprite[item._icon]);
                 else
-                    spr = new gf.Sprite(gf.assetCache.sprite_gui[item.icon.replace('%d', 1)]);
+                    spr = new gf.Sprite(guiSprite[item.icon.replace('%d', 1)]);
 
                 spr.item = item;
                 spr.position.x = item.position[0];
@@ -165,12 +165,12 @@ define([
                 this.addChild(spr);
             }
 
-            this.selected = new gf.Point(0, 0);
-            this.selector = new gf.Sprite(gf.assetCache.sprite_gui['selector.png']);
+            this.selected = new gf.Vector(0, 0);
+            this.selector = new gf.Sprite(guiSprite['selector.png']);
             this.selector.visible = false;
             this.addChild(this.selector);
 
-            this.activeItem = new gf.Sprite(gf.assetCache.sprite_gui['items/lantern.png']);
+            this.activeItem = new gf.Sprite(guiSprite['items/lantern.png']);
             this.activeItem.position.x = 200;
             this.activeItem.position.y = 25;
             this.activeItem.visible = false;
@@ -219,7 +219,7 @@ define([
 
             this.activeItem.setTexture(s.texture);
 
-            this.activeText.setText(s.item.name);
+            this.activeText.text = s.item.name;
 
             if(s.visible) {
                 this.selector.visible = true;
@@ -231,7 +231,7 @@ define([
             if(this.empty) return;
 
             if(e.originalEvent)
-                e.input.preventDefault(e.originalEvent);
+                e.originalEvent.preventDefault();
 
             // .down is keypressed down
             if(e.down) {

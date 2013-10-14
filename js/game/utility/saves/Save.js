@@ -1,12 +1,13 @@
 define([
+    'vendor/gf',
     'game/utility/storage'
-], function(store) {
+], function(gf, store) {
     var Save = function(key) {
         this.key = key;
         this.data = {};
     };
 
-    gf.inherits(Save, Object, {
+    gf.inherit(Save, Object, {
         save: function() {
             store.save(this.key, this.data);
         },

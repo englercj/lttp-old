@@ -1,8 +1,9 @@
 define([
+    'vendor/gf',
     'game/utility/saves/Save'
-], function(Save) {
-    var ZoneSave = function(slot, zone, world) {
-        Save.call(this, 'zone_' + slot + '_' + world + '_' + zone.name);
+], function(gf, Save) {
+    var ZoneSave = function(slot, zone, map) {
+        Save.call(this, 'zone_' + slot + '_' + map + '_' + zone.name);
 
         //go through each object in the zone and save the 'loot' property
         var objs = this.data.objects = [];
@@ -18,7 +19,7 @@ define([
         this.zone = zone;
     };
 
-    gf.inherits(ZoneSave, Save, {
+    gf.inherit(ZoneSave, Save, {
         save: function() {
             Save.prototype.save.call(this);
         },
@@ -40,7 +41,7 @@ define([
                         child.properties.loot = objLoad.properties.loot;
 
                         if(!objZone.properties.loot && objType === 'chest') {
-                            child.setTexture(gf.assetCache.sprite_worlditems['dungeon/chest_open.png']);
+                            child.setTexture(lttp.game.cache.getTextures('sprite_worlditems')['dungeon/chest_open.png']);
                         }
                     } else {
                         console.warn('Mismatch on objects array length! Delete key: ' + this.key);

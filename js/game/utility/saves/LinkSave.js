@@ -1,6 +1,7 @@
 define([
+    'vendor/gf',
     'game/utility/saves/Save'
-], function(Save) {
+], function(gf, Save) {
     var LinkSave = function(slot, name) {
         Save.call(this, 'link_' + slot);
 
@@ -11,8 +12,8 @@ define([
         this.data.slot = slot;
     };
 
-    gf.inherits(LinkSave, Object, {
-        save: function(link, world, pos) {
+    gf.inherit(LinkSave, Save, {
+        save: function(link, map, pos) {
             link = link || {};
 
             this.data.inventory = link.inventory || {};
@@ -22,7 +23,7 @@ define([
             this.data.maxMagic = link.maxMagic || 10;
             this.data.equipted = link.equipted || null;
 
-            this.data.world = world || 'world_linkshouse';
+            this.data.map = map || 'world_linkshouse';
             this.data.position = pos || [128,128];
 
             Save.prototype.save.call(this);

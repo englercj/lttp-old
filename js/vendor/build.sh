@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 cd ../grapefruit &&
-grunt build --force &&
+grunt urequire:dev &&
 cp build/gf.js ../lttp-webgl/js/vendor/gf.js

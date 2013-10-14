@@ -1,15 +1,17 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/entities/Entity'
-], function(C, Entity) {
+], function(gf, C, Entity) {
     var WorldItem = function() {
         this.sensor = true;
         this.loot = true;
 
+        var audioSettings = { volume: C.EFFECT_VOLUME };
         this.sounds = {
-            item: gf.assetCache.effect_item,
-            rupees1: gf.assetCache.effect_rupee1,
-            rupees2: gf.assetCache.effect_rupee2
+            item: lttp.play.audio.add('effect_item', audioSettings),
+            rupees1: lttp.play.audio.add('effect_rupee1', audioSettings),
+            rupees2: lttp.play.audio.add('effect_rupee2', audioSettings)
         };
 
         this.textureKeys = {
@@ -20,24 +22,21 @@ define([
             rupees: 'rupees_%d'
         };
 
-        for(var s in this.sounds) {
-            this.sounds[s].volume = C.EFFECT_VOLUME;
-            lttp.play.audio.attach(this.sounds[s]);
-        }
+        var itemSprite = lttp.game.cache.getTextures('sprite_worlditems');
 
-        Entity.call(this, [gf.assetCache.sprite_worlditems['hearts/heart.png']]);
+        Entity.call(this, [itemSprite['hearts/heart.png']]);
 
         var self = this;
         [1,5,20].forEach(function(v) {
             self.addAnimation('rupees_' + v, [
-                gf.assetCache.sprite_worlditems['inventory/rupees_' + v + '_1.png'],
-                gf.assetCache.sprite_worlditems['inventory/rupees_' + v + '_2.png'],
-                gf.assetCache.sprite_worlditems['inventory/rupees_' + v + '_3.png'],
+                itemSprite['inventory/rupees_' + v + '_1.png'],
+                itemSprite['inventory/rupees_' + v + '_2.png'],
+                itemSprite['inventory/rupees_' + v + '_3.png']
             ], 0.1, true);
         });
     };
 
-    gf.inherits(WorldItem, Entity, {
+    gf.inherit(WorldItem, Entity, {
         setup: function(item, psys, forceLoot) {
             var loot = forceLoot || item.properties.loot,
                 type = loot.split('_')[0],
@@ -54,7 +53,7 @@ define([
                 this.gotoAndPlay(tx);
             } else {
                 this.stop();
-                this.setTexture(gf.assetCache.sprite_worlditems[tx]);
+                this.setTexture(lttp.game.cache.getTextures('sprite_worlditems')[tx]);
             }
 
             this.anchor.x = 0;

@@ -1,16 +1,17 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/entities/Entity'
-], function(C, Enemy) {
+], function(gf, C, Enemy) {
     var Guard = function(type) {
-        Enemy.call(this, gf.assetCache.sprite_enemies, 0.2);
+        Enemy.call(this, lttp.game.cache.getTextures('sprite_enemies'), 0.2);
 
         this.name = type;
 
         this._addAnimations(type);
     };
 
-    gf.inherits(Guard, Enemy, {
+    gf.inherit(Guard, Enemy, {
         _addAnimations: function(type) {
             var prefix = 'guards/guard_' + type;
 

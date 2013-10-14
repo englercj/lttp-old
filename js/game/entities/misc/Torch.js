@@ -1,9 +1,10 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/entities/Entity'
-], function(C, Entity) {
+], function(gf, C, Entity) {
     var Torch = function() {
-        Entity.call(this, gf.assetCache.sprite_misc, 0.2);
+        Entity.call(this, lttp.game.cache.getTextures('sprite_misc'), 0.2);
 
         this.addAnimation('torch', [
             this.spritesheet['torch/torch0.png'].frames[0]
@@ -24,7 +25,7 @@ define([
         this.light = 0.25;
     };
 
-    gf.inherits(Torch, Entity, {
+    gf.inherit(Torch, Entity, {
         lite: function() {
             if(this.type !== 'torch') return;
 

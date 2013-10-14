@@ -1,9 +1,10 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/gui/huditems'
-], function(C, items) {
+], function(gf, C, items) {
     var Hud = function() {
-        gf.Gui.call(this);
+        gf.Container.call(this);
 
         this.scale.x = this.scale.y = C.SCALE / 2;
         this.items = {};
@@ -23,7 +24,7 @@ define([
         this.addChild(this.items.life = new items.LifeMeter([320, 35], 3));
     };
 
-    gf.inherits(Hud, gf.Gui, {
+    gf.inherit(Hud, gf.Container, {
         updateValues: function(link) {
             this.items.equipted.set(link.equipted);
             this.items.rupees.set(link.inventory.rupees);

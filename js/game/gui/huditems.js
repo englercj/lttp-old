@@ -1,19 +1,21 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/fonts/ReturnOfGanon',
     'game/fonts/Hud'
-], function(C, ReturnOfGanonFont, HudFont) {
+], function(gf, C, ReturnOfGanonFont, HudFont) {
     var HudItem = function(pos, name, value) {
         this.name = name;
         this.value = 0;
 
-        gf.DisplayObjectContainer.call(this);
-        this.setPosition(pos[0], pos[1]);
+        gf.Container.call(this);
+        this.position.x = pos[0];
+        this.position.y = pos[1];
 
         this.sprites = new gf.ObjectPool(gf.Sprite, this);
     };
 
-    gf.inherits(HudItem, gf.DisplayObjectContainer, {
+    gf.inherit(HudItem, gf.Container, {
         set: function(val) {
             this.value = val;
 
@@ -22,7 +24,7 @@ define([
     });
 
     var MagicMeter = function(pos, value) {
-        this.textures = gf.assetCache.sprite_gui;
+        this.textures = lttp.game.cache.getTextures('sprite_gui');
 
         HudItem.call(this, pos, 'magic', value);
 
@@ -36,7 +38,7 @@ define([
         this.set(value);
     };
 
-    gf.inherits(MagicMeter, HudItem, {
+    gf.inherit(MagicMeter, HudItem, {
         set: function(val) {
             HudItem.prototype.set.call(this, val);
 
@@ -48,7 +50,7 @@ define([
     });
 
     var LifeMeter = function(pos, value) {
-        this.textures = gf.assetCache.sprite_gui;
+        this.textures = lttp.game.cache.getTextures('sprite_gui');
 
         HudItem.call(this, pos, 'life', value);
 
@@ -58,7 +60,7 @@ define([
         this.dash1.position.x = this.dash1X = 35;
         this.dash1.position.y = this.dashY = 0;
 
-        this.life = this.sprites.create(gf.assetCache.sprite_life);
+        this.life = this.sprites.create(lttp.game.cache.getTexture('image_life'));
         this.life.position.x = this.lifeX = 65;
         this.life.position.y = this.lifeY = -7;
 
@@ -68,14 +70,14 @@ define([
         this.set(value);
     };
 
-    gf.inherits(LifeMeter, HudItem, {
+    gf.inherit(LifeMeter, HudItem, {
         set: function(val) {
             HudItem.prototype.set.call(this, val);
 
             for(var i = 0, il = this.children.length; i < il; ++i) {
                 var child = this.children[i];
 
-                if(child instanceof PIXI.Sprite) {
+                if(child instanceof gf.Sprite) {
                     child.visible = false;
                     this.sprites.free(child);
                 }
@@ -93,8 +95,8 @@ define([
             this.dash2.position.y = this.dashY;
             this.dash2.visible = true;
 
-            this.life = this.sprites.create(gf.assetCache.sprite_life);
-            this.life.setTexture(gf.assetCache.sprite_life);
+            this.life = this.sprites.create(lttp.game.cache.getTexture('image_life'));
+            this.life.setTexture(lttp.game.cache.getTexture('image_life'));
             this.life.position.x = this.lifeX;
             this.life.position.y = this.lifeY;
             this.life.visible = true;
@@ -155,7 +157,7 @@ define([
     });
 
     var EquiptedItem = function(pos, value) {
-        this.textures = gf.assetCache.sprite_gui;
+        this.textures = lttp.game.cache.getTextures('sprite_gui');
 
         HudItem.call(this, pos, 'equipted', value);
 
@@ -168,7 +170,7 @@ define([
         this.children[1].scale.x = this.children[1].scale.y = 2;
     };
 
-    gf.inherits(EquiptedItem, HudItem, {
+    gf.inherit(EquiptedItem, HudItem, {
         set: function(val) {
             HudItem.prototype.set.call(this, val);
 
@@ -186,7 +188,7 @@ define([
     });
 
     var InventoryCounter = function(pos, name, value) {
-        this.textures = gf.assetCache.sprite_gui;
+        this.textures = lttp.game.cache.getTextures('sprite_gui');
 
         HudItem.call(this, pos, name, value);
 
@@ -204,7 +206,7 @@ define([
         this.set(value);
     };
 
-    gf.inherits(InventoryCounter, HudItem, {
+    gf.inherit(InventoryCounter, HudItem, {
         set: function(val) {
             var l = this.name === 'rupees' ? 3 : 2;
             val = val.toString();
@@ -215,7 +217,7 @@ define([
             HudItem.prototype.set.call(this, val);
 
             if(this.font)
-                this.font.setText(val);
+                this.font.text = val;
 
             return this;
         }

@@ -1,11 +1,12 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/data/items',
     'game/entities/Entity',
     'game/entities/misc/Smash',
     'game/entities/misc/Particle',
     'game/entities/items/WorldItem'
-], function(C, ITEMS, Entity, Smash, Particle, WorldItem) {
+], function(gf, C, ITEMS, Entity, Smash, Particle, WorldItem) {
     var Link = function(spritesheet) {
         Entity.call(this, spritesheet);
 
@@ -65,13 +66,13 @@ define([
         this.colliding = [];
 
         //a pool of sprite to do smashing animations
-        this.smashpool = new gf.ObjectPool(Smash, lttp.game);
+        this.smashpool = new gf.ObjectPool(Smash);
 
         //a pool of world items to be dropped
         this.itempool = new gf.ObjectPool(WorldItem);
 
         //a pool of particles to throw around
-        this.particlepool = new gf.ObjectPool(Particle, lttp.game);
+        this.particlepool = new gf.ObjectPool(Particle);
 
         //moveSpeed the ent moves at
         this.moveSpeed = 87;
@@ -86,19 +87,16 @@ define([
             attack: false,
             holdAttack: false
         };
-        this.sounds = {
-            lift: gf.assetCache.effect_lift,
-            throw: gf.assetCache.effect_throw,
-            openChest: gf.assetCache.effect_chest,
-            itemFanfaire: gf.assetCache.effect_item_fanfaire,
-            error: gf.assetCache.effect_error,
-            fall: gf.assetCache.effect_fall
-        };
 
-        for(var s in this.sounds) {
-            this.sounds[s].volume = C.EFFECT_VOLUME;
-            lttp.play.audio.attach(this.sounds[s]);
-        }
+        var audioSettings = { volume: C.EFFECT_VOLUME };
+        this.sounds = {
+            lift: lttp.play.audio.add('effect_lift', audioSettings),
+            throw: lttp.play.audio.add('effect_throw', audioSettings),
+            openChest: lttp.play.audio.add('effect_chest', audioSettings),
+            itemFanfaire: lttp.play.audio.add('effect_item_fanfaire', audioSettings),
+            error: lttp.play.audio.add('effect_error', audioSettings),
+            fall: lttp.play.audio.add('effect_fall', audioSettings)
+        };
 
         this.addAnimations();
 
@@ -109,7 +107,7 @@ define([
         this.equipted = null;
     };
 
-    gf.inherits(Link, Entity, {
+    gf.inherit(Link, Entity, {
         _addDirectionalPrefixedFrames: function(type, num, speed, loop) {
             this._addDirectionalFrames(type + '_%s/' + type + '_%s', num, speed, loop); 
         },
@@ -180,11 +178,11 @@ define([
             //set active
             this.lastDir = 'down';
             this._setMoveAnimation();
-            //this.gotoAndStop('idle_down');
+            //this.goto(0, 'idle_down').stop();
         },
         onWalk: function(dir, e) {
             if(e.originalEvent)
-                e.input.preventDefault(e.originalEvent);
+                e.originalEvent.preventDefault();
 
             // .down is keypressed down
             if(e.down) {
@@ -247,7 +245,7 @@ define([
                 return;
 
             if(e.originalEvent)
-                e.input.preventDefault(e.originalEvent);
+                e.originalEvent.preventDefault();
 
             if(e.down) {
                 if(this.locked || this.actions.holdAttack)
@@ -263,18 +261,22 @@ define([
             }
         },
         lock: function() {
-            this.setVelocity([0, 0]);
+            this.body.velocity.set(0, 0);
             this.locked = true;
         },
         unlock: function() {
             this._setMoveAnimation();
-            this.setVelocity(this.movement);
+            this.body.velocity.copy(this.movement);
             this.locked = false;
         },
         addAttackSensor: function(phys) {
             if(this.atkSensor) return;
 
-            this.atkSensor = phys.addCustomShape(this, new gf.Circle(0, 0, C.ATTACK_SENSOR_RADIUS), true);
+            this.atkSensor = new gf.Body(this);
+            this.atkSensor.shape = new gf.Circle(0, 0, C.ATTACK_SENSOR_RADIUS);
+            this.atkSensor.sensor = true;
+
+            phys.addBody(this.atkSensor);
         },
         //Talk, run, Lift/Throw/Push/Pull
         onUse: function(status) {
@@ -352,6 +354,7 @@ define([
 
             //create the item particle
             particle = this.particlepool.create();
+            this.parent.addChild(particle);
             particle.run(item, this._psystem);
 
             this.emit('updateHud');
@@ -410,10 +413,10 @@ define([
             loot = loot[i];
 
             this.lock();
-            this.gotoAndStop('lift_walk_down');
+            this.goto(0, 'lift_walk_down').stop();
 
             //open chest
-            chest.setTexture(gf.assetCache.sprite_worlditems['dungeon/chest_open.png']);
+            chest.setTexture(lttp.game.cache.getTextures('sprite_worlditems')['dungeon/chest_open.png']);
             this.sounds.openChest.play();
 
             //show loot
@@ -468,10 +471,10 @@ define([
 
             //set the correct texture
             var tx = 'dungeon/' + item.properties.type + (item.properties.heavy ? '_heavy' : '') + '.png';
-            item.setTexture(gf.assetCache.sprite_worlditems[tx]);
+            item.setTexture(lttp.game.cache.getTextures('sprite_worlditems')[tx]);
 
             //lift the item
-            this.gotoAndPlay('lift_' + this.lastDir);
+            this.goto(0, 'lift_' + this.lastDir).play();
             this.sounds.lift.play();
 
             var self = this;
@@ -518,11 +521,14 @@ define([
             var t = o.properties.type,
                 spr = this.smashpool.create();
 
-            spr.gotoAndPlay(t);
+            spr.goto(0, t).play();
             spr.visible = true;
             spr.anchor.x = o.anchor.x;
             spr.anchor.y = o.anchor.y;
-            spr.setPosition(o.position.x, o.position.y);
+            spr.position.copy(o.position);
+
+            //add sprite
+            o.parent.addChild(spr);
 
             //TODO: drops?
             o.destroy();
@@ -607,7 +613,7 @@ define([
             if(this.locked) return;
 
             this._setMoveAnimation();
-            this.setVelocity(this.movement);
+            this.body.velocity.copy(this.movement);
         },
         _setMoveAnimation: function(force) {
             var anim = force || ((this.movement.x || this.movement.y) ? 'walk' : 'idle');
@@ -633,23 +639,23 @@ define([
             if(this.movement.x) {
                 if(this.movement.x > 0) {
                     this.lastDir = 'right';
-                    this.gotoAndPlay(anim + '_right');
+                    this.goto(0, anim + '_right').play();
                 } else {
                     this.lastDir = 'left';
-                    this.gotoAndPlay(anim + '_left');
+                    this.goto(0, anim + '_left').play();
                 }
             }
             else if(this.movement.y) {
                 if(this.movement.y > 0) {
                     this.lastDir = 'down';
-                    this.gotoAndPlay(anim + '_down'); 
+                    this.goto(0, anim + '_down').play();
                 } else {
                     this.lastDir = 'up';
-                    this.gotoAndPlay(anim + '_up');
+                    this.goto(0, anim + '_up').play();
                 }
             }
             else {
-                this.gotoAndStop(anim + '_' + this.lastDir);
+                this.goto(0, anim + '_' + this.lastDir).stop();
             }
         },
         _setAttackAnimation: function() {
@@ -707,7 +713,7 @@ define([
                 self.off('frame', frame);
                 self.unlock();
             });
-            this.gotoAndPlay('attack_' + dir);
+            this.goto(0, 'attack_' + dir).play();
         },
         jumpDown: function(vec) {
             //TODO: Play sound
@@ -737,10 +743,6 @@ define([
                         var n = now - last;
 
                         self.position[p] += n;
-                        self.setPosition(
-                            self.position.x,
-                            self.position.y
-                        );
 
                         last = now;
                     },
@@ -762,10 +764,6 @@ define([
                     var n = now - last;
 
                     self.position[p] += n;
-                    self.setPosition(
-                        self.position.x,
-                        self.position.y
-                    );
 
                     last = now;
                 },
@@ -789,7 +787,7 @@ define([
                     var obj = self.colliding[i];
 
                     if(obj.collisionType === 'solid' && self.currentAnimation.indexOf('push') === -1 && !self.carrying) {
-                        self.gotoAndPlay('push_' + self.lastDir);
+                        self.goto(0, 'push_' + self.lastDir).play();
                         break;
                     }
                     else if(obj.collisionType === 'jump') {

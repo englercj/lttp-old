@@ -1,18 +1,15 @@
 define([
+    'vendor/gf',
     'game/data/constants',
     'game/fonts/ReturnOfGanon'
-], function(C, ReturnOfGanonFont) {
+], function(gf, C, ReturnOfGanonFont) {
     var Dialog = function() {
-        gf.Gui.call(this);
+        gf.Container.call(this);
 
+        var audioSettings = { volume: C.MUSIC_VOLUME };
         this.sounds = {
-            open: gf.assetCache.effect_pause_close,
+            open: lttp.play.audio.add('effect_pause_close', audioSettings),
         };
-
-        for(var s in this.sounds) {
-            this.sounds[s].volume = C.MUSIC_VOLUME;
-            lttp.play.audio.attach(this.sounds[s]);
-        }
 
         this.scale.x = this.scale.y = C.SCALE;
         this.position.x = 102;
@@ -33,7 +30,7 @@ define([
         this._setup();
     };
 
-    gf.inherits(Dialog, gf.Gui, {
+    gf.inherit(Dialog, gf.Container, {
         setText: function(text) {
             this.text = text;
 
@@ -45,7 +42,7 @@ define([
                 i += 30;
             }
 
-            this.font.setText('');
+            this.font.text = '';
         },
         _getPreviousSpace: function(str, i) {
             var found = false,
@@ -92,12 +89,7 @@ define([
             }
         },
         _type: function(cb) {
-            this.font.setText(
-                this.text.substr(
-                    this.range[0],
-                    this.range[1]
-                )
-            );
+            this.font.text = this.text.substr(this.range[0], this.range[1]);
 
             this.range[1]++;
 
@@ -111,7 +103,7 @@ define([
         },
         _setup: function() {
             //add background
-            this.addChild(new gf.Sprite(gf.assetCache.sprite_gui['dialog.png']))
+            this.addChild(new gf.Sprite(lttp.game.cache.getTextures('sprite_gui')['dialog.png']));
 
             //add font
             this.font = new ReturnOfGanonFont();

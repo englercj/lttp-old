@@ -1,14 +1,17 @@
 define([
-], function() {
-    var State = function(name, game) {
-        gf.GameState.call(this, name);
+    'vendor/gf'
+], function(gf) {
+    var State = function(game, name) {
+        gf.State.call(this, game, name);
 
-        game.addState(this);
+        this.physics.gravity.set(0, 0);
+
+        game.state.add(this);
     };
 
-    gf.inherits(State, gf.GameState, {
+    gf.inherit(State, gf.State, {
         start: function() {
-            this.game.enableState(this);
+            this.game.state.enable(this);
 
             return this;
         },
@@ -17,7 +20,7 @@ define([
                 this.music.stop();
         },
         destroy: function() {
-            this.game.removeState(this);
+            this.game.state.remove(this);
 
             if(this.music)
                 this.music.stop();
