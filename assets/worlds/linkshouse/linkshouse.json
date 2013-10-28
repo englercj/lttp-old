@@ -242,79 +242,79 @@
             {
              "0":
                 {
-                 "static":"true",
+                 "body":"static",
                  "type":"solid"
                 },
              "1":
                 {
+                 "body":"static",
                  "hitArea":"[0,0,8,16]",
-                 "static":"true",
                  "type":"solid"
                 },
              "10":
                 {
+                 "body":"static",
                  "hitArea":"[8,0,16,0,16,16,0,16,0,8,8,8]",
-                 "static":"true",
                  "type":"solid"
                 },
              "11":
                 {
+                 "body":"static",
                  "hitArea":"[0,0,0,16,16,8,8,8,8,16,0,16]",
-                 "static":"true",
                  "type":"solid"
                 },
              "12":
                 {
+                 "body":"static",
                  "hitArea":"[0,0,16,0,16,16,8,16,8,8,0,8]",
-                 "static":"true",
                  "type":"solid"
                 },
              "2":
                 {
+                 "body":"static",
                  "hitArea":"[8,0,8,16]",
-                 "static":"true",
                  "type":"solid"
                 },
              "3":
                 {
+                 "body":"static",
                  "hitArea":"[0,0,16,8]",
-                 "static":"true",
                  "type":"solid"
                 },
              "4":
                 {
+                 "body":"static",
                  "hitArea":"[0,8,16,8]",
-                 "static":"true",
                  "type":"solid"
                 },
              "5":
                 {
+                 "body":"static",
                  "hitArea":"[16,0,16,16,0,16]",
-                 "static":"true",
                  "type":"solid"
                 },
              "6":
                 {
+                 "body":"static",
                  "hitArea":"[0,0,16,16,0,16]",
-                 "static":"true",
                  "type":"solid"
                 },
              "7":
                 {
+                 "body":"static",
                  "hitArea":"[0,0,16,0,16,16]",
-                 "static":"true",
                  "type":"solid"
                 },
              "8":
                 {
+                 "body":"static",
                  "hitArea":"[0,0,16,0,0,16]",
-                 "static":"true",
                  "type":"solid"
                 },
              "9":
                 {
+                 "body":"static",
                  "hitArea":"[0,0,8,0,8,8,16,8,16,16,0,16]",
-                 "static":"true",
                  "type":"solid"
                 }
             },

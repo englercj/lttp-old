@@ -6,6 +6,9 @@ define(['vendor/gf'], function(gf) {
             game.load.tilemap('world_linkshouse',   'assets/worlds/linkshouse/linkshouse.json', null, gf.FILE_FORMAT.JSON);
             game.load.tilemap('cave-034',           'assets/worlds/cave-034/cave-034.json',     null, gf.FILE_FORMAT.JSON); //hyrule castle secret entrance
 
+            // Images
+            game.load.image('image_life',           'assets/ui/life.png',                       null, gf.ATLAS_FORMAT.JSON_HASH);
+
             // Misc Sprite Atlases
             game.load.atlas('sprite_link',          'assets/sprites/entities/link.png',         'assets/sprites/entities/link.json',        null, gf.ATLAS_FORMAT.JSON_HASH);
             game.load.atlas('sprite_misc',          'assets/sprites/entities/misc.png',         'assets/sprites/entities/misc.json',        null, gf.ATLAS_FORMAT.JSON_HASH);
@@ -20,7 +23,6 @@ define(['vendor/gf'], function(gf) {
             game.load.atlas('sprite_gui',           'assets/sprites/ui/gui.png',                'assets/sprites/ui/gui.json',               null, gf.ATLAS_FORMAT.JSON_HASH);
             game.load.atlas('sprite_rog_font',      'assets/sprites/fonts/retofganon.png',      'assets/sprites/fonts/retofganon.json',     null, gf.ATLAS_FORMAT.JSON_HASH);
             game.load.atlas('sprite_hud_font',      'assets/sprites/fonts/hud.png',             'assets/sprites/fonts/hud.json',            null, gf.ATLAS_FORMAT.JSON_HASH);
-            game.load.image('image_life',           'assets/ui/life.png',                       null, gf.ATLAS_FORMAT.JSON_HASH);
 
             // Music
             game.load.audio('music_lightworld', [

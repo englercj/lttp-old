@@ -4,7 +4,7 @@
  * Copyright (c) 2013, Chad Engler
  * https://github.com/grapefruitjs/gf-debug
  *
- * Compiled: 2013-10-13
+ * Compiled: 2013-10-20
  *
  * GrapeFruit Debug Module is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -101,20 +101,8 @@ debug.logEvent = function(name) {
  */
 debug.drawBodyShape = function(body, style, gfx) {
     var shape = body.shape,
-        a = body.sprite.anchor,
-        ax = a !== undefined ? a.x : 0,
-        ay = a !== undefined ? a.y : 0,
-        trans = body.sprite.worldTransform,
-        px = trans[2],
-        py = trans[5],
-        sx = trans[0],
-        sy = trans[4],
-        sw = body.sprite.width * sx,
-        sh = body.sprite.height * sy,
+        p = body.position,
         game = this.game;
-
-    px -= ax * sw;
-    py -= ay * sh;
 
     //setup gfx
     gfx = gfx || (function() {
@@ -137,27 +125,27 @@ debug.drawBodyShape = function(body, style, gfx) {
         //var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
         //    cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
 
-        gfx.drawCircle(px + (sw / 2), py + (sh / 2), shape.radius * ((sx + sy) / 2));
+        gfx.drawCircle(p.x, p.y, shape.radius);
     }
     //draw polygon
     else {
         var pt = shape.points[0];
 
         gfx.moveTo(
-            px + pt.x,
-            py + pt.y
+            p.x + pt.x,
+            p.y + pt.y
         );
 
         for(var x = 1; x < shape.points.length; x++) {
             gfx.lineTo(
-                px + shape.points[x].x * sx,
-                py + shape.points[x].y * sy
+                p.x + shape.points[x].x,
+                p.y + shape.points[x].y
             );
         }
 
         gfx.lineTo(
-            px + pt.x,
-            py + pt.y
+            p.x + pt.x,
+            p.y + pt.y
         );
     }
 

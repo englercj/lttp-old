@@ -16,12 +16,16 @@ require([
     $(function() {
         $game = $('#game');
 
+        //set the default scale mode for PIXI
+        gf.PIXI.BaseTexture.SCALE_MODE.DEFAULT = gf.PIXI.BaseTexture.SCALE_MODE.NEAREST;
+
         lttp.game = game = new gf.Game('game', {
             gravity: 0,
             friction: [0, 0],
             width: $game.width(),
             height: $game.height(),
-            transparent: true
+            transparent: true,
+            renderer: gf.RENDERER.CANVAS
         });
         gfdebug.show(game);
 
