@@ -4,7 +4,7 @@
  * Copyright (c) 2013, Chad Engler
  * https://github.com/grapefruitjs/gf-debug
  *
- * Compiled: 2013-10-20
+ * Compiled: 2013-10-29
  *
  * GrapeFruit Debug Module is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -89,7 +89,7 @@ debug.logEvent = function(name) {
 /**
  * Draws the body of a sprite
  *
- * @method drawBodyShape
+ * @method drawPhysicsShape
  * @param body {Body} The body to draw a visual representation of
  * @param [style] {Object} The style of the line draws
  * @param [style.size=1] {Number} The thickness of the line stroke
@@ -99,9 +99,8 @@ debug.logEvent = function(name) {
  *      none is passed a new one is created and added ot the world.
  * @return {Graphics} The graphics object used to draw the shape
  */
-debug.drawBodyShape = function(body, style, gfx) {
-    var shape = body.shape,
-        p = body.position,
+debug.drawPhysicsShape = function(shape, style, gfx) {
+    var p = shape.body.p,
         game = this.game;
 
     //setup gfx
@@ -121,31 +120,34 @@ debug.drawBodyShape = function(body, style, gfx) {
     );
 
     //draw circle
-    if(shape._shapetype === gf.SHAPE.CIRCLE) {
-        //var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
-        //    cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
+    if(shape.type === 'circle') {
+        /* jshint -W106 */
+        var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
+            cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
+        /* jshint +W106 */
 
-        gfx.drawCircle(p.x, p.y, shape.radius);
+        gfx.drawCircle(cx, cy, shape.r);
     }
     //draw polygon
     else {
-        var pt = shape.points[0];
+        var vx = shape.verts[0],
+            vy = shape.verts[1];
 
         gfx.moveTo(
-            p.x + pt.x,
-            p.y + pt.y
+            p.x + vx,
+            p.y + vy
         );
 
-        for(var x = 1; x < shape.points.length; x++) {
+        for(var i = 2; i < shape.verts.length; i += 2) {
             gfx.lineTo(
-                p.x + shape.points[x].x,
-                p.y + shape.points[x].y
+                p.x + shape.verts[i],
+                p.y + shape.verts[i + 1]
             );
         }
 
         gfx.lineTo(
-            p.x + pt.x,
-            p.y + pt.y
+            p.x + vx,
+            p.y + vy
         );
     }
 
@@ -165,7 +167,7 @@ debug.drawBodyShape = function(body, style, gfx) {
  *      none is passed a new one is created and added ot the world.
  * @return {Graphics} The graphics object used to draw the tree
  */
-debug.drawQuadTree = function(tree, style, gfx) {
+/*debug.drawQuadTree = function(tree, style, gfx) {
     var self = this;
 
     //setup gfx
@@ -203,7 +205,7 @@ debug.drawQuadTree = function(tree, style, gfx) {
     }
 
     return gfx;
-};
+};*/
 
 debug._bindEvents = function() {
     var activePanel,
@@ -503,15 +505,15 @@ gf.inherit(debug.SpritesPanel, debug.Panel, {
                 '<input type="checkbox" value="" id="gf_debug_toggleShapes" class="gf_debug_toggleShapes" name="check" />' +
                 '<label for="gf_debug_toggleShapes"></label>' +
             '</div>' +
-            '<span>Draw Collider Shapes</span>' +
+            '<span>Draw Collider Shapes</span>'/* +
             '<div class="checkbox">' +
                 '<input type="checkbox" value="" id="gf_debug_toggleQuadTree" class="gf_debug_toggleQuadTree" name="check" />' +
                 '<label for="gf_debug_toggleQuadTree"></label>' +
             '</div>' +
-            '<span>Draw QuadTree</span>'
+            '<span>Draw QuadTree</span>'*/
         );
         debug.ui.delegate(pad, 'change', '.gf_debug_toggleShapes', this.toggleType.bind(this, 'shapes'));
-        debug.ui.delegate(pad, 'change', '.gf_debug_toggleQuadTree', this.toggleType.bind(this, 'tree'));
+        //debug.ui.delegate(pad, 'change', '.gf_debug_toggleQuadTree', this.toggleType.bind(this, 'tree'));
 
         div.appendChild(pad);
 
@@ -531,31 +533,33 @@ gf.inherit(debug.SpritesPanel, debug.Panel, {
         this.gfx.clear();
 
         //ensure always on top
-        if(!this.showing.shapes && !this.showing.tree)
+        if(!this.showing.shapes/* && !this.showing.tree*/)
             return this._updateGfx(true);
         else
             this._updateGfx();
 
         //draw all the bodies
         if(this.showing.shapes) {
-            var bods = this.game.physics.bodies;
-            for(var i = 0; i < bods.length; ++i) {
-                debug.drawBodyShape(
-                    bods[i],
-                    bods[i].sensor ? this.style.sensorShape : this.style._defaultShape,
-                    this.gfx
+            var self = this;
+            this.game.physics.space.eachShape(function(shape) {
+                if(!shape.body) return;
+
+                debug.drawPhysicsShape(
+                    shape,
+                    shape.sensor ? self.style.sensorShape : self.style._defaultShape,
+                    self.gfx
                 );
-            }
+            });
         }
 
         //draw the quadtree
-        if(this.showing.tree) {
+        /*if(this.showing.tree) {
             debug.drawQuadTree(
                 this.game.physics.tree,
                 this.style.tree,
                 this.gfx
             );
-        }
+        }*/
     },
     _updateGfx: function(rm) {
         if(rm) {
