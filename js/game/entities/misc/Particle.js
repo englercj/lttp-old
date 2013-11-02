@@ -46,25 +46,25 @@ define([
 
             switch(lttp.play.link.lastDir) {
                 case 'up':
-                    this.position.set(
+                    this.setPosition(
                         p.x + (link.width / 2) - (this.width / 2),
                         p.y - space - link.height
                     );
                     break;
                 case 'down':
-                    this.position.set(
+                    this.setPosition(
                         p.x + (link.width / 2) - (this.width / 2),
                         p.y + space + this.height
                     );
                     break;
                 case 'left':
-                    this.position.set(
+                    this.setPosition(
                         p.x - space - this.width,
                         p.y - 3
                     );
                     break;
                 case 'right':
-                    this.position.set(
+                    this.setPosition(
                         p.x + space + link.width,
                         p.y - 3
                     );
@@ -74,7 +74,7 @@ define([
             //if there is a velocity set it
             if(cfg.velocity) {
                 this.velocity = cfg.velocity.clone();
-                this.body.velocity.copy(cfg.velocity);
+                this.setVelocity(this.velocity);
 
                 if(cfg.velocityTimer) {
                     var cb;
@@ -99,7 +99,7 @@ define([
             this.velocity.x = -this.velocity.x;
             this.velocity.y = -this.velocity.y;
 
-            this.body.velocity.copy(this.velocity);
+            this.setVelocity(this.velocity);
         },
         _collide: function(obj, vec, colShape, myShape) {
             //fire particle

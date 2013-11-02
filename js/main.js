@@ -17,7 +17,7 @@ require([
         $game = $('#game');
 
         //set the default scale mode for PIXI
-        gf.PIXI.BaseTexture.SCALE_MODE.DEFAULT = gf.PIXI.BaseTexture.SCALE_MODE.NEAREST;
+        gf.Texture.SCALE_MODE.DEFAULT = gf.Texture.SCALE_MODE.NEAREST;
 
         lttp.game = game = new gf.Game('game', {
             gravity: 0,

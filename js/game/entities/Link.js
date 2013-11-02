@@ -108,6 +108,9 @@ define([
     };
 
     gf.inherit(Link, Entity, {
+        updateTransform: function() {
+            Entity.prototype.updateTransform.call(this);
+        },
         _addDirectionalPrefixedFrames: function(type, num, speed, loop) {
             this._addDirectionalFrames(type + '_%s/' + type + '_%s', num, speed, loop); 
         },
@@ -261,22 +264,25 @@ define([
             }
         },
         lock: function() {
-            this.body.velocity.set(0, 0);
+            this.setVelocity(new gf.Vector());
+            //this.body.velocity.set(0, 0);
             this.locked = true;
         },
         unlock: function() {
             this._setMoveAnimation();
-            this.body.velocity.copy(this.movement);
+            this.setVelocity(this.movement);
+            //this.body.velocity.copy(this.movement);
             this.locked = false;
         },
         addAttackSensor: function(phys) {
             if(this.atkSensor) return;
 
-            this.atkSensor = new gf.Body(this);
+            this.atkSensor = phys.addCustomShape(this, new gf.Circle(0, 0, C.ATTACK_SENSOR_RADIUS), true);
+            /*this.atkSensor = new gf.Body(this);
             this.atkSensor.shape = new gf.Circle(0, 0, C.ATTACK_SENSOR_RADIUS);
             this.atkSensor.sensor = true;
 
-            phys.addBody(this.atkSensor);
+            phys.addBody(this.atkSensor);*/
         },
         //Talk, run, Lift/Throw/Push/Pull
         onUse: function(status) {
@@ -355,7 +361,7 @@ define([
             //create the item particle
             particle = this.particlepool.create();
             this.parent.addChild(particle);
-            particle.run(item, this._psystem);
+            particle.run(item, this._phys.system);
 
             this.emit('updateHud');
         },
@@ -369,7 +375,7 @@ define([
 
             var obj = this.itempool.create();
 
-            obj.setup(item, this._psystem);
+            obj.setup(item, this._phys.system);
             this.parent.addChild(obj);
 
             this._markEmpty(item);
@@ -525,7 +531,7 @@ define([
             spr.visible = true;
             spr.anchor.x = o.anchor.x;
             spr.anchor.y = o.anchor.y;
-            spr.position.copy(o.position);
+            spr.setPosition(o.position.x, o.position.y);
 
             //add sprite
             o.parent.addChild(spr);
@@ -535,8 +541,10 @@ define([
         },
         _physUpdate: function() {
             if(this.carrying) {
-                this.carrying.position.x = this.position.x;
-                this.carrying.position.y = this.position.y - this.height + 5;
+                this.carrying.setPosition(
+                    this.position.x,
+                    this.position.y - this.height + 5
+                );
             }
         },
         _checkAttack: function() {
@@ -613,7 +621,8 @@ define([
             if(this.locked) return;
 
             this._setMoveAnimation();
-            this.body.velocity.copy(this.movement);
+            this.setVelocity(this.movement);
+            //this.body.velocity.copy(this.movement);
         },
         _setMoveAnimation: function(force) {
             var anim = force || ((this.movement.x || this.movement.y) ? 'walk' : 'idle');
@@ -720,7 +729,7 @@ define([
 
             this.lock();
             this.stop();
-            this._psystem.pause();
+            this._phys.system.pause();
 
             vec.normalize();
 
@@ -743,6 +752,10 @@ define([
                         var n = now - last;
 
                         self.position[p] += n;
+                        self.setPosition(
+                            self.position.x,
+                            self.position.y
+                        );
 
                         last = now;
                     },
@@ -764,12 +777,16 @@ define([
                     var n = now - last;
 
                     self.position[p] += n;
+                    self.setPosition(
+                        self.position.x,
+                        self.position.y
+                    );
 
                     last = now;
                 },
                 done: function() {
                     self.unlock();
-                    self._psystem.resume();
+                    self._phys.system.resume();
                 }
             });
         },

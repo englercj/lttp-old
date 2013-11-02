@@ -42,6 +42,9 @@ define([
             //create link
             this.link = this.createLink();
 
+            //bind events
+            this.bindInput();
+
             //set inventory
             for(var k in data.inventory) {
                 this.link.inventory[k] = data.inventory[k];
@@ -146,25 +149,22 @@ define([
             });
         },
         pause: function() {
-            //render the current world onto a texture (excluding camera)
-            this.camera.visible = false;
-            this._bgtx.render(this.game.stage);
+            //render the current world onto a texture
+            this._bgtx.render(this.game.world);
             this._bgspr.visible = true;
 
-            //turn the camera back on
-            this.camera.visible = true;
+            //hides and stop updates to the world
+            this.world.visible = false;
 
             //stop physics updates
-            //this.physics.pause();
-
-            //stop updates to the world
-            this.world.visible = false;
+            this.physics.pause();
         },
         resume: function() {
             this._bgspr.visible = false;
-            //this.physics.resume();
-
             this.world.visible = true;
+
+            //restart physics simulation
+            this.physics.resume();
         },
         _saveZoneState: function(zone) {
             //save zone state
@@ -240,12 +240,12 @@ define([
 
             this.firstZone = true;
 
-            //this.physics.nextTick(function() {
-                //self.physics.skip(2);
+            this.physics.nextTick(function() {
+                self.physics.skip(2);
 
                 //load the new world into the game
                 if(!self.maps[exit.name]) {
-                    self.maps[exit.name] = this.world.add.tilemap(exit.name, true);
+                    self.maps[exit.name] = self.world.add.tilemap(exit.name, true);
                 }
 
                 self.map = self.maps[exit.name];
@@ -264,7 +264,7 @@ define([
 
                 //start music
                 if(self.map.properties.music) {
-                    self.music = this.audio.add(self.map.properties.music, { volume: C.MUSIC_VOLUME, loop: true });
+                    self.music = self.audio.add(self.map.properties.music, { volume: C.MUSIC_VOLUME, loop: true });
 
                     if(!self.music)
                         console.warn('Music not loaded! "' + self.map.properties.music + '"');
@@ -277,15 +277,14 @@ define([
                 self.map.findLayer('zones').spawn();
 
                 //set link position
-                self.link.position.set(
+                self.link.setPosition(
                     exit.properties.loc[0],
                     exit.properties.loc[1]
                 );
                 self.camera.follow(self.link, gf.CAMERA_FOLLOW.LOCKON);
-                //self.link.reindex();
 
                 if(cb) cb();
-            //});
+            });
         },
         gotoZone: function(zone, vec) {
             if(zone === this.activeZone)
@@ -327,6 +326,10 @@ define([
                         );
                         //set link position
                         self.link.position[p] += space;
+                        self.link.setPosition(
+                            self.link.position.x,
+                            self.link.position.y
+                        );
 
                         //zone ready
                         self._zoneReady();
@@ -343,6 +346,10 @@ define([
                             );
                             //set link position
                             self.link.position[p] += space;
+                            self.link.setPosition(
+                                self.link.position.x,
+                                self.link.position.y
+                            );
 
                             //zone ready
                             self._zoneReady();
@@ -361,6 +368,10 @@ define([
                     );
                     //set link position
                     self.link.position[p] += space;
+                    self.link.setPosition(
+                        self.link.position.x,
+                        self.link.position.y
+                    );
 
                     //zone ready
                     self._zoneReady();
@@ -393,29 +404,28 @@ define([
                 this.oldLayer.despawn();
             }
 
-            var zone = this.activeZone;
+            var zone = this.activeZone,
+                scale = 3;
 
             this.firstZone = false;
 
             //set camera bounds
             if(!zone.bounds) {
                 zone.bounds = zone.hitArea.clone();
+                zone.bounds.x += zone.position.x;
+                zone.bounds.y += zone.position.y;
 
-                //all except polygon
-                if(zone.bounds.x !== undefined) {
-                    zone.bounds.x += zone.position.x;
-                    zone.bounds.y += zone.position.y;
-                }
-                //polygon
-                else {
-                    for(var i = 0; i < zone.bounds.points.length; ++i) {
-                        var p = zone.bounds.points[i];
-
-                        p.x += zone.position.x;
-                        p.y += zone.position.y;
-                    }
+                if(zone.bounds._shapetype = gf.SHAPE.RECTANGLE) {
+                    zone.bounds.x *= scale;
+                    zone.bounds.y *= scale;
+                    zone.bounds.width *= scale;
+                    zone.bounds.height *= scale;
+                } else {
+                    zone.bounds.scale.set(scale, scale);
+                    zone.bounds.recalc();
                 }
             }
+
             this.camera.constrain(zone.bounds.clone());
             this.camera.follow(this.link, gf.CAMERA_FOLLOW.LOCKON);
         },
@@ -426,10 +436,7 @@ define([
             var l = new Link(this.game.cache.getTextures('sprite_link')),
                 self = this;
 
-            l.mass = 1;
-            l.inertia = Infinity;
-            l.friction = 0;
-            l.hitArea = new gf.Polygon([
+            l.hitArea = new gf.Polygon(0, 0, [
                 7,8, //x,y relative to links top-left
                 9,8,
                 16,14,
@@ -439,11 +446,14 @@ define([
                 0,16,
                 0,14
             ]);
+            l.mass = 1;
+            l.inertia = Infinity;
+            l.friction = 0;
 
             l.anchor.x = 0;
             l.anchor.y = 1;
 
-            this.physics.addSprite(l);
+            l.enablePhysics(this.physics);
             l.addAttackSensor(this.physics);
 
             l.on('updateHud', function() {
@@ -463,6 +473,9 @@ define([
                 self.showDialog(sign.properties.text);
             });
 
+            return l;
+        },
+        bindInput: function() {
             //bind the keyboard
             this.game.input.keyboard.on(gf.Keyboard.KEY.W, this._boundMoveUp = this.onMove.bind(this, 'up'));
             this.game.input.keyboard.on(gf.Keyboard.KEY.S, this._boundMoveDown = this.onMove.bind(this, 'down'));
@@ -488,8 +501,6 @@ define([
             this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_4, this._boundGpUseItem = this.onUseItem.bind(this));
 
             this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.LEFT_TRIGGER, this._boundGpROCKET = this.onROCKET.bind(this));
-
-            return l;
         },
         onMove: function(dir, status) {
             if(this.inventory.visible)
