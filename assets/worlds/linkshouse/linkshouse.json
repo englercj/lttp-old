@@ -269,11 +269,88 @@
                  "hitArea":"[0,0,16,0,16,16,8,16,8,8,0,8]",
                  "type":"solid"
                 },
+             "16":
+                {
+                 "static":"true",
+                 "type":"jump"
+                },
+             "17":
+                {
+                 "hitArea":"[0,0,8,16]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "18":
+                {
+                 "hitArea":"[8,0,8,16]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "19":
+                {
+                 "hitArea":"[0,0,16,8]",
+                 "static":"true",
+                 "type":"jump"
+                },
              "2":
                 {
                  "body":"static",
                  "hitArea":"[8,0,8,16]",
                  "type":"solid"
+                },
+             "20":
+                {
+                 "hitArea":"[0,8,16,8]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "21":
+                {
+                 "hitArea":"[16,0,16,16,0,16]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "22":
+                {
+                 "hitArea":"[0,0,16,16,0,16]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "23":
+                {
+                 "hitArea":"[0,0,16,0,16,16]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "24":
+                {
+                 "hitArea":"[0,0,16,0,0,16]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "25":
+                {
+                 "hitArea":"[0,0,8,0,8,8,16,8,16,16,0,16]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "26":
+                {
+                 "hitArea":"[8,0,16,0,16,16,0,16,0,8,8,8]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "27":
+                {
+                 "hitArea":"[0,0,0,16,16,8,8,8,8,16,0,16]",
+                 "static":"true",
+                 "type":"jump"
+                },
+             "28":
+                {
+                 "hitArea":"[0,0,16,0,16,16,8,16,8,8,0,8]",
+                 "static":"true",
+                 "type":"jump"
                 },
              "3":
                 {
