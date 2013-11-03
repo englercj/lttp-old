@@ -36,7 +36,7 @@ define([
             this.type = cfg.type;
 
             //play animation for this item
-            this.gotoAndPlay(item.name);
+            this.goto(0, item.name).play();
             this.enablePhysics(phys);
 
             //set position

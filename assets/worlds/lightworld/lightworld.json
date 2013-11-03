@@ -7,7 +7,7 @@
          "opacity":1,
          "properties":
             {
-             "preRender":"true"
+             "preRender":"false"
             },
          "type":"tilelayer",
          "visible":true,

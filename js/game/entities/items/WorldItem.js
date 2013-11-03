@@ -50,7 +50,7 @@ define([
             this.value = value;
 
             if(type === 'rupees') {
-                this.gotoAndPlay(tx);
+                this.goto(0, tx).play(tx);
             } else {
                 this.stop();
                 this.setTexture(lttp.game.cache.getTextures('sprite_worlditems')[tx]);

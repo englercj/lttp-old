@@ -42,18 +42,22 @@ define([
 
             this.addAnimation(dir, frames);
         },
-        gotoAndPlay: function(anim) {
-            if(typeof anim === 'string') {
-                if(anim.indexOf('grass') !== -1)
-                    this.sounds.grass.play();
-                else
-                    this.sounds.smash.play();
+        goto: function(frame, anim) {
+            //this will be called before the ctor completes so don't do this extra
+            //portion until after the ctor finishes
+            if(this.sounds) {
+                if(typeof anim === 'string') {
+                    if(anim.indexOf('grass') !== -1)
+                        this.sounds.grass.play();
+                    else
+                        this.sounds.smash.play();
+                }
+
+                if(!this.animations[anim])
+                    anim = 'pot';
             }
 
-            if(!this.animations[anim])
-                anim = 'pot';
-
-            Entity.prototype.gotoAndPlay.apply(this, arguments);
+            return Entity.prototype.goto.apply(this, arguments);
         },
         _done: function() {
             this.visible = false;

@@ -29,7 +29,7 @@ define([
         lite: function() {
             if(this.type !== 'torch') return;
 
-            this.gotoAndPlay('torch_lit');
+            this.goto(0, 'torch_lit').play();
             setTimeout(this.extinguish.bind(this), 5000);
 
             //light up dat world

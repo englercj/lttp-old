@@ -186,7 +186,7 @@ define([
                         self.link.unlock();
                     });
                     this.link.lock();
-                    this.link.gotoAndPlay(exit.properties.animation);
+                    this.link.goto(0, exit.properties.animation).play();
 
                     return;
                 }
