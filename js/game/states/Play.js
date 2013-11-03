@@ -92,23 +92,23 @@ define([
             this.game.input.keyboard.off(gf.input.KEY.I, this._boundToggleInventory);
 
             //unbind the gamepad
-            this.game.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_HOR, this._boundGpMoveHor);
-            this.game.input.gamepad.sticks.off(gf.input.GP_AXIS.LEFT_ANALOGUE_VERT,  this._boundGpMoveVert);
+            this.game.input.gamepad.sticks.off(gf.GamepadSticks.AXIS.LEFT_ANALOGUE_HOR, this._boundGpMoveHor);
+            this.game.input.gamepad.sticks.off(gf.GamepadSticks.AXIS.LEFT_ANALOGUE_VERT,  this._boundGpMoveVert);
 
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_TOP, this._boundGpMoveUp);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_BOTTOM, this._boundGpMoveDown);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_LEFT, this._boundGpMoveLeft);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.PAD_RIGHT, this._boundGpMoveRight);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.PAD_TOP, this._boundGpMoveUp);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.PAD_BOTTOM, this._boundGpMoveDown);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.PAD_LEFT, this._boundGpMoveLeft);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.PAD_RIGHT, this._boundGpMoveRight);
 
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_1, this._boundGpUse);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_2, this._boundGpAttack);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_3, this._boundGpToggleMap);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.FACE_4, this._boundGpUseItem);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.FACE_1, this._boundGpUse);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.FACE_2, this._boundGpAttack);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.FACE_3, this._boundGpToggleMap);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.FACE_4, this._boundGpUseItem);
 
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.SELECT, this._boundGpToggleSaveMenu);
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.START, this._boundGpToggleInventory);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.SELECT, this._boundGpToggleSaveMenu);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.START, this._boundGpToggleInventory);
 
-            this.game.input.gamepad.buttons.off(gf.input.GP_BUTTON.LEFT_TRIGGER, this._boundGpROCKET);
+            this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.LEFT_TRIGGER, this._boundGpROCKET);
         },
         onToggleSaveMenu: function() {},
         onToggleMap: function() {},
@@ -233,8 +233,8 @@ define([
                 this.link.parent.removeChild(this.link);
 
             if(this.map) {
-                this.map.visible = false;
                 this._saveZoneState(this.activeLayer);
+                this.map.visible = false;
                 this.map.despawnObjects();
             }
 

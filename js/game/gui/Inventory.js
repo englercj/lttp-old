@@ -322,7 +322,7 @@ define([
         onGpMove: function(e) {
             var dir;
 
-            if(e.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR) {
+            if(e.code === gf.GamepadSticks.AXIS.LEFT_ANALOGUE_HOR) {
                 if(e.value > 0) {
                     if(this.move.right)
                         return;

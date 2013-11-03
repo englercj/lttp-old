@@ -4,7 +4,7 @@
  * Copyright (c) 2013, Chad Engler
  * https://github.com/grapefruitjs/gf-debug
  *
- * Compiled: 2013-10-29
+ * Compiled: 2013-11-03
  *
  * GrapeFruit Debug Module is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -468,26 +468,6 @@ debug.SpritesPanel = function(game) {
     this.name = 'sprites';
     this.title = 'Sprites';
 
-    this.gfx = new gf.Graphics();
-
-    this.style = {
-        _defaultShape: {
-            size: 1,
-            color: 0xff2222,
-            alpha: 1
-        },
-        sensorShape: {
-            size: 1,
-            color: 0x22ff22,
-            alpha: 1
-        },
-        tree: {
-            size: 1,
-            color: 0x2222ff,
-            alpha: 1
-        }
-    };
-
     this.showing = {
         shapes: false,
         tree: false
@@ -517,12 +497,19 @@ gf.inherit(debug.SpritesPanel, debug.Panel, {
 
         div.appendChild(pad);
 
+        this.physics = new debug.Physics(div, this.game);
+
         return div;
     },
     toggleType: function(type) {
         this.showing[type] = !this.showing[type];
     },
     tick: function() {
+        if(!this.active)
+            return;
+
+        this.physics.render();
+        /*
         if(this.game.world !== this.gfx.parent) {
             if(this.gfx.parent)
                 this.gfx.parent.removeChild(this.gfx);
@@ -533,7 +520,7 @@ gf.inherit(debug.SpritesPanel, debug.Panel, {
         this.gfx.clear();
 
         //ensure always on top
-        if(!this.showing.shapes/* && !this.showing.tree*/)
+        if(!this.showing.shapes && !this.showing.tree)
             return this._updateGfx(true);
         else
             this._updateGfx();
@@ -553,13 +540,14 @@ gf.inherit(debug.SpritesPanel, debug.Panel, {
         }
 
         //draw the quadtree
-        /*if(this.showing.tree) {
+        if(this.showing.tree) {
             debug.drawQuadTree(
                 this.game.physics.tree,
                 this.style.tree,
                 this.gfx
             );
-        }*/
+        }
+        */
     },
     _updateGfx: function(rm) {
         if(rm) {
@@ -1169,7 +1157,7 @@ gf.inherit(debug.Gamepad, Object, {
             labelEl = this.element.querySelector('label[for="' + axisIds[status.code][0] + '"]'),
             offsetVal = status.value * STICK_OFFSET;
 
-        if(status.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR || status.code === gf.input.GP_AXIS.RIGHT_ANALOGUE_HOR) {
+        if(status.code === gf.GamepadSticks.AXIS.LEFT_ANALOGUE_HOR || status.code === gf.GamepadSticks.AXIS.RIGHT_ANALOGUE_HOR) {
             stickEl.style.marginLeft = offsetVal + 'px';
         } else {
             stickEl.style.marginTop = offsetVal + 'px';
@@ -1188,6 +1176,135 @@ gf.inherit(debug.Gamepad, Object, {
             labelEl.classList.remove('positive');
             labelEl.classList.remove('negative');
         }
+    }
+});
+
+debug.Physics = function(container, game) {
+    //create canvases
+    this.canvas = document.createElement('canvas');
+    this.staticCanvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.sctx = this.staticCanvas.getContext('2d');
+    container.appendChild(this.canvas);
+    //container.appendChild(this.staticCanvas);
+
+    //store trees
+    this.game = game;
+
+    //style of things to draw
+    this.style = {
+        _defaultShape: {
+            size: 1,
+            color: '#ff2222',
+            alpha: 1
+        },
+        sensorShape: {
+            size: 1,
+            color: '#22ff22',
+            alpha: 1
+        },
+        tree: {
+            size: 1,
+            color: '#2222ff',
+            alpha: 1
+        }
+    };
+};
+
+gf.inherit(debug.Physics, Object, {
+    render: function() {
+        var sw, sh,
+            fw, fh,
+            doRender = false,
+            actShapes = this.game.physics.space.activeShapes,
+            stcShapes = this.game.physics.space.staticShapes;
+
+        sw = sh = fw = fh = 0;
+
+        if(actShapes.root) {
+            /* jshint -W106 */
+            sw = actShapes.root.bb_r - actShapes.root.bb_l;
+            sh = actShapes.root.bb_t - actShapes.root.bb_b;
+            /* jshint +W106 */
+            doRender = true;
+        }
+
+        if(stcShapes.root) {
+            /* jshint -W106 */
+            fw = Math.max(sw, stcShapes.root.bb_r - stcShapes.root.bb_l);
+            fh = Math.max(sh, stcShapes.root.bb_t - stcShapes.root.bb_b);
+            /* jshint +W106 */
+            doRender = true;
+        }
+
+        if(doRender) {
+            //clear canvas
+            this.ctx.clearRect(0, 0, this.canvas.width = fw, this.canvas.height = fh);
+
+            //render static shapes
+            //if(this.staticCanvas.width !== sw || this.staticCanvas.height !== sh) {
+            //this.sctx.clearRect(0, 0, this.staticCanvas.width = sw, this.staticCanvas.height = sh);
+            //this.staticCanvas.width = sw;
+            //this.staticCanvas.height = sh;
+            this.drawShapes(this.ctx, stcShapes);
+            //}
+
+            //draw static canvas
+            /* jshint -W106 */
+            //this.ctx.drawImage(this.staticCanvas, 0, 0);
+            /* jshint +W106 */
+
+            //render active shapes
+            this.drawShapes(this.ctx, actShapes);
+        }
+    },
+    drawShapes: function(ctx, tree) {
+        var self = this;
+        tree.each(function(shape) {
+            self.drawShape(
+                ctx,
+                shape,
+                shape.sensor ? self.style.sensorShape : self.style._defaultShape
+            );
+        });
+    },
+    drawShape: function(ctx, shape, style) {
+        ctx.lineWidth = style.size;
+        ctx.strokeStyle = style.color;
+
+        var p = shape.body.p;
+
+        //draw circle
+        if(shape.type === 'circle') {
+            /* jshint -W106 */
+            var cx = shape.bb_l + ((shape.bb_r - shape.bb_l) / 2),
+                cy = shape.bb_t + ((shape.bb_b - shape.bb_t) / 2);
+            /* jshint +W106 */
+
+            ctx.arc(cx, cy, shape.r, 0, 2 * Math.PI);
+        }
+        //draw polygon
+        else {
+            var vx = shape.verts[0],
+                vy = shape.verts[1];
+
+            ctx.beginPath();
+            ctx.moveTo(
+                p.x + vx,
+                p.y + vy
+            );
+
+            for(var i = 2; i < shape.verts.length; i += 2) {
+                ctx.lineTo(
+                    p.x + shape.verts[i],
+                    p.y + shape.verts[i + 1]
+                );
+            }
+
+            ctx.closePath();
+        }
+
+        ctx.stroke();
     }
 });
 

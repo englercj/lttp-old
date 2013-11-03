@@ -185,7 +185,7 @@ define([
             }
         },
         onGpMove: function(e) {
-            if(e.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR) {
+            if(e.code === gf.GamepadSticks.AXIS.LEFT_ANALOGUE_HOR) {
                 if(e.value > 0) {
                     if(this._lastHorzGpValue > 0)
                         return;

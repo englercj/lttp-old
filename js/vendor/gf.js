@@ -8733,7 +8733,6 @@ define(
         this.tileSize = this.parent.tileSize;
       this.clearTiles();
       this._renderTiles(x, y, width, height);
-      this.state.physics.reindexStatic();
     },
     _preRender: function () {
       if (!this.visible)
@@ -8852,9 +8851,7 @@ define(
       tile.interactive = interactive;
       tile.setTexture(texture);
       tile.setPosition(position[0], position[1]);
-      if (hitArea) {
-        tile.hitArea = hitArea;
-      }
+      tile.hitArea = hitArea;
       if (props.body === "static") {
         tile.mass = Infinity;
       } else {
@@ -8912,9 +8909,6 @@ define(
       while (this._panDelta.y <= -tszY) {
         this._renderDown();
         this._panDelta.y += tszY;
-      }
-      if (this.hasPhysics) {
-        this.parent.parent.physics.reindexStatic();
       }
     },
     _renderLeft: function (forceNew) {
@@ -13887,6 +13881,9 @@ define(
           data.spr._phys.control = data.control;
           break;
         case "remove":
+          if (data.body.space) {
+            this.space.removeBody(data.body);
+          }
           if (data.shape.space) {
             this.space.removeShape(data.shape);
           }
@@ -13894,9 +13891,6 @@ define(
             for (var i = data.customShapes.length - 1; i > -1; --i) {
               this.space.removeShape(data.customShapes[i]);
             }
-          }
-          if (data.body.space) {
-            this.space.removeBody(data.body);
           }
           data.body = null;
           data.shape.sprite = null;

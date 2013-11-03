@@ -199,7 +199,7 @@ define([
             this._checkMovement();
         },
         onGpWalk: function(e) {
-            if(e.code === gf.input.GP_AXIS.LEFT_ANALOGUE_HOR) {
+            if(e.code === gf.GamepadSticks.AXIS.LEFT_ANALOGUE_HOR) {
                 if(e.value === 0) {
                     if(!this._lastHorzGpValue)
                         return;
@@ -466,6 +466,12 @@ define([
             item.sensor = true;
             item.enablePhysics();
 
+            //remove from collision list
+            var idx = this.colliding.indexOf(item);
+            if(idx !== -1) {
+                this.colliding.splice(idx, 1);
+            }
+
             //drop the loot
             if(item.properties.loot) {
                 this.dropLoot(item);
@@ -638,11 +644,11 @@ define([
                 this._setMoveDirAnimation(anim);
             }
 
-            if(this.colliding.length && (this.movement.x || this.movement.y)) {
+            /*if(this.colliding.length && (this.movement.x || this.movement.y)) {
                 this._isBlocked();
             } else {
                 this._notBlocked();
-            }
+            }*/
         },
         _setMoveDirAnimation: function(anim) {
             if(this.movement.x) {
@@ -790,7 +796,7 @@ define([
                 }
             });
         },
-        _isBlocked: function() {
+        /*_isBlocked: function() {
             var self = this;
 
             if(this._toBlockedAnim)
@@ -817,7 +823,7 @@ define([
         _notBlocked: function() {
             clearTimeout(this._toBlockedAnim);
             this._toBlockedAnim = null;
-        },
+        },*/
         //on collision
         _collide: function(obj, vec, colShape, myShape) {
             //we got into range of something to attack
@@ -842,7 +848,7 @@ define([
             else if(!obj.sensor) {
                 obj.__colVec = new gf.Vector(vec.x, vec.y);
                 this.colliding.push(obj);
-                this._isBlocked();
+                //this._isBlocked();
             }
             //colliding with a sensor object
             else {
@@ -852,21 +858,24 @@ define([
             }
         },
         _separate: function(obj, colShape, myShape) {
+            //remove from attack range
             if(myShape === this.atkSensor) {
                 var i = this.inAttackRange.indexOf(obj);
 
                 if(i >= 0) {
                     this.inAttackRange.splice(i, 1);
                 }
-            } else if(!obj.sensor) {
+            }
+            //remove from collision list
+            else if(!obj.sensor) {
                 var i = this.colliding.indexOf(obj);
 
                 if(i >= 0) {
                     this.colliding.splice(i, 1);
                 }
 
-                if(!this.colliding.length)
-                    this._notBlocked();
+                /*if(!this.colliding.length)
+                    this._notBlocked();*/
             }
         }
     });
