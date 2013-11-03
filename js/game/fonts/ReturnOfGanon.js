@@ -37,7 +37,14 @@ define([
 
         'gjpqy,<>'.split('').forEach(function(c) {
             map[c] = {
-                yOffset: 4,
+                yOffset: 6,
+                name: map[c]
+            };
+        });
+
+        'acemnorsuvwxz'.split('').forEach(function(c) {
+            map[c] = {
+                yOffset: 6,
                 name: map[c]
             };
         });

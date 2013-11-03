@@ -150,8 +150,12 @@ define([
         },
         pause: function() {
             //render the current world onto a texture
-            this._bgtx.render(this.game.world);
+            this.hud.visible = false;
+            this._bgtx.render(this);
             this._bgspr.visible = true;
+
+            //turn the camera back on
+            this.hud.visible = true;
 
             //hides and stop updates to the world
             this.world.visible = false;

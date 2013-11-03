@@ -107,10 +107,9 @@ define([
 
             //add font
             this.font = new ReturnOfGanonFont();
-            this.font.maxX = 
             this.font.scale.x = this.font.scale.y = 0.5;
             this.font.position.x = 8;
-            this.font.position.y = 20;
+            this.font.position.y = 8;
             this.addChild(this.font);
         }
     });
