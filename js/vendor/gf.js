@@ -429,7 +429,7 @@ define(
   
 // uRequire v0.6.5: START body of original nodejs module
   var constants = {
-      version: "@@VERSION",
+      version: "0.1.0",
       RENDERER: {
         AUTO: "auto",
         CANVAS: "canvas",

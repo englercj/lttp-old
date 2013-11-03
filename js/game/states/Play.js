@@ -311,7 +311,7 @@ define([
         _zoneTransition: function(zone, vec) {
             var p = vec.x ? 'x' : 'y',
                 last = 0,
-                space = 10,
+                space = 0,
                 animTime = 500,
                 zone = this.activeZone,
                 self = this;

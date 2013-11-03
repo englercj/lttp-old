@@ -7,7 +7,7 @@
          "opacity":1,
          "properties":
             {
-             "preRender":"false"
+             "preRender":"true"
             },
          "type":"tilelayer",
          "visible":true,
@@ -21475,7 +21475,7 @@
                  "y":0
                 }, 
                 {
-                 "height":496,
+                 "height":512,
                  "name":"Link's House",
                  "properties":
                     {
@@ -21769,7 +21769,7 @@
                  "y":3072
                 }, 
                 {
-                 "height":1040,
+                 "height":1024,
                  "name":"Great Swamp",
                  "properties":
                     {
@@ -21780,7 +21780,7 @@
                  "visible":true,
                  "width":1040,
                  "x":1536,
-                 "y":3056
+                 "y":3072
                 }, 
                 {
                  "height":512,
@@ -21967,7 +21967,7 @@
                  "y":0
                 }, 
                 {
-                 "height":496,
+                 "height":512,
                  "name":"Link's House - West",
                  "properties":
                     {
@@ -21982,7 +21982,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "width":256,
          "x":0,
          "y":0
