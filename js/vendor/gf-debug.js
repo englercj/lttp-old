@@ -1,10 +1,10 @@
 /**
  * @license
- * GrapeFruit Debug Module - v0.0.1
+ * GrapeFruit Debug Module - v0.0.2
  * Copyright (c) 2013, Chad Engler
  * https://github.com/grapefruitjs/gf-debug
  *
- * Compiled: 2013-11-03
+ * Compiled: 2013-11-04
  *
  * GrapeFruit Debug Module is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -19,7 +19,7 @@ window.gfdebug = debug;
 
 //the version of this plugin. Placed in by grunt when built you can change
 //this value in the package.json (under version)
-debug.version = '0.0.1';
+debug.version = '0.0.2';
 
 //on tick funciton to replace the gf.Game.prototype._tick function with
 //will call _super to run the normal tick, then tick the panels as well

@@ -15,7 +15,7 @@ define([
         this.music.volume = C.MUSIC_VOLUME;
         this.audio.attach(this.music);
 
-        var audioSettings = { volume: C.MUSIC_VOLUME };
+        var audioSettings = { volume: C.EFFECT_VOLUME };
         this.sounds = {
             select: this.audio.add('effect_menu_select', audioSettings),
             cursor: this.audio.add('effect_menu_select_cursor', audioSettings),
@@ -257,24 +257,27 @@ define([
                     this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
                     return;
                 } else if(c.name === 'right') {
-                    this.panameI = Math.min((c.text.length / 2), this.pnameI + 1);
+                    this.pnameI = Math.min((n.length / 2), this.pnameI + 1);
                     this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
                     return;
                 }
 
                 if(this.pname.text.length === 11) {
-                    var i = this.pnameI;
-
-                    for(var cnt = i; cnt > 0; --cnt)
-                        i++;
+                    var i = this.pnameI * 2;
 
                     n = n.substr(0, i) + c.text + n.substr(i+1);
                 }
                 else {
-                    if(n.length)
-                        n += ' ';
+                    if(this.pnameI < (n.length / 2)) {
+                        var i = this.pnameI * 2;
 
-                    n += c.text;
+                        n = n.substr(0, i) + c.text + n.substr(i + 1);
+                    } else {
+                        if(n.length)
+                            n += ' ';
+
+                        n += c.text;
+                    }
                 }
                 this.pnameI = (this.pnameI + 1) % 6;
 

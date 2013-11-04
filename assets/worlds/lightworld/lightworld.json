@@ -12312,6 +12312,21 @@
                  "width":0,
                  "x":1232,
                  "y":1680
+                }, 
+                {
+                 "gid":5686,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1344,
+                 "y":1632
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -22328,11 +22343,13 @@
              "3":
                 {
                  "static":"true",
+                 "text":"",
                  "type":"sign"
                 },
              "30":
                 {
                  "static":"true",
+                 "text":"",
                  "type":"sign"
                 },
              "9":

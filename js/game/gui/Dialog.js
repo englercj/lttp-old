@@ -20,10 +20,12 @@ define([
         this.range = [0, 1]; //start pos, length
 
         this.fastSpeed = 15;
-        this.typeSpeed = 50;
+        this.typeSpeed = 60;
         this.speed = this.typeSpeed;
 
         this.speedCooldown = 250;
+
+        this.firstOpen = true;
 
         this.padding = 5;
 
@@ -56,6 +58,7 @@ define([
             } while(i+sub < str.length || i-sub > 0);
         },
         show: function(cb) {
+            this.firstOpen = true;
             this.visible = true;
             this.sounds.open.play();
 
@@ -73,6 +76,12 @@ define([
             this.visible = false;
         },
         onAdvance: function(status) {
+            //skip first one
+            if(this.firstOpen) {
+                this.firstOpen = false;
+                return;
+            }
+
             //done typing
             if(this.doneCb) {
                 this.doneCb();

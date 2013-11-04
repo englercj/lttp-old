@@ -41,16 +41,13 @@ require([
             //load starting states
             lttp.intro = new IntroState(game);
             lttp.intro.start();
-            lttp.intro.audio.mute();
 
             //load select state
             lttp.select = new SelectState(game);
             lttp.select.on('select', loadGame);
-            lttp.select.audio.mute();
 
             //load the play state
             lttp.play = new PlayState(game);
-            lttp.play.audio.mute();
 
             game.input.keyboard.on(gf.Keyboard.KEY.ENTER, gotoSelect);
             game.input.keyboard.on(gf.Keyboard.KEY.SPACE, gotoSelect);

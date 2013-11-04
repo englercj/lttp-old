@@ -240,6 +240,9 @@ define([
                 this._saveZoneState(this.activeLayer);
                 this.map.visible = false;
                 this.map.despawnObjects();
+                this.map.clearTiles();
+
+                this.world.removeChild(this.map);
             }
 
             this.firstZone = true;
@@ -250,6 +253,8 @@ define([
                 //load the new world into the game
                 if(!self.maps[exit.name]) {
                     self.maps[exit.name] = self.world.add.tilemap(exit.name, true);
+                } else {
+                    self.world.add.obj(self.maps[exit.name]);
                 }
 
                 self.map = self.maps[exit.name];
@@ -285,7 +290,17 @@ define([
                     exit.properties.loc[0],
                     exit.properties.loc[1]
                 );
-                self.camera.follow(self.link, gf.CAMERA_FOLLOW.LOCKON);
+                //self.camera.follow(self.link, gf.CAMERA_FOLLOW.LOCKON);
+
+                //god this is dirty, but basically we give it a few frames to fix the camera onto
+                //link for the new zone he is in, in the new world.
+                self.game.once('tick', function() {
+                    self.game.once('tick', function() {
+                        self.game.once('tick', function() {
+                            self.map.render();
+                        });
+                    });
+                });
 
                 if(cb) cb();
             });
@@ -432,6 +447,7 @@ define([
 
             this.camera.constrain(zone.bounds.clone());
             this.camera.follow(this.link, gf.CAMERA_FOLLOW.LOCKON);
+            this.camera.pan(1, 1);
         },
         createLink: function(saveData) {
             if(this.link)

@@ -31,8 +31,8 @@ define({
     THROW_DISTANCE_Y: 50,
 
     //volume for sounds
-    EFFECT_VOLUME: 0.15,
-    MUSIC_VOLUME: 0.25,
+    EFFECT_VOLUME: 0.80,
+    MUSIC_VOLUME: 0.20,
 
     //how long to run into something before an action takes place (blocked/jump down)
     BLOCKED_WAIT_TIME: 500,

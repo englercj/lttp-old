@@ -6,9 +6,9 @@ define([
     var Intro = function(game) {
         State.call(this, game, 'title');
 
-        var audioSettings = { volume: C.MUSIC_VOLUME };
+        var audioSettings = { volume: C.EFFECT_VOLUME };
         this.sounds = {
-            intro: this.audio.add('music_title', audioSettings),
+            intro: this.audio.add('music_title', { volume: C.MUSIC_VOLUME }),
             sword: this.audio.add('effect_sword1', audioSettings),
             ding: this.audio.add('effect_menu_select', audioSettings)
         };
