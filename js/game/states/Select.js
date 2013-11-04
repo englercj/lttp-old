@@ -39,7 +39,10 @@ define([
                     speed: 0.1,
                     loop: true
                 }
-            })
+            }),
+            link1: new gf.Sprite([txSelect['link1.png'], txSelect['link2.png']]),
+            link2: new gf.Sprite([txSelect['link1.png'], txSelect['link2.png']]),
+            link3: new gf.Sprite([txSelect['link1.png'], txSelect['link2.png']])
         };
 
         for(var sp in this.sprites) {
@@ -47,6 +50,7 @@ define([
         }
 
         this.fontpool = new gf.ObjectPool(ReturnOfGanonFont);
+        this.heartpool = new gf.ObjectPool(gf.Sprite);
 
         this._setupSelect();
         this._setupRegister();
@@ -310,17 +314,88 @@ define([
 
                 for(var i = 0; i < s.length; ++i) {
                     var n = i + 1,
-                        sv = s[i];
+                        sv = s[i].load(),
+                        inv = sv ? sv.inventory : null,
+                        spr = this.sprites['link' + n];
 
-                    sv.load();
+                    this['slot' + n].text = n + '.' + (sv ? sv.name : '');
 
-                    this['slot' + n].text = n + '.' + (sv.data ? sv.data.name : '');
-                    //TODO: set hearts
-                    //TODO: link icon
+                    if(inv) {
+                        spr.visible = true;
+
+                        if(inv.sword === 1 && inv.shield === 1) {
+                            spr.goto(3);
+                        } else if(inv.shield === 1) {
+                            spr.goto(2);
+                        } else if(inv.sword === 1) {
+                            spr.goto(1);
+                        } else {
+                            spr.goto(0);
+                        }
+
+                        this._renderHearts(this['hearts' + n], sv.health, sv.maxHealth);
+                    }
                 }
             }
 
             this.active = name;
+        },
+        _renderHearts: function(c, val, max) {
+            var x = 0,
+                y = 20,
+                size = 16,
+                perRow = 10,
+                done = 0,
+                hp = 0,
+                txSelect = this.game.cache.getTextures('sprite_select');
+
+            for(hp = val; hp > 0; --hp) {
+                done++;
+
+                var off = 0,
+                    spr,
+                    tx;
+                if(hp < 1) { //partial
+                    tx = txSelect['heart-half.png'];
+                    off = 2;
+                } else {
+                    tx = txSelect['heart-full.png'];
+                }
+
+                spr = this.heartpool.create(tx);
+                spr.setTexture(tx);
+                spr.position.x = x;
+                spr.position.y = y + off;
+                spr.visible = true;
+
+                if((x / size) >= (perRow - 1)) {
+                    x = 0;
+                    y += size;
+                } else {
+                    x += size;
+                }
+
+                c.addChild(spr);
+            }
+
+            for(done; done < max; ++done) {
+                var tx = txSelect['heart-empty.png'],
+                    spr = this.heartpool.create(tx);
+
+                spr.setTexture(tx);
+                spr.position.x = x;
+                spr.position.y = y;
+                spr.visible = true;
+
+                if((x / size) >= (perRow - 1)) {
+                    x = 0;
+                    y += size;
+                } else {
+                    x += size;
+                }
+
+                c.addChild(spr);
+            }
         },
         _setupSelect: function() {
             this.select = new gf.Container();
@@ -332,6 +407,39 @@ define([
             this.sprites.fairy.goto(0, 'flap').play();
             this.select.addChild(this.sprites.fairy);
 
+            this.sprites.link1.position.x = 155;
+            this.sprites.link1.position.y = 205;
+            this.sprites.link1.visible = false;
+            this.select.addChild(this.sprites.link1);
+
+            this.sprites.link2.position.x = 155;
+            this.sprites.link2.position.y = 300;
+            this.sprites.link2.visible = false;
+            this.select.addChild(this.sprites.link2);
+
+            this.sprites.link3.position.x = 155;
+            this.sprites.link3.position.y = 385;
+            this.sprites.link3.visible = false;
+            this.select.addChild(this.sprites.link3);
+
+            this.hearts1 = new gf.Container();
+            this.hearts1.position.x = 425;
+            this.hearts1.position.y = 190;
+            this.hearts1.scale.x = this.hearts1.scale.y = TEXT_SCALE;
+            this.select.addChild(this.hearts1);
+
+            this.hearts2 = new gf.Container();
+            this.hearts2.position.x = 425;
+            this.hearts2.position.y = 280;
+            this.hearts2.scale.x = this.hearts2.scale.y = TEXT_SCALE;
+            this.select.addChild(this.hearts2);
+
+            this.hearts3 = new gf.Container();
+            this.hearts3.position.x = 425;
+            this.hearts3.position.y = 370;
+            this.hearts3.scale.x = this.hearts3.scale.y = TEXT_SCALE;
+            this.select.addChild(this.hearts3);
+
             var text = new gf.Container(),
                 title = this.fontpool.create(),
                 copy = this.fontpool.create(),
@@ -340,34 +448,40 @@ define([
             text.scale.x = text.scale.y = TEXT_SCALE;
 
             title.text = 'PLAYER  SELECT';
+            title.monospace = 15;
             title.position.x = 80;
-            title.position.y = 50;
+            title.position.y = 49;
             text.addChild(title);
 
             this.slot1 = this.fontpool.create();
+            this.slot1.monospace = 15;
             this.slot1.text = '1.';
             this.slot1.position.x = 145;
             this.slot1.position.y = 145;
             text.addChild(this.slot1);
 
             this.slot2 = this.fontpool.create();
+            this.slot2.monospace = 15;
             this.slot2.text = '2.';
             this.slot2.position.x = 145;
             this.slot2.position.y = 205;
             text.addChild(this.slot2);
  
             this.slot3 = this.fontpool.create();
+            this.slot3.monospace = 15;
             this.slot3.text = '3.';
             this.slot3.position.x = 145;
             this.slot3.position.y = 265;
             text.addChild(this.slot3);
 
             copy.text = 'COPY  PLAYER';
+            copy.monospace = 15;
             copy.position.x = 100;
             copy.position.y = 355;
             text.addChild(copy);
 
             erase.text = 'ERASE PLAYER';
+            erase.monospace = 15;
             erase.position.x = 100;
             erase.position.y = 385;
             text.addChild(erase);

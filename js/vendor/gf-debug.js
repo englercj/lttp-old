@@ -437,7 +437,7 @@ gf.inherit(debug.PerformancePanel, debug.Panel, {
             debug: 'rgba(220, 220, 80, 1)',
             event: 'rgba(200, 200, 200, 0.6)'
         });
-        this.graph.max = 30;
+        this.graph.max = 45;
 
         return div;
     },

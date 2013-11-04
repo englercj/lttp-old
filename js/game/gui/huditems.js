@@ -143,7 +143,7 @@ define([
                 spr.position.y = y;
                 spr.visible = true;
 
-                if((x / size) >= perRow) {
+                if((x / size) >= (perRow - 1)) {
                     x = 0;
                     y += size;
                 } else {

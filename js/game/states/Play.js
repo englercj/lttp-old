@@ -62,9 +62,9 @@ define([
             this.link.equipted = data.equipted;
 
             //initialize HUD objects
-            this.addChild(this.hud = new Hud());
-            this.addChild(this.inventory = new Inventory());
-            this.addChild(this.dialog = new Dialog());
+            this.camera.add.obj(this.hud = new Hud());
+            this.camera.add.obj(this.inventory = new Inventory());
+            this.camera.add.obj(this.dialog = new Dialog());
 
             this.hud.updateValues(this.link);
             this.inventory.updateValues(this.link);
@@ -211,7 +211,7 @@ define([
                     break;
 
                 case 'close':
-                    this.camera.close('ellipse', 2000, this.link.position, function() {
+                    this.camera.close('ellipse', animTime, this.link.position, function() {
                         self._dogotoMap(exit, vec);
                     });
 
