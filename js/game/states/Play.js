@@ -484,8 +484,9 @@ define([
             l.anchor.x = 0;
             l.anchor.y = 1;
 
-            l.enablePhysics(this.physics);
-            l.addAttackSensor(this.physics);
+            l.enablePhysics(this.physics, function() {
+                l.addAttackSensor(this);
+            });
 
             l.on('updateHud', function() {
                 self.hud.updateValues(l);
