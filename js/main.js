@@ -11,8 +11,11 @@ require([
     var $game, game, muted;
 
     window.lttp = {
-        firstZone: true,
-        loading: null
+        game: null,
+        loading: null,
+        intro: null,
+        select: null,
+        play: null
     };
 
     $(function() {
@@ -35,7 +38,7 @@ require([
         resources.preload(game);
         game.load.once('complete', function() {
             //setup loading text.
-            lttp.loading = new ReturnOfGanonFont('Loading: 0%', { align: 'center' });
+            lttp.loading = new ReturnOfGanonFont('Loading: 0%');
             lttp.loading.setPosition(225, 300);
             lttp.loading.scale.set(3, 3);
             game.camera.add.obj(lttp.loading);
@@ -44,13 +47,11 @@ require([
             game.spritepool.add('torch', Torch);
             game.spritepool.add('flower', Flower);
 
-            //load all resources
-            resources.load(game);
-            game.load.on('progress', function(val) {
-                lttp.loading.text = 'Loading: ' + val + '%';
-            });
-
-            game.load.on('complete', function() {
+            //load startup and common resources
+            resources.startup(game);
+            resources.common(game);
+            game.load.on('progress', loadProgress);
+            game.load.once('complete', function() {
                 //load starting states
                 lttp.intro = new IntroState(game);
                 lttp.intro.start();
@@ -72,7 +73,8 @@ require([
                 game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.RIGHT_SHOULDER, onToggleAudio);
 
                 //hide loading text
-                lttp.loading.visible = false;
+                lttp.loading.hide();
+                game.load.off('progress', loadProgress);
             });
 
             //load all resources
@@ -113,13 +115,17 @@ require([
         if(muted) {
             lttp.intro.audio.unmute();
             lttp.select.audio.unmute();
-            //lttp.play.audio.unmute();
+            lttp.play.audio.unmute();
             muted = false;
         } else {
             lttp.intro.audio.mute();
             lttp.select.audio.mute();
-            //lttp.play.audio.mute();
+            lttp.play.audio.mute();
             muted = true;
         }
+    }
+
+    function loadProgress(val) {
+        lttp.loading.text = 'Loading: ' + val + '%';
     }
 });

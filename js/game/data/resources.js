@@ -1,48 +1,24 @@
 define(['vendor/gf'], function(gf) {
     return {
+        /**
+         * Items required for the preloader to display
+         */
         preload: function(game) {
             game.load.atlas('sprite_rog_font',      'assets/sprites/fonts/retofganon.png',      'assets/sprites/fonts/retofganon.json',     null, gf.ATLAS_FORMAT.JSON_HASH);
         },
-        common: function(game) {
-
-        },
-        load: function(game) {
-            // Worlds
-            game.load.tilemap('world_lightworld',   'assets/worlds/lightworld/lightworld.json', null, gf.FILE_FORMAT.JSON);
-            game.load.tilemap('world_linkshouse',   'assets/worlds/linkshouse/linkshouse.json', null, gf.FILE_FORMAT.JSON);
-            game.load.tilemap('cave-034',           'assets/worlds/cave-034/cave-034.json',     null, gf.FILE_FORMAT.JSON); //hyrule castle secret entrance
-
+        /**
+         * Items required for the startup and intro screens
+         */
+        startup: function(game) {
             // Images
             game.load.image('image_life',           'assets/ui/life.png',                       null, gf.ATLAS_FORMAT.JSON_HASH);
 
-            // Misc Sprite Atlases
-            game.load.atlas('sprite_link',          'assets/sprites/entities/link.png',         'assets/sprites/entities/link.json',        null, gf.ATLAS_FORMAT.JSON_HASH);
-            game.load.atlas('sprite_misc',          'assets/sprites/entities/misc.png',         'assets/sprites/entities/misc.json',        null, gf.ATLAS_FORMAT.JSON_HASH);
-            game.load.atlas('sprite_smash',         'assets/sprites/misc/smash.png',            'assets/sprites/misc/smash.json',           null, gf.ATLAS_FORMAT.JSON_HASH);
-            game.load.atlas('sprite_worlditems',    'assets/sprites/misc/overworlditems.png',   'assets/sprites/misc/overworlditems.json',  null, gf.ATLAS_FORMAT.JSON_HASH);
+            // Misc Sprites Atlases
             game.load.atlas('sprite_intro',         'assets/sprites/misc/intro.png',            'assets/sprites/misc/intro.json',           null, gf.ATLAS_FORMAT.JSON_HASH);
             game.load.atlas('sprite_select',        'assets/sprites/misc/selectscreen.png',     'assets/sprites/misc/selectscreen.json',    null, gf.ATLAS_FORMAT.JSON_HASH);
             game.load.atlas('sprite_particles',     'assets/sprites/misc/particles.png',        'assets/sprites/misc/particles.json',       null, gf.ATLAS_FORMAT.JSON_HASH);
-            game.load.atlas('sprite_enemies',       'assets/sprites/misc/particles.png',        'assets/sprites/misc/particles.json',       null, gf.ATLAS_FORMAT.JSON_HASH);
-
-            // HUD Sprite Atlases
-            game.load.atlas('sprite_gui',           'assets/sprites/ui/gui.png',                'assets/sprites/ui/gui.json',               null, gf.ATLAS_FORMAT.JSON_HASH);
-            game.load.atlas('sprite_rog_font',      'assets/sprites/fonts/retofganon.png',      'assets/sprites/fonts/retofganon.json',     null, gf.ATLAS_FORMAT.JSON_HASH);
-            game.load.atlas('sprite_hud_font',      'assets/sprites/fonts/hud.png',             'assets/sprites/fonts/hud.json',            null, gf.ATLAS_FORMAT.JSON_HASH);
 
             // Music
-            game.load.audio('music_lightworld', [
-                    'assets/audio/music/overworld.lite.ogg'
-                ]
-            );
-            game.load.audio('music_darkworld', [
-                    'assets/audio/music/dark_world.lite.ogg'
-                ]
-            );
-            game.load.audio('music_village', [
-                    'assets/audio/music/kakariko_village.lite.ogg'
-                ]
-            );
             game.load.audio('music_title', [
                     'assets/audio/music/title.lite.ogg'
                 ]
@@ -51,8 +27,24 @@ define(['vendor/gf'], function(gf) {
                     'assets/audio/music/select_screen.lite.ogg'
                 ]
             );
+        },
+        /**
+         * Common items to preload before the game starts,
+         * since they are used in many different worlds and areas
+         */
+        common: function(game) {
+            // Misc Sprite Atlases
+            game.load.atlas('sprite_link',          'assets/sprites/entities/link.png',         'assets/sprites/entities/link.json',        null, gf.ATLAS_FORMAT.JSON_HASH);
+            game.load.atlas('sprite_misc',          'assets/sprites/entities/misc.png',         'assets/sprites/entities/misc.json',        null, gf.ATLAS_FORMAT.JSON_HASH);
+            game.load.atlas('sprite_enemies',       'assets/sprites/entities/enemies.png',      'assets/sprites/entities/enemies.json',     null, gf.ATLAS_FORMAT.JSON_HASH);
+            game.load.atlas('sprite_smash',         'assets/sprites/misc/smash.png',            'assets/sprites/misc/smash.json',           null, gf.ATLAS_FORMAT.JSON_HASH);
+            game.load.atlas('sprite_worlditems',    'assets/sprites/misc/overworlditems.png',   'assets/sprites/misc/overworlditems.json',  null, gf.ATLAS_FORMAT.JSON_HASH);
 
-            // Sounds
+            // HUD Sprite Atlases
+            game.load.atlas('sprite_gui',           'assets/sprites/ui/gui.png',                'assets/sprites/ui/gui.json',               null, gf.ATLAS_FORMAT.JSON_HASH);
+            game.load.atlas('sprite_hud_font',      'assets/sprites/fonts/hud.png',             'assets/sprites/fonts/hud.json',            null, gf.ATLAS_FORMAT.JSON_HASH);
+
+            // Sound Effects
             game.load.audio('effect_grass_cut', [
                     'assets/audio/effects/LTTP_Grass_Cut.lite.ogg'
                 ]
@@ -131,6 +123,49 @@ define(['vendor/gf'], function(gf) {
                     'assets/audio/effects/LTTP_Rupee2.lite.ogg'
                 ]
             );
+        },
+        /**
+         * Items to load that are only used in the lightworld
+         */
+        world_lightworld: function(game) {
+            // Tilemap
+            game.load.tilemap('world_lightworld',   'assets/worlds/lightworld/lightworld.json', null, gf.FILE_FORMAT.JSON);
+
+            // Music
+            game.load.audio('music_lightworld', [
+                    'assets/audio/music/overworld.lite.ogg'
+                ]
+            );
+            game.load.audio('music_village', [
+                    'assets/audio/music/kakariko_village.lite.ogg'
+                ]
+            );
+        },
+        /**
+         * Items to load that are only used in the darkworld
+         */
+        world_darkworld: function(game) {
+            // Tilemap
+            game.load.tilemap('world_lightworld',   'assets/worlds/lightworld/lightworld.json', null, gf.FILE_FORMAT.JSON);
+
+            // Music
+            game.load.audio('music_darkworld', [
+                    'assets/audio/music/dark_world.lite.ogg'
+                ]
+            );
+        },
+        /**
+         * Items to load that are only used in link's house
+         */
+        world_linkshouse: function(game) {
+            // Tilemap
+            game.load.tilemap('world_linkshouse',   'assets/worlds/linkshouse/linkshouse.json', null, gf.FILE_FORMAT.JSON);
+        },
+        /**
+         * Cave 034: Hyrule Castle Secret Entrance
+         */
+        cave_034: function(game) {
+            game.load.tilemap('cave_034',           'assets/worlds/cave_034/cave_034.json',     null, gf.FILE_FORMAT.JSON);
         }
     };
 });

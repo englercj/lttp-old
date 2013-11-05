@@ -1,14 +1,16 @@
 define([
     'vendor/gf',
     'game/data/constants',
+    'game/data/resources',
     'game/states/State',
     'game/entities/Link',
     'game/gui/Hud',
     'game/gui/Inventory',
     'game/gui/Dialog',
     'game/utility/saves/LinkSave',
-    'game/utility/saves/ZoneSave'
-], function(gf, C, State, Link, Hud, Inventory, Dialog, LinkSave, ZoneSave) {
+    'game/utility/saves/ZoneSave',
+    'game/fonts/ReturnOfGanon'
+], function(gf, C, resources, State, Link, Hud, Inventory, Dialog, LinkSave, ZoneSave, ReturnOfGanonFont) {
     var Play = function(game) {
         State.call(this, game, 'play');
 
@@ -28,7 +30,13 @@ define([
         this._bgspr = new gf.Sprite(this._bgtx);
         this._bgspr.visible = false;
 
-        this.game.stage.addChildAt(this._bgspr, 0);
+        this.loading = new ReturnOfGanonFont('Loading...');
+        this.loading.setPosition(225, 300);
+        this.loading.scale.set(3, 3);
+        this.loading.hide();
+
+        this.addChild(this.loading);
+        this.addChild(this._bgspr);
     };
 
     gf.inherit(Play, State, {
@@ -244,7 +252,7 @@ define([
         _dogotoMap: function(exit, vec, cb) {
             var self = this;
 
-            //remove the player so he isn't destroyed by the world
+            //remove the player so he can be added to proper map
             if(this.link.parent)
                 this.link.parent.removeChild(this.link);
 
@@ -254,8 +262,26 @@ define([
                 this.map.despawnObjects();
                 this.map.clearTiles();
 
-                this.world.removeChild(this.map);
+                //this.world.removeChild(this.map);
             }
+
+            //need to load the map
+            if(!self.maps[exit.name]) {
+                //load the map's resources
+                resources[exit.name](this.game);
+                this.loading.show();
+                this.game.load.once('complete', function() {
+                    self.loading.hide();
+                    self.maps[exit.name] = self.world.add.tilemap(exit.name, true);
+                    self._dogotoMapLoaded(exit, vec, cb);
+                });
+                this.game.load.start();
+            } else {
+                this._dogotoMapLoaded(exit, vec, cb);
+            }
+        },
+        _dogotoMapLoaded: function(exit, vec, cb) {
+            var self = this;
 
             this.firstZone = true;
 
@@ -263,11 +289,11 @@ define([
                 self.physics.skip(2);
 
                 //load the new world into the game
-                if(!self.maps[exit.name]) {
+                /*if(!self.maps[exit.name]) {
                     self.maps[exit.name] = self.world.add.tilemap(exit.name, true);
                 } else {
                     self.world.add.obj(self.maps[exit.name]);
-                }
+                }*/
 
                 self.map = self.maps[exit.name];
                 self.map.visible = true;
