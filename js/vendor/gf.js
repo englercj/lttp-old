@@ -8131,6 +8131,14 @@ define(
     utils.setValues(this, settings);
   };
   inherit(Container, PIXI.DisplayObjectContainer, {
+    show: function () {
+      this.visible = true;
+      return this;
+    },
+    hide: function () {
+      this.visible = false;
+      return this;
+    },
     addChild: function (child) {
       PIXI.DisplayObjectContainer.prototype.addChild.apply(this, arguments);
       return child;
@@ -8299,6 +8307,14 @@ define(
     this.goto(0, this.currentAnimation);
   };
   inherit(Sprite, PIXI.Sprite, {
+    show: function () {
+      this.visible = true;
+      return this;
+    },
+    hide: function () {
+      this.visible = false;
+      return this;
+    },
     clone: function () {
       var anims = utils.extend(true, {}, this.animations), spr = new Sprite(anims, this.speed, this.currentAnimation);
       spr.name = this.name;
@@ -8394,8 +8410,6 @@ define(
           this.emit("complete", this.currentAnimation);
         }
       }
-    },
-    onCollide: function () {
     }
   });
   module.exports = Sprite;
