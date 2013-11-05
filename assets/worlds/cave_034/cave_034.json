@@ -339,11 +339,11 @@
  "tilesets":[
         {
          "firstgid":1,
-         "image":"cave-034-tileset.png",
+         "image":"cave_034-tileset.png",
          "imageheight":304,
          "imagewidth":352,
          "margin":0,
-         "name":"cave-034-tileset",
+         "name":"cave_034-tileset",
          "properties":
             {
 
