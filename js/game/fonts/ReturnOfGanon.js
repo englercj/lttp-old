@@ -89,11 +89,11 @@ define([
         gf.PIXI.BitmapText.fonts[font.name] = font;
     }
 
-    var ReturnOfGanon = function(text) {
+    var ReturnOfGanon = function(text, style) {
         if(!sprite)
             createFont();
 
-        gf.BitmapText.call(this, text || '', font);
+        gf.BitmapText.call(this, text || '', font, style);
     };
 
     gf.inherit(ReturnOfGanon, gf.BitmapText);

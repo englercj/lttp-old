@@ -14630,6 +14630,7 @@ define(
     fileDone: function (key, fail) {
       this.done++;
       this.progress = Math.round(this.done / this.total * 100);
+      this.emit("progress", this.progress);
       if (fail) {
         this.emit("error", key);
       }

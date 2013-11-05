@@ -1,5 +1,11 @@
 define(['vendor/gf'], function(gf) {
     return {
+        preload: function(game) {
+            game.load.atlas('sprite_rog_font',      'assets/sprites/fonts/retofganon.png',      'assets/sprites/fonts/retofganon.json',     null, gf.ATLAS_FORMAT.JSON_HASH);
+        },
+        common: function(game) {
+
+        },
         load: function(game) {
             // Worlds
             game.load.tilemap('world_lightworld',   'assets/worlds/lightworld/lightworld.json', null, gf.FILE_FORMAT.JSON);
