@@ -306,19 +306,6 @@ define([
 
                 self.lastExit = exit;
 
-                if(self.music)
-                    self.music.stop();
-
-                //start music
-                if(self.map.properties.music) {
-                    self.music = self.audio.add(self.map.properties.music, { volume: C.MUSIC_VOLUME, loop: true });
-
-                    if(!self.music)
-                        console.warn('Music not loaded! "' + self.map.properties.music + '"');
-                    else
-                        self.music.play();
-                }
-
                 //spawn exits & zones
                 self.map.findLayer('exits').spawn();
                 self.map.findLayer('zones').spawn();
@@ -485,6 +472,28 @@ define([
             this.camera.constrain(zone.bounds.clone());
             this.camera.follow(this.link, gf.CAMERA_FOLLOW.LOCKON);
             this.camera.pan(1, 1);
+
+            //play zone music, or the map music if there is no zone music
+            this.setMusic(zone.properties.music || this.map.properties.music);
+        },
+        setMusic: function(key) {
+            //no key or already playing
+            if(!key || (this.music && this.music.key === key))
+                return;
+
+            //stop current music
+            if(this.music)
+                this.music.stop();
+
+            //load new music
+            this.music = this.audio.add(key, { volume: C.MUSIC_VOLUME, loop: true });
+
+            //warn if we didn't load it
+            if(!this.music)
+                gf.utils.warn('Music not loaded! "' + zone.properties.music + '"');
+            //play if we did
+            else
+                this.music.play();
         },
         createLink: function(saveData) {
             if(this.link)

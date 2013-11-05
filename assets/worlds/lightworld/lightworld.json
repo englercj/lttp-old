@@ -21875,7 +21875,7 @@
                  "name":"Kakariko Village",
                  "properties":
                     {
-
+                     "music":"music_village"
                     },
                  "rotation":0,
                  "type":"zone",
