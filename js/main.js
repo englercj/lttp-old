@@ -27,7 +27,6 @@ require([
             transparent: true,
             renderer: gf.RENDERER.CANVAS
         });
-        gfdebug.show(game);
 
         game.spritepool.add('torch', Torch);
         game.spritepool.add('flower', Flower);
