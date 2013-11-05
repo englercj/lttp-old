@@ -271,9 +271,9 @@ define([
                 resources[exit.name](this.game);
                 this.loading.show();
                 this.game.load.once('complete', function() {
-                    self.loading.hide();
                     self.maps[exit.name] = self.world.add.tilemap(exit.name, true);
                     self._dogotoMapLoaded(exit, vec, cb);
+                    self.loading.hide();
                 });
                 this.game.load.start();
             } else {
