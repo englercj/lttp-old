@@ -72,7 +72,8 @@ define([
             this.gotoMap({
                 name: data.map,
                 properties: {
-                    loc: data.position
+                    loc: data.position,
+                    transition: 'fade'
                 }
             });
         },
@@ -199,11 +200,22 @@ define([
             this._doMapTransition(exit, vec);
         },
         _doMapTransition: function(exit, vec) {
-            if(!this.map)
-                return this._dogotoMap(exit, vec);
-
             var animTime = 250,
-                self = this;
+                self = this,
+                fade;
+
+            if(!this.map) {
+                fade = this.camera.fade(0x000000, 1, 1, function() {
+                    self._dogotoMap(exit, vec, function() {
+                        self.camera.flash(0x000000, animTime * 3);
+                        fade.stop();
+                    });
+
+                    return false;
+                });
+
+                return;
+            }
 
             switch(exit.properties.transition) {
                 case 'none':
@@ -217,7 +229,7 @@ define([
 
                 case 'fade':
                 default:
-                    var fade = this.camera.fade(0x000000, animTime, 1, function() {
+                    fade = this.camera.fade(0x000000, animTime, 1, function() {
                         self._dogotoMap(exit, vec, function() {
                             self.camera.flash(0x000000, animTime);
                             fade.stop();
@@ -298,11 +310,10 @@ define([
                     self.game.once('tick', function() {
                         self.game.once('tick', function() {
                             self.map.render();
+                            if(cb) cb();
                         });
                     });
                 });
-
-                if(cb) cb();
             });
         },
         gotoZone: function(zone, vec) {
