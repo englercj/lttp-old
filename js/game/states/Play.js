@@ -336,8 +336,14 @@ define([
             //transfer the zone stuff
             this.activeZone = zone;
             this.oldLayer = this.activeLayer;
+            this.oldLayerOverlay = this.activeLayerOverlay;
+
             this.activeLayer = this.map.findLayer(zone.name);
             this.activeLayer.spawn();
+
+            this.activeLayerOverlay = this.map.findLayer(zone.name + '_overlay');
+            if(this.activeLayerOverlay)
+                this.activeLayerOverlay.spawn();
 
             //load saved layer info
             var zsv = new ZoneSave(this.lastLoad.slot, this.activeLayer, this.lastExit.name);
@@ -359,6 +365,8 @@ define([
                 animTime = 500,
                 zone = this.activeZone,
                 self = this;
+
+            this.link.lock();
 
             switch(zone.properties.transition) {
                 case 'fade':
@@ -421,6 +429,8 @@ define([
             if(this.oldLayer) {
                 this._saveZoneState(this.oldLayer);
                 this.oldLayer.despawn();
+                if(this.oldLayerOverlay)
+                    this.oldLayerOverlay.despawn();
             }
 
             var zone = this.activeZone,
@@ -451,6 +461,8 @@ define([
 
             //play zone music, or the map music if there is no zone music
             this.setMusic(zone.properties.music || this.map.properties.music);
+
+            this.link.unlock();
         },
         setMusic: function(key) {
             //no key or already playing

@@ -21875,7 +21875,7 @@
                  "name":"Kakariko Village",
                  "properties":
                     {
-                     "music":"music_village"
+
                     },
                  "rotation":0,
                  "type":"zone",
@@ -22082,11 +22082,264 @@
          "width":256,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "height":256,
+         "name":"Lost Woods_overlay",
+         "objects":[
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":768,
+                 "y":256
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":768,
+                 "y":512
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":768,
+                 "y":768
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":768,
+                 "y":1024
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":512,
+                 "y":1024
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":256,
+                 "y":1024
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":0,
+                 "y":1024
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":0,
+                 "y":768
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":256,
+                 "y":768
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":512,
+                 "y":768
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":512,
+                 "y":512
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":256,
+                 "y":512
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":0,
+                 "y":512
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":0,
+                 "y":256
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":256,
+                 "y":256
+                }, 
+                {
+                 "gid":5757,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":512,
+                 "y":256
+                }],
+         "opacity":0.449999988079071,
+         "type":"objectgroup",
+         "visible":true,
+         "width":256,
+         "x":0,
+         "y":0
         }],
  "orientation":"orthogonal",
  "properties":
     {
      "music":"music_lightworld",
+     "overlay":"rain",
      "scale":"3"
     },
  "tileheight":16,
@@ -22410,6 +22663,21 @@
                 }
             },
          "tilewidth":32
+        }, 
+        {
+         "firstgid":5757,
+         "image":"tiles\/woods.png",
+         "imageheight":256,
+         "imagewidth":256,
+         "margin":0,
+         "name":"woods_overlay",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tileheight":256,
+         "tilewidth":256
         }],
  "tilewidth":16,
  "version":1,
