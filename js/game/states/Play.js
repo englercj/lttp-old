@@ -354,6 +354,7 @@ define([
         _zoneTransition: function(zone, vec) {
             var p = vec.x ? 'x' : 'y',
                 last = 0,
+                obj = { v: 0 },
                 space = 0,
                 animTime = 500,
                 zone = this.activeZone,
@@ -377,30 +378,6 @@ define([
                         //zone ready
                         self._zoneReady();
                     });
-                    /*
-                    TweenLite.to(this.world, animTime / 1000, {
-                        alpha: 0,
-                        ease: Linear.easeNone,
-                        onComplete: function() {
-                            //pan camera
-                            self.camera.pan(
-                                (self.camera.size.x + space) * vec.x,
-                                (self.camera.size.y + space) * vec.y
-                            );
-                            //set link position
-                            self.link.position[p] += space;
-                            self.link.setPosition(
-                                self.link.position.x,
-                                self.link.position.y
-                            );
-
-                            //zone ready
-                            self._zoneReady();
-                            //fade in the world again
-                            TweenLite.to(self.world, animTime / 1000, { alpha: 1 });
-                        }
-                    });
-                    */
                     break;
 
                 case 'none':
@@ -422,21 +399,20 @@ define([
 
                 case 'slide':
                 default:
-                    //tweenlite doesn't have a step callback like jq :(
-                    $({v:0}).animate({v:this.camera.size[p] + space}, {
-                        duration: animTime,
-                        easing: 'swing',
-                        step: function(now, tween) {
-                            var n = now - last;
+                    TweenLite.to(obj, animTime / 1000, {
+                        v: this.camera.size[p] + space,
+                        ease: Linear.easeNone,
+                        onUpdate: function() {
+                            var n = obj.v - last;
 
                             self.camera.pan(
                                 n * vec.x,
                                 n * vec.y
                             );
 
-                            last = now;
+                            last = obj.v;
                         },
-                        done: this._zoneReady.bind(this)
+                        onComplete: this._zoneReady.bind(this)
                     });
                     break;
             }

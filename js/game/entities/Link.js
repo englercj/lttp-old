@@ -739,10 +739,9 @@ define([
 
             vec.normalize();
 
-            var last = 0,
-                jump = 2,
+            var jump = 2,
                 p = vec.x ? 'x' : 'y',
-                anim = { p: (C.JUMP_DISTANCE + jump) * (-vec[p]) },
+                amount = (C.JUMP_DISTANCE + jump) * (-vec[p]),
                 self = this;
 
             setTimeout(function() {
@@ -751,50 +750,42 @@ define([
 
             //do a small jump up if we are pointing down
             if(vec.y < 0) {
-                $({y:0}).animate({y: '-='+jump}, {
-                    duration: C.JUMP_TIME / 4,
-                    easing: 'linear',
-                    step: function(now, tween) {
-                        var n = now - last;
-
-                        self.position[p] += n;
+                var opts = {
+                    ease: Linear.easeNone,
+                    onUpdate: function() {
                         self.setPosition(
                             self.position.x,
                             self.position.y
                         );
-
-                        last = now;
                     },
-                    //now jump down
-                    done: this._doJumpDown.bind(this, p, anim)
-                });
+                    onComplete: this._doJumpDown.bind(this, p, amount)
+                };
+                opts[p] = this.position[p] - jump;
+
+                TweenLite.to(this.position, C.JUMP_TIME / 4, opts);
             } else {
-                this._doJumpDown(p, anim);
+                this._doJumpDown(p, amount);
             }
         },
-        _doJumpDown: function(p, anim) {
+        _doJumpDown: function(p, amount) {
             var self = this,
-                last = 0;
+                opts = {
+                    ease: Linear.easeNone,
+                    onUpdate: function() {
+                        self.setPosition(
+                            self.position.x,
+                            self.position.y
+                        );
+                    },
+                    onComplete: function() {
+                        self.unlock();
+                        self._phys.system.resume();
+                    }
+                };
 
-            $({p: 0}).animate(anim, {
-                duration: (C.JUMP_TIME / 4) * 3,
-                easing: 'linear',
-                step: function(now, tween) {
-                    var n = now - last;
+            opts[p] = amount;
 
-                    self.position[p] += n;
-                    self.setPosition(
-                        self.position.x,
-                        self.position.y
-                    );
-
-                    last = now;
-                },
-                done: function() {
-                    self.unlock();
-                    self._phys.system.resume();
-                }
-            });
+            TweenLite.to(this.position, (C.JUMP_TIME / 4) * 3, opts);
         },
         /*_isBlocked: function() {
             var self = this;

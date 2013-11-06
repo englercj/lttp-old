@@ -37,7 +37,8 @@ define({
     //how long to run into something before an action takes place (blocked/jump down)
     BLOCKED_WAIT_TIME: 500,
 
-    JUMP_TIME: 500,
+    //time it takes to execute a jump animation (in seconds)
+    JUMP_TIME: 0.5,
     JUMP_DISTANCE: 50,
 
     //time it takes for the inventory menu to drop down, in seconds
