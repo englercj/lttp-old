@@ -333,15 +333,18 @@ define([
             if(zone === this.activeZone)
                 return;
 
-            //transfer the zone stuff
-            this.activeZone = zone;
+            //save old actives
+            this.oldZone = this.activeZone;
             this.oldLayer = this.activeLayer;
             this.oldLayerOverlay = this.activeLayerOverlay;
 
+            //assign new actives
+            this.activeZone = zone;
             this.activeLayer = this.map.findLayer(zone.name);
-            this.activeLayer.spawn();
-
             this.activeLayerOverlay = this.map.findLayer(zone.name + '_overlay');
+
+            //spawn layer objects
+            this.activeLayer.spawn();
             if(this.activeLayerOverlay)
                 this.activeLayerOverlay.spawn();
 
@@ -361,14 +364,14 @@ define([
             var p = vec.x ? 'x' : 'y',
                 last = 0,
                 obj = { v: 0 },
-                space = 0,
+                space = 24,
                 animTime = 500,
                 zone = this.activeZone,
                 self = this;
 
             this.link.lock();
 
-            switch(zone.properties.transition) {
+            switch(zone.properties.transition || this.oldZone.properties.transition) {
                 case 'fade':
                     this.camera.fade(0x000000, animTime, 1, function() {
                         //pan camera
@@ -377,7 +380,7 @@ define([
                             (self.camera.size.y + space) * vec.y
                         );
                         //set link position
-                        self.link.position[p] += space;
+                        self.link.position[p] += space * vec[p];
                         self.link.setPosition(
                             self.link.position.x,
                             self.link.position.y
@@ -395,7 +398,7 @@ define([
                         (self.camera.size.y + space) * vec.y
                     );
                     //set link position
-                    self.link.position[p] += space;
+                    self.link.position[p] += space * vec[p];
                     self.link.setPosition(
                         self.link.position.x,
                         self.link.position.y
@@ -416,6 +419,12 @@ define([
                             self.camera.pan(
                                 n * vec.x,
                                 n * vec.y
+                            );
+
+                            self.link.position[p] += (n / (self.camera.size[p] + space)) * space * vec[p];
+                            self.link.setPosition(
+                                self.link.position.x,
+                                self.link.position.y
                             );
 
                             last = obj.v;
