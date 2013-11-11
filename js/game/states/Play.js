@@ -117,6 +117,7 @@ define([
             this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.SELECT, this._boundGpToggleSaveMenu);
             this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.START, this._boundGpToggleInventory);
 
+            this.game.input.keyboard.off(gf.Keyboard.KEY.SHIFT, this._boundROCKET);
             this.game.input.gamepad.buttons.off(gf.GamepadButtons.BUTTON.LEFT_TRIGGER, this._boundGpROCKET);
         },
         onToggleSaveMenu: function() {},
@@ -591,6 +592,7 @@ define([
             this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_2, this._boundGpAttack = this.onAttack.bind(this));
             this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.FACE_4, this._boundGpUseItem = this.onUseItem.bind(this));
 
+            this.game.input.keyboard.on(gf.Keyboard.KEY.SHIFT, this._boundROCKET = this.onROCKET.bind(this));
             this.game.input.gamepad.buttons.on(gf.GamepadButtons.BUTTON.LEFT_TRIGGER, this._boundGpROCKET = this.onROCKET.bind(this));
         },
         onMove: function(dir, status) {
