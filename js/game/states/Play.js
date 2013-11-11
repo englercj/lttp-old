@@ -392,7 +392,7 @@ define([
             var p = vec.x ? 'x' : 'y',
                 last = 0,
                 obj = { v: 0 },
-                space = 24,
+                space = 20,
                 animTime = 500,
                 zone = this.activeZone,
                 self = this;
@@ -404,8 +404,8 @@ define([
                     this.camera.fade(0x000000, animTime, 1, function() {
                         //pan camera
                         self.camera.pan(
-                            (self.camera.size.x + space) * vec.x,
-                            (self.camera.size.y + space) * vec.y
+                            self.camera.size.x * vec.x,
+                            self.camera.size.y * vec.y
                         );
                         //set link position
                         self.link.position[p] += space * vec[p];
@@ -422,8 +422,8 @@ define([
                 case 'none':
                     //pan camera
                     self.camera.pan(
-                        (self.camera.size.x + space) * vec.x,
-                        (self.camera.size.y + space) * vec.y
+                        self.camera.size.x * vec.x,
+                        self.camera.size.y * vec.y
                     );
                     //set link position
                     self.link.position[p] += space * vec[p];
@@ -439,7 +439,7 @@ define([
                 case 'slide':
                 default:
                     TweenLite.to(obj, animTime / 1000, {
-                        v: this.camera.size[p] + space,
+                        v: this.camera.size[p],
                         ease: Linear.easeNone,
                         onUpdate: function() {
                             var n = obj.v - last;
@@ -449,7 +449,7 @@ define([
                                 n * vec.y
                             );
 
-                            self.link.position[p] += (n / (self.camera.size[p] + space)) * space * vec[p];
+                            self.link.position[p] += (n / self.camera.size[p]) * space * vec[p];
                             self.link.setPosition(
                                 self.link.position.x,
                                 self.link.position.y
