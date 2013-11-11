@@ -329,6 +329,27 @@ define([
                 });
             });
         },
+        showMapOverlay: function() {
+            var o = this.map.properties.overlay;
+
+            if(!o) {
+                this.overlay.stop().hide();
+                return;
+            }
+
+            if(!this.overlay) {
+                var spr = this.game.cache.getTextures('sprite_overlay');
+                this.overlay = new gf.Sprite({
+                    rain: {
+                        frames: [spr['rain1.png'], spr['rain2.png'], spr['rain3.png']],
+                        loop: true,
+                        speed: 0.5
+                    }
+                });
+            }
+
+            this.overlay.goto(0, o).play();
+        },
         gotoZone: function(zone, vec) {
             if(zone === this.activeZone)
                 return;
@@ -345,8 +366,14 @@ define([
 
             //spawn layer objects
             this.activeLayer.spawn();
-            if(this.activeLayerOverlay)
+
+            //show overlay for layer or map
+            if(this.activeLayerOverlay) {
+                this.overlay.stop().hide();
                 this.activeLayerOverlay.spawn();
+            } else {
+                this.showMapOverlay();
+            }
 
             //load saved layer info
             var zsv = new ZoneSave(this.lastLoad.slot, this.activeLayer, this.lastExit.name);
