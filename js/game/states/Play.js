@@ -36,7 +36,7 @@ define([
         this.loading.hide();
 
         this.addChild(this.loading);
-        this.addChild(this._bgspr);
+        this.camera.add.obj(this._bgspr);
     };
 
     gf.inherit(Play, State, {
@@ -148,8 +148,8 @@ define([
                 this.audio.mute();
         },
         showDialog: function(text) {
-            this.dialog.setText(text);
             this.pause();
+            this.dialog.setText(text);
 
             var self = this;
             this.dialog.show(function() {

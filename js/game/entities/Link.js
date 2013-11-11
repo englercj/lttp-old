@@ -330,6 +330,7 @@ define([
                             break;
 
                         case 'grass':
+                        case 'grass_brown':
                         case 'pot':
                             this.liftItem(e);
                             break;
@@ -558,13 +559,13 @@ define([
                 var e = this.inAttackRange[i],
                     t = e.type;
 
-                if(t.indexOf('grass') === -1)
+                if(t.match(/grass|grass_brown/) === null)
                     continue;
 
                 if(this._inCone(e, C.ATTACK_CONE)) {
                     if(e.takeDamage) {
                         e.takeDamage(this.damage)
-                    } else if(t.indexOf('grass') !== -1) {
+                    } else if(t.match(/grass|grass_brown/) === null) {
                         this._destroyObject(e);
                     }
                 }

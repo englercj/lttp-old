@@ -7,7 +7,7 @@
          "opacity":1,
          "properties":
             {
-             "preRender":"true"
+             "preRender":"false"
             },
          "type":"tilelayer",
          "visible":true,
@@ -21528,8 +21528,8 @@
                  "rotation":0,
                  "type":"zone",
                  "visible":true,
-                 "width":1008,
-                 "x":2576,
+                 "width":1024,
+                 "x":2560,
                  "y":3072
                 }, 
                 {
@@ -21808,7 +21808,7 @@
                  "rotation":0,
                  "type":"zone",
                  "visible":true,
-                 "width":1040,
+                 "width":1024,
                  "x":1536,
                  "y":3072
                 }, 
@@ -22039,7 +22039,7 @@
                 }, 
                 {
                  "height":8,
-                 "name":"cave-034",
+                 "name":"cave_034",
                  "properties":
                     {
                      "animation":"fall_in_hole",

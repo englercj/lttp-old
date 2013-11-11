@@ -31,7 +31,7 @@ require([
             width: $game.width(),
             height: $game.height(),
             transparent: true,
-            renderer: gf.RENDERER.CANVAS
+            renderer: gf.RENDERER.AUTO
         });
 
         //load necessary preload files

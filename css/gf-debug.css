@@ -4,6 +4,9 @@
     A set of useful LESS mixins
     More info at: http://lesselements.com
   ---------------------------------------------------*/
+.clear {
+  clear: both;
+}
 .gf_debug {
   position: fixed;
   bottom: 0;
@@ -60,6 +63,10 @@
   display: none;
   height: 265px;
   overflow: auto;
+}
+.gf_debug .gf_debug_panel.map > div {
+  float: left;
+  width: 200px;
 }
 .gf_debug .gf_debug_panel.sprites > div {
   padding: 25px;
