@@ -26,8 +26,6 @@ require([
 
         //create game instance
         lttp.game = game = new gf.Game('game', {
-            gravity: 0,
-            friction: [0, 0],
             width: $game.width(),
             height: $game.height(),
             transparent: true,
