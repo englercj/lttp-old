@@ -259,9 +259,11 @@ define([
 
             if(this.map) {
                 this._saveZoneState(this.activeLayer);
-                this.map.visible = false;
                 this.map.despawnObjects();
                 this.map.clearTiles();
+
+                if(this.map.parent)
+                    this.map.parent.removeChild(this.map);
 
                 //this.world.removeChild(this.map);
             }
@@ -292,12 +294,11 @@ define([
                 //load the new world into the game
                 /*if(!self.maps[exit.name]) {
                     self.maps[exit.name] = self.world.add.tilemap(exit.name, true);
-                } else {
-                    self.world.add.obj(self.maps[exit.name]);
-                }*/
+                } else {*/
+                //}
 
                 self.map = self.maps[exit.name];
-                self.map.visible = true;
+                self.world.add.obj(self.map);
 
                 var player = self.map.findLayer('player');
                 if(player)

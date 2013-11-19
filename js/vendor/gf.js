@@ -9254,7 +9254,7 @@ define(
       return props.interactive || props.tileprops.interactive || set && set.properties.interactive || this.properties.interactive || this.parent.properties.interactive;
     },
     despawn: function () {
-      return Container.prototype.removeAllChildren.call(this);
+      return Container.prototype.destroyAllChildren.call(this);
     },
     destroy: function () {
       this.despawn();

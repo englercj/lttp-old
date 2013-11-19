@@ -21833,7 +21833,7 @@
                     {
                      "large":"true",
                      "rock":"true",
-                     "static":"true"
+                     "body":"static"
                     },
                  "rotation":0,
                  "type":"zone",
@@ -22405,25 +22405,25 @@
                 },
              "16":
                 {
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "17":
                 {
                  "hitArea":"[0,0,8,16]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "18":
                 {
                  "hitArea":"[8,0,8,16]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "19":
                 {
                  "hitArea":"[0,0,16,8]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "2":
@@ -22435,55 +22435,55 @@
              "20":
                 {
                  "hitArea":"[0,8,16,8]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "21":
                 {
                  "hitArea":"[16,0,16,16,0,16]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "22":
                 {
                  "hitArea":"[0,0,16,16,0,16]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "23":
                 {
                  "hitArea":"[0,0,16,0,16,16]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "24":
                 {
                  "hitArea":"[0,0,16,0,0,16]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "25":
                 {
                  "hitArea":"[0,0,8,0,8,8,16,8,16,16,0,16]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "26":
                 {
                  "hitArea":"[8,0,16,0,16,16,0,16,0,8,8,8]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "27":
                 {
                  "hitArea":"[0,0,0,16,16,8,8,8,8,16,0,16]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "28":
                 {
                  "hitArea":"[0,0,16,0,16,16,8,16,8,8,0,8]",
-                 "static":"true",
+                 "body":"static",
                  "type":"jump"
                 },
              "3":
@@ -22548,39 +22548,39 @@
             {
              "1":
                 {
-                 "static":"true",
+                 "body":"static",
                  "type":"grass_brown"
                 },
              "11":
                 {
-                 "static":"true",
+                 "body":"static",
                  "type":"stump"
                 },
              "18":
                 {
-                 "static":"true",
+                 "body":"static",
                  "type":"rock"
                 },
              "19":
                 {
                  "heavy":"true",
-                 "static":"true",
+                 "body":"static",
                  "type":"rock"
                 },
              "20":
                 {
-                 "static":"true",
+                 "body":"static",
                  "type":"rock"
                 },
              "21":
                 {
                  "heavy":"true",
-                 "static":"true",
+                 "body":"static",
                  "type":"rock"
                 },
              "22":
                 {
-                 "static":"true",
+                 "body":"static",
                  "stump":"true"
                 },
              "28":
@@ -22595,19 +22595,19 @@
                 },
              "3":
                 {
-                 "static":"true",
+                 "body":"static",
                  "text":"",
                  "type":"sign"
                 },
              "30":
                 {
-                 "static":"true",
+                 "body":"static",
                  "text":"",
                  "type":"sign"
                 },
              "9":
                 {
-                 "static":"true",
+                 "body":"static",
                  "type":"grass"
                 }
             },
@@ -22631,30 +22631,30 @@
              "1":
                 {
                  "break":"true",
-                 "static":"true",
+                 "body":"static",
                  "type":"rock_large"
                 },
              "2":
                 {
-                 "static":"true",
+                 "body":"static",
                  "type":"rock_large"
                 },
              "3":
                 {
                  "heavy":"true",
-                 "static":"true",
+                 "body":"static",
                  "type":"rock_large"
                 },
              "5":
                 {
                  "break":"true",
-                 "static":"true",
+                 "body":"static",
                  "type":"rock_large"
                 },
              "7":
                 {
                  "heavy":"true",
-                 "static":"true",
+                 "body":"static",
                  "type":"rock_large"
                 },
              "8":
