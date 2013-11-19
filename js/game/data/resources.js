@@ -132,7 +132,7 @@ define(['vendor/gf'], function(gf) {
             game.load.tilemap('world_lightworld',   'assets/worlds/lightworld/lightworld.json', null, gf.FILE_FORMAT.JSON);
 
             // Overlay sprite atlases
-            game.load.atlas('sprite_overlay',       'assets/sprites/overlays/overlays.png',         'assets/sprites/overlays/overlays.json',        null, gf.ATLAS_FORMAT.JSON_HASH);
+            //game.load.atlas('sprite_overlay',       'assets/sprites/overlays/overlays.png',         'assets/sprites/overlays/overlays.json',        null, gf.ATLAS_FORMAT.JSON_HASH);
 
             // Music
             game.load.audio('music_lightworld', [
@@ -163,6 +163,11 @@ define(['vendor/gf'], function(gf) {
         world_linkshouse: function(game) {
             // Tilemap
             game.load.tilemap('world_linkshouse',   'assets/worlds/linkshouse/linkshouse.json', null, gf.FILE_FORMAT.JSON);
+
+            game.load.audio('music_village', [
+                    'assets/audio/music/kakariko_village.lite.ogg'
+                ]
+            );
         },
         /**
          * Cave 034: Hyrule Castle Secret Entrance

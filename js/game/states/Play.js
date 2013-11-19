@@ -333,7 +333,7 @@ define([
         showMapOverlay: function() {
             var o = this.map.properties.overlay;
 
-            if(!o) {
+            /*if(!o) {
                 this.overlay.stop().hide();
                 return;
             }
@@ -349,7 +349,7 @@ define([
                 });
             }
 
-            this.overlay.goto(0, o).play();
+            this.overlay.goto(0, o).play();*/
         },
         gotoZone: function(zone, vec) {
             if(zone === this.activeZone)
