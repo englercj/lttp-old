@@ -32,7 +32,7 @@ define([
 
         this.loading = new ReturnOfGanonFont('Loading...');
         this.loading.setPosition(225, 300);
-        this.loading.scale.set(3, 3);
+        this.loading.scale.set(C.SCALE, C.SCALE);
         this.loading.hide();
 
         this.addChild(this.loading);
@@ -472,7 +472,7 @@ define([
             }
 
             var zone = this.activeZone,
-                scale = 3;
+                scale = C.SCALE;
 
             this.firstZone = false;
 

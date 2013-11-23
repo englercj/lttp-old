@@ -1,5 +1,6 @@
 require([
     'vendor/gf',
+    'game/data/constants',
     'game/data/resources',
     'game/states/Intro',
     'game/states/Select',
@@ -7,8 +8,11 @@ require([
     'game/entities/misc/Torch',
     'game/entities/misc/Flower',
     'game/fonts/ReturnOfGanon'
-], function(gf, resources, IntroState, SelectState, PlayState, Torch, Flower, ReturnOfGanonFont) {
+], function(gf, C, resources, IntroState, SelectState, PlayState, Torch, Flower, ReturnOfGanonFont) {
     var $game, game, muted;
+
+    C.SCALE = window.LTTP_SCALE || C.SCALE;
+    C.TEXT_SCALE = window.LTTP_TEXT_SCALE || C.TEXT_SCALE;
 
     window.lttp = {
         game: null,
@@ -40,7 +44,7 @@ require([
             //setup loading text.
             lttp.loading = new ReturnOfGanonFont('Loading: 0%');
             lttp.loading.setPosition(225, 300);
-            lttp.loading.scale.set(3, 3);
+            lttp.loading.scale.set(C.SCALE, C.SCALE);
             game.camera.add.obj(lttp.loading);
 
             //add sprite pool objects

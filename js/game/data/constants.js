@@ -18,6 +18,7 @@ define({
     WIDTH: 256,
     HEIGHT: 224,
     SCALE: 3,
+    TEXT_SCALE: 1.5,
 
     //cone within hit detector to check for interactions
     ATTACK_CONE: 0.5,

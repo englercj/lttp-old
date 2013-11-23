@@ -1,5 +1,3 @@
-var TEXT_SCALE = 1.5;
-
 define([
     'vendor/gf',
     'game/data/constants',
@@ -46,7 +44,7 @@ define([
         };
 
         for(var sp in this.sprites) {
-            this.sprites[sp].scale.x = this.sprites[sp].scale.y = 3;
+            this.sprites[sp].scale.x = this.sprites[sp].scale.y = C.SCALE;
         }
 
         this.fontpool = new gf.ObjectPool(ReturnOfGanonFont);
@@ -180,7 +178,7 @@ define([
                 this.char.y = gf.math.clamp(this.char.y, 0, 3);
                 this.char.x = gf.math.clamp(this.char.x, 0, 28);
 
-                this.line.position.y = 392 + (this.char.y * (this.delta.y * TEXT_SCALE));
+                this.line.position.y = 392 + (this.char.y * (this.delta.y * C.TEXT_SCALE));
                 this.characters.position.x = -((this.char.x - 6) * this.delta.x);
             } else if(this.active === 'erase') {
 
@@ -254,11 +252,11 @@ define([
                     }
                 } else if(c.name === 'left') {
                     this.pnameI = Math.max(0, this.pnameI - 1);
-                    this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
+                    this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
                     return;
                 } else if(c.name === 'right') {
                     this.pnameI = Math.min((n.length / 2), this.pnameI + 1);
-                    this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
+                    this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
                     return;
                 }
 
@@ -283,7 +281,7 @@ define([
 
                 this.pname.text = n;
 
-                this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * TEXT_SCALE);
+                this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
 
                 this.sounds.lowhp.play();
             } else if(this.active === 'erase') {
@@ -428,19 +426,19 @@ define([
             this.hearts1 = new gf.Container();
             this.hearts1.position.x = 425;
             this.hearts1.position.y = 190;
-            this.hearts1.scale.x = this.hearts1.scale.y = TEXT_SCALE;
+            this.hearts1.scale.x = this.hearts1.scale.y = C.TEXT_SCALE;
             this.select.addChild(this.hearts1);
 
             this.hearts2 = new gf.Container();
             this.hearts2.position.x = 425;
             this.hearts2.position.y = 280;
-            this.hearts2.scale.x = this.hearts2.scale.y = TEXT_SCALE;
+            this.hearts2.scale.x = this.hearts2.scale.y = C.TEXT_SCALE;
             this.select.addChild(this.hearts2);
 
             this.hearts3 = new gf.Container();
             this.hearts3.position.x = 425;
             this.hearts3.position.y = 370;
-            this.hearts3.scale.x = this.hearts3.scale.y = TEXT_SCALE;
+            this.hearts3.scale.x = this.hearts3.scale.y = C.TEXT_SCALE;
             this.select.addChild(this.hearts3);
 
             var text = new gf.Container(),
@@ -448,7 +446,7 @@ define([
                 copy = this.fontpool.create(),
                 erase = this.fontpool.create();
 
-            text.scale.x = text.scale.y = TEXT_SCALE;
+            text.scale.x = text.scale.y = C.TEXT_SCALE;
 
             title.text = 'PLAYER  SELECT';
             title.monospace = 15;
@@ -509,7 +507,7 @@ define([
                     '     <> =+       <> =+  <> =+'
                 ];
 
-            text.scale.x = text.scale.y = TEXT_SCALE;
+            text.scale.x = text.scale.y = C.TEXT_SCALE;
 
             title.text = 'REGISTER  YOUR  NAME';
             title.position.x = 80;
