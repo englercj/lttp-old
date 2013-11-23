@@ -32,6 +32,8 @@ require([
             renderer: gf.RENDERER.AUTO
         });
 
+        game.load.baseUrl = window.LTTP_BASE_URL || '';
+
         //load necessary preload files
         resources.preload(game);
         game.load.once('complete', function() {
