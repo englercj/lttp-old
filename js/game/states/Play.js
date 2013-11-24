@@ -31,7 +31,7 @@ define([
         this._bgspr.visible = false;
 
         this.loading = new ReturnOfGanonFont('Loading...');
-        this.loading.setPosition(225, 300);
+        this.loading.setPosition(75 * C.SCALE, 100 * C.SCALE);
         this.loading.scale.set(C.SCALE, C.SCALE);
         this.loading.hide();
 
@@ -298,6 +298,7 @@ define([
                 //}
 
                 self.map = self.maps[exit.name];
+                self.map.scale.set(C.SCALE, C.SCALE);
                 self.world.add.obj(self.map);
 
                 var player = self.map.findLayer('player');

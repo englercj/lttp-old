@@ -43,7 +43,7 @@ require([
         game.load.once('complete', function() {
             //setup loading text.
             lttp.loading = new ReturnOfGanonFont('Loading: 0%');
-            lttp.loading.setPosition(225, 300);
+            lttp.loading.setPosition(75 * C.SCALE, 100 * C.SCALE);
             lttp.loading.scale.set(C.SCALE, C.SCALE);
             game.camera.add.obj(lttp.loading);
 

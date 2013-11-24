@@ -138,19 +138,19 @@ define([
 
                 switch(this.selected) {
                     case 0: //slot 1
-                        this.sprites.fairy.position.y = 215;
+                        this.sprites.fairy.position.y = 72 * C.SCALE; //215;
                         break;
                     case 1: //slot 2
-                        this.sprites.fairy.position.y = 310;
+                        this.sprites.fairy.position.y = 103 * C.SCALE; //310;
                         break;
                     case 2: //slot 3
-                        this.sprites.fairy.position.y = 395;
+                        this.sprites.fairy.position.y = 132 * C.SCALE; //395;
                         break;
                     case 3: //copy
-                        this.sprites.fairy.position.y = 530;
+                        this.sprites.fairy.position.y = 177 * C.SCALE; //530;
                         break;
                     case 4: //erase
-                        this.sprites.fairy.position.y = 575;
+                        this.sprites.fairy.position.y = 192 * C.SCALE; //575;
                         break;
                 }
 
@@ -178,7 +178,7 @@ define([
                 this.char.y = gf.math.clamp(this.char.y, 0, 3);
                 this.char.x = gf.math.clamp(this.char.x, 0, 28);
 
-                this.line.position.y = 392 + (this.char.y * (this.delta.y * C.TEXT_SCALE));
+                this.line.position.y = (261 * C.TEXT_SCALE) /*392*/ + (this.char.y * (this.delta.y * C.TEXT_SCALE));
                 this.characters.position.x = -((this.char.x - 6) * this.delta.x);
             } else if(this.active === 'erase') {
 
@@ -252,11 +252,11 @@ define([
                     }
                 } else if(c.name === 'left') {
                     this.pnameI = Math.max(0, this.pnameI - 1);
-                    this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
+                    this.sprites.pointer.position.x = (60 * C.TEXT_SCALE) + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
                     return;
                 } else if(c.name === 'right') {
                     this.pnameI = Math.min((n.length / 2), this.pnameI + 1);
-                    this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
+                    this.sprites.pointer.position.x = (60 * C.TEXT_SCALE) + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
                     return;
                 }
 
@@ -281,7 +281,7 @@ define([
 
                 this.pname.text = n;
 
-                this.sprites.pointer.position.x = 90 + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
+                this.sprites.pointer.position.x = (60 * C.TEXT_SCALE) + (this.pnameI * 2 * this.pname.monospace * C.TEXT_SCALE);
 
                 this.sounds.lowhp.play();
             } else if(this.active === 'erase') {
@@ -302,7 +302,7 @@ define([
             if(name === 'register') {
                 this.pname.text = '';
                 this.pnameI = 0;
-                this.sprites.pointer.position.x = 90;
+                this.sprites.pointer.position.x = (60 * C.TEXT_SCALE);
                 this.line.visible = true;
             }
 
@@ -403,41 +403,41 @@ define([
 
             this.select.addChild(this.sprites.select);
 
-            this.sprites.fairy.position.x = 80;
-            this.sprites.fairy.position.y = 215;
+            this.sprites.fairy.position.x = (27 * C.SCALE); // 80;
+            this.sprites.fairy.position.y = (72 * C.SCALE); //215;
             this.sprites.fairy.goto(0, 'flap').play();
             this.select.addChild(this.sprites.fairy);
 
-            this.sprites.link1.position.x = 155;
-            this.sprites.link1.position.y = 205;
+            this.sprites.link1.position.x = (52 * C.SCALE); //155;
+            this.sprites.link1.position.y = (68 * C.SCALE); //205;
             this.sprites.link1.visible = false;
             this.select.addChild(this.sprites.link1);
 
-            this.sprites.link2.position.x = 155;
-            this.sprites.link2.position.y = 300;
+            this.sprites.link2.position.x = (52 * C.SCALE); //155;
+            this.sprites.link2.position.y = (100 * C.SCALE); //300;
             this.sprites.link2.visible = false;
             this.select.addChild(this.sprites.link2);
 
-            this.sprites.link3.position.x = 155;
-            this.sprites.link3.position.y = 385;
+            this.sprites.link3.position.x = (52 * C.SCALE); //155;
+            this.sprites.link3.position.y = (128 * C.SCALE); //385;
             this.sprites.link3.visible = false;
             this.select.addChild(this.sprites.link3);
 
             this.hearts1 = new gf.Container();
-            this.hearts1.position.x = 425;
-            this.hearts1.position.y = 190;
+            this.hearts1.position.x = (142 * C.SCALE); //425;
+            this.hearts1.position.y = (63 * C.SCALE); //190;
             this.hearts1.scale.x = this.hearts1.scale.y = C.TEXT_SCALE;
             this.select.addChild(this.hearts1);
 
             this.hearts2 = new gf.Container();
-            this.hearts2.position.x = 425;
-            this.hearts2.position.y = 280;
+            this.hearts2.position.x = (142 * C.SCALE); //425;
+            this.hearts2.position.y = (93 * C.SCALE); //280;
             this.hearts2.scale.x = this.hearts2.scale.y = C.TEXT_SCALE;
             this.select.addChild(this.hearts2);
 
             this.hearts3 = new gf.Container();
-            this.hearts3.position.x = 425;
-            this.hearts3.position.y = 370;
+            this.hearts3.position.x = (142 * C.SCALE); //425;
+            this.hearts3.position.y = (142 * C.SCALE); //370;
             this.hearts3.scale.x = this.hearts3.scale.y = C.TEXT_SCALE;
             this.select.addChild(this.hearts3);
 
@@ -493,8 +493,8 @@ define([
         _setupRegister: function() {
             this.register = new gf.Container();
 
-            this.sprites.pointer.position.x = 90;
-            this.sprites.pointer.position.y = 265;
+            this.sprites.pointer.position.x = (60 * C.TEXT_SCALE);
+            this.sprites.pointer.position.y = (176 * C.TEXT_SCALE); //265;
             this.register.addChild(this.sprites.pointer);
 
             var text = new gf.Container(),

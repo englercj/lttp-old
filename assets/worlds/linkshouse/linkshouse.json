@@ -177,8 +177,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-     "music":"music_village",
-     "scale":"3"
+     "music":"music_village"
     },
  "tileheight":16,
  "tilesets":[
@@ -276,20 +275,20 @@
                 },
              "17":
                 {
-                 "hitArea":"[0,0,8,16]",
                  "body":"static",
+                 "hitArea":"[0,0,8,16]",
                  "type":"jump"
                 },
              "18":
                 {
-                 "hitArea":"[8,0,8,16]",
                  "body":"static",
+                 "hitArea":"[8,0,8,16]",
                  "type":"jump"
                 },
              "19":
                 {
-                 "hitArea":"[0,0,16,8]",
                  "body":"static",
+                 "hitArea":"[0,0,16,8]",
                  "type":"jump"
                 },
              "2":
@@ -300,56 +299,56 @@
                 },
              "20":
                 {
-                 "hitArea":"[0,8,16,8]",
                  "body":"static",
+                 "hitArea":"[0,8,16,8]",
                  "type":"jump"
                 },
              "21":
                 {
-                 "hitArea":"[16,0,16,16,0,16]",
                  "body":"static",
+                 "hitArea":"[16,0,16,16,0,16]",
                  "type":"jump"
                 },
              "22":
                 {
-                 "hitArea":"[0,0,16,16,0,16]",
                  "body":"static",
+                 "hitArea":"[0,0,16,16,0,16]",
                  "type":"jump"
                 },
              "23":
                 {
-                 "hitArea":"[0,0,16,0,16,16]",
                  "body":"static",
+                 "hitArea":"[0,0,16,0,16,16]",
                  "type":"jump"
                 },
              "24":
                 {
-                 "hitArea":"[0,0,16,0,0,16]",
                  "body":"static",
+                 "hitArea":"[0,0,16,0,0,16]",
                  "type":"jump"
                 },
              "25":
                 {
-                 "hitArea":"[0,0,8,0,8,8,16,8,16,16,0,16]",
                  "body":"static",
+                 "hitArea":"[0,0,8,0,8,8,16,8,16,16,0,16]",
                  "type":"jump"
                 },
              "26":
                 {
-                 "hitArea":"[8,0,16,0,16,16,0,16,0,8,8,8]",
                  "body":"static",
+                 "hitArea":"[8,0,16,0,16,16,0,16,0,8,8,8]",
                  "type":"jump"
                 },
              "27":
                 {
-                 "hitArea":"[0,0,0,16,16,8,8,8,8,16,0,16]",
                  "body":"static",
+                 "hitArea":"[0,0,0,16,16,8,8,8,8,16,0,16]",
                  "type":"jump"
                 },
              "28":
                 {
-                 "hitArea":"[0,0,16,0,16,16,8,16,8,8,0,8]",
                  "body":"static",
+                 "hitArea":"[0,0,16,0,16,16,8,16,8,8,0,8]",
                  "type":"jump"
                 },
              "3":

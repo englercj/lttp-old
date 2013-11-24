@@ -21831,9 +21831,9 @@
                  "name":"Desert of Mystery",
                  "properties":
                     {
+                     "body":"static",
                      "large":"true",
-                     "rock":"true",
-                     "body":"static"
+                     "rock":"true"
                     },
                  "rotation":0,
                  "type":"zone",
@@ -22339,8 +22339,7 @@
  "properties":
     {
      "music":"music_lightworld",
-     "overlay":"rain",
-     "scale":"3"
+     "overlay":"rain"
     },
  "tileheight":16,
  "tilesets":[
@@ -22410,20 +22409,20 @@
                 },
              "17":
                 {
-                 "hitArea":"[0,0,8,16]",
                  "body":"static",
+                 "hitArea":"[0,0,8,16]",
                  "type":"jump"
                 },
              "18":
                 {
-                 "hitArea":"[8,0,8,16]",
                  "body":"static",
+                 "hitArea":"[8,0,8,16]",
                  "type":"jump"
                 },
              "19":
                 {
-                 "hitArea":"[0,0,16,8]",
                  "body":"static",
+                 "hitArea":"[0,0,16,8]",
                  "type":"jump"
                 },
              "2":
@@ -22434,56 +22433,56 @@
                 },
              "20":
                 {
-                 "hitArea":"[0,8,16,8]",
                  "body":"static",
+                 "hitArea":"[0,8,16,8]",
                  "type":"jump"
                 },
              "21":
                 {
-                 "hitArea":"[16,0,16,16,0,16]",
                  "body":"static",
+                 "hitArea":"[16,0,16,16,0,16]",
                  "type":"jump"
                 },
              "22":
                 {
-                 "hitArea":"[0,0,16,16,0,16]",
                  "body":"static",
+                 "hitArea":"[0,0,16,16,0,16]",
                  "type":"jump"
                 },
              "23":
                 {
-                 "hitArea":"[0,0,16,0,16,16]",
                  "body":"static",
+                 "hitArea":"[0,0,16,0,16,16]",
                  "type":"jump"
                 },
              "24":
                 {
-                 "hitArea":"[0,0,16,0,0,16]",
                  "body":"static",
+                 "hitArea":"[0,0,16,0,0,16]",
                  "type":"jump"
                 },
              "25":
                 {
-                 "hitArea":"[0,0,8,0,8,8,16,8,16,16,0,16]",
                  "body":"static",
+                 "hitArea":"[0,0,8,0,8,8,16,8,16,16,0,16]",
                  "type":"jump"
                 },
              "26":
                 {
-                 "hitArea":"[8,0,16,0,16,16,0,16,0,8,8,8]",
                  "body":"static",
+                 "hitArea":"[8,0,16,0,16,16,0,16,0,8,8,8]",
                  "type":"jump"
                 },
              "27":
                 {
-                 "hitArea":"[0,0,0,16,16,8,8,8,8,16,0,16]",
                  "body":"static",
+                 "hitArea":"[0,0,0,16,16,8,8,8,8,16,0,16]",
                  "type":"jump"
                 },
              "28":
                 {
-                 "hitArea":"[0,0,16,0,16,16,8,16,8,8,0,8]",
                  "body":"static",
+                 "hitArea":"[0,0,16,0,16,16,8,16,8,8,0,8]",
                  "type":"jump"
                 },
              "3":
@@ -22563,8 +22562,8 @@
                 },
              "19":
                 {
-                 "heavy":"true",
                  "body":"static",
+                 "heavy":"true",
                  "type":"rock"
                 },
              "20":
@@ -22574,8 +22573,8 @@
                 },
              "21":
                 {
-                 "heavy":"true",
                  "body":"static",
+                 "heavy":"true",
                  "type":"rock"
                 },
              "22":
@@ -22630,8 +22629,8 @@
             {
              "1":
                 {
-                 "break":"true",
                  "body":"static",
+                 "break":"true",
                  "type":"rock_large"
                 },
              "2":
@@ -22641,20 +22640,20 @@
                 },
              "3":
                 {
-                 "heavy":"true",
                  "body":"static",
+                 "heavy":"true",
                  "type":"rock_large"
                 },
              "5":
                 {
-                 "break":"true",
                  "body":"static",
+                 "break":"true",
                  "type":"rock_large"
                 },
              "7":
                 {
-                 "heavy":"true",
                  "body":"static",
+                 "heavy":"true",
                  "type":"rock_large"
                 },
              "8":
