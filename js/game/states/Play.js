@@ -274,6 +274,7 @@ define([
                 resources[exit.name](this.game);
                 this.loading.show();
                 this.game.load.once('complete', function() {
+                    self.game.cache.getTilemap(exit.name).data.properties.scale = C.SCALE;
                     self.maps[exit.name] = self.world.add.tilemap(exit.name, true);
                     self._dogotoMapLoaded(exit, vec, cb);
                     self.loading.hide();
@@ -298,7 +299,6 @@ define([
                 //}
 
                 self.map = self.maps[exit.name];
-                self.map.scale.set(C.SCALE, C.SCALE);
                 self.world.add.obj(self.map);
 
                 var player = self.map.findLayer('player');
