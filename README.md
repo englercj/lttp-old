@@ -1,3 +1,5 @@
+# DEPRECATED, SEE: https://github.com/englercj/lttp
+
 ## The Legend of Zelda: A Link to the Past (WebGL Edition)
 
 This is a recreation of [Nintendo's The Legend of Zelda: A Link to the Past](http://www.nintendo.com/games/detail/5oMtHuB3aOHoawfC6brZ6myQYnE4flQ_).
